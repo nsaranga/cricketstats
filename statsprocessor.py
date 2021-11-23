@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 # Stats Processor functions
 
 def ratio(stat1, stat2, multiplier=None):
@@ -9,6 +10,7 @@ def ratio(stat1, stat2, multiplier=None):
     if not multiplier:
         stat = round((stat1 / stat2), 2)
     return stat
+
 
 def madfromlist(statlist1, statlist2, stattype=False):
     data = []

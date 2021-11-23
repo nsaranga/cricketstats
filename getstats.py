@@ -1,4 +1,8 @@
-import json, glob, time, statsprocessor
+import glob
+import json
+import statsprocessor
+import time
+import pandas as pd
 
 
 # How will program work
@@ -452,6 +456,10 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                 allplayerstats[eachplayer]["Bowling SR"] = statsprocessor.ratio(
                     allplayerstats[eachplayer]["Balls Bowled"], allplayerstats[eachplayer]["Wickets"], multiplier=0)
     if players:
-        return allplayerstats
+        df = pd.DataFrame(allplayerstats)
+        allplayerstatsdf = df.transpose()
+        return allplayerstatsdf
     elif teams:
-        return allteamstats
+        df = pd.DataFrame(allteamstats)
+        allteamstatsdf = df.transpose()
+        return allteamstatsdf

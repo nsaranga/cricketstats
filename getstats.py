@@ -5,40 +5,7 @@ import time
 import pandas as pd
 
 
-# How will program work
-# 1 Wrapper CLI interface -> user inputs query.
-# 2 Query -> Call query class and create object for query. attributes will be the paramters?
-# 3 Query Object calls/uses getstats func.
-# 4 Class init playerstats ={} and teamstats={}.
-# 5 get stats runs -> raw stats.
-# 6 pass raw stats to stats process that gets derived metrics.? YES this way this I can change based on what I collect?
-# display final stats query object as pandas dataframe
-# ask if I want plot of dataframe?
-# data structures, if derived stats are processed after main func, then allplayerstats, and allteams stats has to be defiend in its own class.
-# also there has to be function that does reverse look up, say looks up at all teams/bowlers/batters/fielders, then feeds that list back into getstats function. that will given me top 10 lists and such: basically function that records all bowlers, batters or fielders, in given parameters then inputs them into getstatsfunc.with same parameters.
-# also have field for saving the transposed dataframe as csv?
-# another thing to do is have the outputs stats set as variables of the class, and then edited by the functions under it. YES THIS MAKES SENSE.
-# have like a "stats process function"
-# woudl it be easier to load json files as data frame then scrape data that way?
-# I have to make the data from json load an object, an dcreate methods for that object
-# okay but json.load actually creats a dict object. so that has to be done before and outside the get stats methods.
-# the wrapper should also insert the correct titles for graphs and overs tsuff depending on inputs.
-# add importing of players csv as dataframe to search for players.
-# add opposing bowler and batter checks
-# requried arguments should be database what else, over intervals can be optional, if false just look at all overs. do this for time as well?
-# have to do innings specific check as well for tests.and draw/tie checks. also recording scores for 3rd and 4th innings.
-# do ingestion of all files into on big list, then loop through.
-
-# Things to do with core query engine:
-# On thing to make it faster would be to ingest whole databse as one file and the start is for each match...
-# 3 Record list of shots hit. Then from this can derive average gap between boundaries. or average balls taken to hit first boundary.
-# 4 Check batting position. Will require looking at batter and non-striker in over 1, and then all "player ins"?
-# 5 record the nature of outs for batters
-
-def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], innings=[], sex=[], playerteams=[],
-             oppositionbatters=[], oppositionbowlers=[
-                 ], oppositionteams=[], venue=[], event=[], matchtype=[],
-             matchresult=""):
+def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], innings=[], sex=[], playerteams=[], oppositionbatters=[], oppositionbowlers=[], oppositionteams=[], venue=[], event=[], matchtype=[], matchresult=""):
     if players:
         allplayerstats = {}
         for eachplayer in players:

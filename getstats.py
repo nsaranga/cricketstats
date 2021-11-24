@@ -18,7 +18,7 @@ import pandas as pd
 # also there has to be function that does reverse look up, say looks up at all teams/bowlers/batters/fielders, then feeds that list back into getstats function. that will given me top 10 lists and such: basically function that records all bowlers, batters or fielders, in given parameters then inputs them into getstatsfunc.with same parameters.
 # also have field for saving the transposed dataframe as csv?
 # another thing to do is have the outputs stats set as variables of the class, and then edited by the functions under it. YES THIS MAKES SENSE.
-# have like a "stats process function" 
+# have like a "stats process function"
 # woudl it be easier to load json files as data frame then scrape data that way?
 # I have to make the data from json load an object, an dcreate methods for that object
 # okay but json.load actually creats a dict object. so that has to be done before and outside the get stats methods.
@@ -36,7 +36,8 @@ import pandas as pd
 # 5 record the nature of outs for batters
 
 def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], innings=[], sex=[], playerteams=[],
-             oppositionbatters=[], oppositionbowlers=[], oppositionteams=[], venue=[], event=[], matchtype=[],
+             oppositionbatters=[], oppositionbowlers=[
+                 ], oppositionteams=[], venue=[], event=[], matchtype=[],
              matchresult=""):
     if players:
         allplayerstats = {}
@@ -140,7 +141,8 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                 if "result" in match["info"]["outcome"] and match["info"]["outcome"]['result'] == "draw":
                     allteamstats[eachteam]["Drawn"] += 1
                 if "winner" in match["info"]["outcome"] and eachteam in match["info"]["outcome"]["winner"]:
-                    allteamstats[match["info"]["outcome"]["winner"]]["Won"] += 1
+                    allteamstats[match["info"]["outcome"]
+                                 ["winner"]]["Won"] += 1
 
         # Open each innings in match
         for nthinnings, eachinnings in enumerate(match['innings']):
@@ -176,91 +178,129 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                     # Player Batting stats
                     if eachball['batter'] in players and (
                             not oppositionbowlers or eachball['bowler'] in oppositionbowlers):
-                        allplayerstats[eachball['batter']]["Runs"] += eachball['runs']['batter']
-                        allplayerstats[eachball['batter']]["inningsruns"].append(eachball['runs']['batter'])
+                        allplayerstats[eachball['batter']
+                                       ]["Runs"] += eachball['runs']['batter']
+                        allplayerstats[eachball['batter']]["inningsruns"].append(
+                            eachball['runs']['batter'])
                         if eachball['runs']['batter'] == 4:
                             allplayerstats[eachball['batter']]["Fours"] += 1
                         if eachball['runs']['batter'] == 6:
                             allplayerstats[eachball['batter']]["Sixes"] += 1
                         if eachball['runs']['total'] == 0:
-                            allplayerstats[eachball['batter']]["Dot Balls"] += 1
+                            allplayerstats[eachball['batter']
+                                           ]["Dot Balls"] += 1
                         if "extras" not in eachball:
-                            allplayerstats[eachball['batter']]["Balls Faced"] += 1
-                            allplayerstats[eachball['batter']]["inningsballsfaced"] += 1
+                            allplayerstats[eachball['batter']
+                                           ]["Balls Faced"] += 1
+                            allplayerstats[eachball['batter']
+                                           ]["inningsballsfaced"] += 1
                         if "extras" in eachball:
                             if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']):
-                                allplayerstats[eachball['batter']]["Balls Faced"] += 1
-                                allplayerstats[eachball['batter']]["inningsballsfaced"] += 1
+                                allplayerstats[eachball['batter']
+                                               ]["Balls Faced"] += 1
+                                allplayerstats[eachball['batter']
+                                               ]["inningsballsfaced"] += 1
                         if "wickets" in eachball:
                             for eachwicket in eachball["wickets"]:
                                 if eachball['batter'] == eachwicket["player_out"]:
-                                    allplayerstats[eachball['batter']]["Outs"] += 1
+                                    allplayerstats[eachball['batter']
+                                                   ]["Outs"] += 1
                     # include legbyes and byes.
                     if nth < 5:
                         if eachball['batter'] in players:
-                            allplayerstats[eachball['batter']]["totalstosopp"] += 1
+                            allplayerstats[eachball['batter']
+                                           ]["totalstosopp"] += 1
                             if eachball['runs']['batter'] == 1 or eachball['runs']['batter'] == 3:
-                                allplayerstats[eachball['batter']]["totalstos"] += 1
+                                allplayerstats[eachball['batter']
+                                               ]["totalstos"] += 1
                         if eachball['bowler'] in players:
-                            allplayerstats[eachball['bowler']]["totalstosgivenopp"] += 1
+                            allplayerstats[eachball['bowler']
+                                           ]["totalstosgivenopp"] += 1
                             if eachball['runs']['batter'] == 1 or eachball['runs']['batter'] == 3:
-                                allplayerstats[eachball['bowler']]["totalstosgiven"] += 1
+                                allplayerstats[eachball['bowler']
+                                               ]["totalstosgiven"] += 1
                     if nth == 5:
                         if eachball['batter'] in players:
-                            allplayerstats[eachball['batter']]["totalstosopp"] += 1
+                            allplayerstats[eachball['batter']
+                                           ]["totalstosopp"] += 1
                             if eachball['runs']['batter'] == 0 or eachball['runs']['batter'] == 2:
-                                allplayerstats[eachball['batter']]["totalstos"] += 1
+                                allplayerstats[eachball['batter']
+                                               ]["totalstos"] += 1
                         if eachball['bowler'] in players:
-                            allplayerstats[eachball['bowler']]["totalstosgivenopp"] += 1
+                            allplayerstats[eachball['bowler']
+                                           ]["totalstosgivenopp"] += 1
                             if eachball['runs']['batter'] == 0 or eachball['runs']['batter'] == 2:
-                                allplayerstats[eachball['bowler']]["totalstosgiven"] += 1
+                                allplayerstats[eachball['bowler']
+                                               ]["totalstosgiven"] += 1
 
                     # Player Bowling stats
                     if eachball['bowler'] in players and (
                             not oppositionbatters or eachball['batter'] in oppositionbatters):
-                        allplayerstats[eachball['bowler']]["totalrunsgiven"] += eachball['runs']['batter']
-                        allplayerstats[eachball['bowler']]["inningsrunsgiven"].append(eachball['runs']['batter'])
+                        allplayerstats[eachball['bowler']
+                                       ]["totalrunsgiven"] += eachball['runs']['batter']
+                        allplayerstats[eachball['bowler']]["inningsrunsgiven"].append(
+                            eachball['runs']['batter'])
                         if eachball['runs']['batter'] == 4:
-                            allplayerstats[eachball['bowler']]["totalfoursgiven"] += 1
+                            allplayerstats[eachball['bowler']
+                                           ]["totalfoursgiven"] += 1
                         if eachball['runs']['batter'] == 6:
-                            allplayerstats[eachball['bowler']]["totalsixesgiven"] += 1
+                            allplayerstats[eachball['bowler']
+                                           ]["totalsixesgiven"] += 1
                         if eachball['runs']['total'] == 0:
-                            allplayerstats[eachball['bowler']]["totaldotballsbowled"] += 1
+                            allplayerstats[eachball['bowler']
+                                           ]["totaldotballsbowled"] += 1
                         if "extras" not in eachball:
-                            allplayerstats[eachball['bowler']]["Balls Bowled"] += 1
-                            allplayerstats[eachball['bowler']]["inningsballsbowled"] += 1
+                            allplayerstats[eachball['bowler']
+                                           ]["Balls Bowled"] += 1
+                            allplayerstats[eachball['bowler']
+                                           ]["inningsballsbowled"] += 1
                         if "extras" in eachball:
                             if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']):
-                                allplayerstats[eachball['bowler']]["Balls Bowled"] += 1
-                                allplayerstats[eachball['bowler']]["inningsballsbowled"] += 1
+                                allplayerstats[eachball['bowler']
+                                               ]["Balls Bowled"] += 1
+                                allplayerstats[eachball['bowler']
+                                               ]["inningsballsbowled"] += 1
                             if "wides" in eachball['extras']:
-                                allplayerstats[eachball['bowler']]["totalrunsgiven"] += eachball['extras']['wides']
-                                allplayerstats[eachball['bowler']]["totalextras"] += eachball['extras']['wides']
+                                allplayerstats[eachball['bowler']
+                                               ]["totalrunsgiven"] += eachball['extras']['wides']
+                                allplayerstats[eachball['bowler']
+                                               ]["totalextras"] += eachball['extras']['wides']
                             if "noballs" in eachball['extras']:
-                                allplayerstats[eachball['bowler']]["totalrunsgiven"] += eachball['extras']['noballs']
-                                allplayerstats[eachball['bowler']]["totalextras"] += eachball['extras']['noballs']
+                                allplayerstats[eachball['bowler']
+                                               ]["totalrunsgiven"] += eachball['extras']['noballs']
+                                allplayerstats[eachball['bowler']
+                                               ]["totalextras"] += eachball['extras']['noballs']
                         if "wickets" in eachball:
                             for eachwicket in eachball["wickets"]:
                                 if any([eachwicket["kind"] == "bowled", eachwicket["kind"] == "lbw",
                                         eachwicket["kind"] == "hit wicket", eachwicket["kind"] == "caught",
                                         eachwicket["kind"] == "stumped"]):
-                                    allplayerstats[eachball['bowler']]["Wickets"] += 1
-                                    allplayerstats[eachball['bowler']]["inningswickets"] += 1
+                                    allplayerstats[eachball['bowler']
+                                                   ]["Wickets"] += 1
+                                    allplayerstats[eachball['bowler']
+                                                   ]["inningswickets"] += 1
                                 if eachwicket["kind"] == "bowled":
-                                    allplayerstats[eachball['bowler']]["totalbowleds"] += 1
+                                    allplayerstats[eachball['bowler']
+                                                   ]["totalbowleds"] += 1
                                 if eachwicket["kind"] == "lbw":
-                                    allplayerstats[eachball['bowler']]["totallbws"] += 1
+                                    allplayerstats[eachball['bowler']
+                                                   ]["totallbws"] += 1
                                 if eachwicket["kind"] == "hit wicket":
-                                    allplayerstats[eachball['bowler']]["totalhitwickets"] += 1
+                                    allplayerstats[eachball['bowler']
+                                                   ]["totalhitwickets"] += 1
                                 if eachwicket["kind"] == "caught":
-                                    allplayerstats[eachball['bowler']]["totalcaughts"] += 1
+                                    allplayerstats[eachball['bowler']
+                                                   ]["totalcaughts"] += 1
                                 if eachwicket["kind"] == "stumped":
-                                    allplayerstats[eachball['bowler']]["totalstumpeds"] += 1
+                                    allplayerstats[eachball['bowler']
+                                                   ]["totalstumpeds"] += 1
 
                     # Team Batting stats maybe here I should have small section to gather innings score of team.
                     if eachinnings["team"] in teams:
-                        allteamstats[eachinnings["team"]]["inningsruns"].append(eachball['runs']['total'])
-                        allteamstats[eachinnings["team"]]["Runs"] += eachball['runs']['total']
+                        allteamstats[eachinnings["team"]]["inningsruns"].append(
+                            eachball['runs']['total'])
+                        allteamstats[eachinnings["team"]
+                                     ]["Runs"] += eachball['runs']['total']
                         if eachball['runs']['batter'] == 4:
                             allteamstats[eachinnings["team"]]["Fours"] += 1
                         if eachball['runs']['batter'] == 6:
@@ -268,21 +308,27 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                         if eachball['runs']['total'] == 0:
                             allteamstats[eachinnings["team"]]["Dot Balls"] += 1
                         if "extras" not in eachball:
-                            allteamstats[eachinnings["team"]]["Balls Faced"] += 1
-                            allteamstats[eachinnings["team"]]["inningsballsfaced"] += 1
+                            allteamstats[eachinnings["team"]
+                                         ]["Balls Faced"] += 1
+                            allteamstats[eachinnings["team"]
+                                         ]["inningsballsfaced"] += 1
                         if "extras" in eachball:
                             if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']):
-                                allteamstats[eachinnings["team"]]["Balls Faced"] += 1
-                                allteamstats[eachinnings["team"]]["inningsballsfaced"] += 1
+                                allteamstats[eachinnings["team"]
+                                             ]["Balls Faced"] += 1
+                                allteamstats[eachinnings["team"]
+                                             ]["inningsballsfaced"] += 1
                         if "wickets" in eachball:
                             for eachwicket in eachball["wickets"]:
                                 allteamstats[eachinnings["team"]]["Outs"] += 1
-                                allteamstats[eachinnings["team"]]["inningsouts"] += 1
+                                allteamstats[eachinnings["team"]
+                                             ]["inningsouts"] += 1
 
                     # Team Bowling stats
                     for eachteam in match["info"]["teams"]:
                         if eachteam in teams and eachteam not in eachinnings["team"]:
-                            allteamstats[eachteam]["inningsrunsgiven"].append(eachball['runs']['total'])
+                            allteamstats[eachteam]["inningsrunsgiven"].append(
+                                eachball['runs']['total'])
                             allteamstats[eachteam]["totalrunsgiven"] += eachball['runs']['total']
                             if eachball['runs']['batter'] == 4:
                                 allteamstats[eachteam]["totalfoursgiven"] += 1
@@ -321,7 +367,8 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                     if "wickets" in eachball:
                         for eachwicket in eachball["wickets"]:
                             if eachball["non_striker"] in players and eachball['non_striker'] == eachwicket["player_out"]:
-                                allplayerstats[eachball['non_striker']]["Outs"] += 1
+                                allplayerstats[eachball['non_striker']
+                                               ]["Outs"] += 1
 
                             if "fielders" in eachwicket:
                                 for eachfielder in eachwicket["fielders"]:
@@ -329,16 +376,20 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                                         continue
                                     if eachfielder["name"] in players:
                                         if eachwicket["kind"] == "caught":
-                                            allplayerstats[eachfielder["name"]]["totalcatches"] += 1
+                                            allplayerstats[eachfielder["name"]
+                                                           ]["totalcatches"] += 1
                                         if eachwicket["kind"] == "stumped":
-                                            allplayerstats[eachfielder["name"]]["totalstumpings"] += 1
+                                            allplayerstats[eachfielder["name"]
+                                                           ]["totalstumpings"] += 1
                                         if eachwicket["kind"] == "run out":
-                                            allplayerstats[eachfielder["name"]]["totalrunouts"] += 1
+                                            allplayerstats[eachfielder["name"]
+                                                           ]["totalrunouts"] += 1
             # List of Team scores.
             if eachinnings["team"] in teams:
                 allteamstats[eachinnings["team"]]["All Scores"].append(
                     sum(allteamstats[eachinnings["team"]]["inningsruns"]))
-                allteamstats[eachinnings["team"]]["All Outs"].append(allteamstats[eachinnings["team"]]["inningsouts"])
+                allteamstats[eachinnings["team"]]["All Outs"].append(
+                    allteamstats[eachinnings["team"]]["inningsouts"])
                 allteamstats[eachinnings["team"]]["All Overs Faced"].append(
                     round(allteamstats[eachinnings["team"]]["inningsballsfaced"] / 6))
                 if nthinnings == 0:
@@ -355,29 +406,37 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                         sum(allteamstats[eachinnings["team"]]["inningsruns"]))
             for eachteam in match["info"]["teams"]:
                 if eachteam in teams and eachteam not in eachinnings["team"]:
-                    allteamstats[eachteam]["All Runsgiven"].append(sum(allteamstats[eachteam]["inningsrunsgiven"]))
-                    allteamstats[eachteam]["All Wickets"].append(allteamstats[eachteam]["inningswickets"])
+                    allteamstats[eachteam]["All Runsgiven"].append(
+                        sum(allteamstats[eachteam]["inningsrunsgiven"]))
+                    allteamstats[eachteam]["All Wickets"].append(
+                        allteamstats[eachteam]["inningswickets"])
                     allteamstats[eachteam]["All Overs Bowled"].append(
                         round(allteamstats[eachteam]["inningsballsbowled"] / 6))
                     if nthinnings == 0:
-                        allteamstats[eachteam]["1st Innings Wickets"].append(allteamstats[eachteam]["inningswickets"])
+                        allteamstats[eachteam]["1st Innings Wickets"].append(
+                            allteamstats[eachteam]["inningswickets"])
                     if nthinnings == 1:
-                        allteamstats[eachteam]["2nd Innings Wickets"].append(allteamstats[eachteam]["inningswickets"])
+                        allteamstats[eachteam]["2nd Innings Wickets"].append(
+                            allteamstats[eachteam]["inningswickets"])
                     if nthinnings == 2:
-                        allteamstats[eachteam]["3rd Innings Wickets"].append(allteamstats[eachteam]["inningswickets"])
+                        allteamstats[eachteam]["3rd Innings Wickets"].append(
+                            allteamstats[eachteam]["inningswickets"])
                     if nthinnings == 3:
-                        allteamstats[eachteam]["4th Innings Wickets"].append(allteamstats[eachteam]["inningswickets"])
+                        allteamstats[eachteam]["4th Innings Wickets"].append(
+                            allteamstats[eachteam]["inningswickets"])
 
             if players:
                 for eachplayer in allplayerstats:
                     if allplayerstats[eachplayer]["inningsballsfaced"] > 0:
-                        allplayerstats[eachplayer]["All Scores"].append(sum(allplayerstats[eachplayer]["inningsruns"]))
+                        allplayerstats[eachplayer]["All Scores"].append(
+                            sum(allplayerstats[eachplayer]["inningsruns"]))
                         allplayerstats[eachplayer]["All Balls Faced"].append(
                             allplayerstats[eachplayer]["inningsballsfaced"])
                     if allplayerstats[eachplayer]["inningsballsbowled"] > 0:
                         allplayerstats[eachplayer]["All Runsgiven"].append(
                             sum(allplayerstats[eachplayer]["inningsrunsgiven"]))
-                        allplayerstats[eachplayer]["All Wickets"].append(allplayerstats[eachplayer]["inningswickets"])
+                        allplayerstats[eachplayer]["All Wickets"].append(
+                            allplayerstats[eachplayer]["inningswickets"])
                         allplayerstats[eachplayer]["All Overs Bowled"].append(
                             round(allplayerstats[eachplayer]["inningsballsbowled"] / 6))
 
@@ -389,8 +448,9 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                             match['innings'][1]['target']['runs'] - 1)
                     if nthinnings == (len(match['innings']) - 1) and match['info']['outcome']["winner"] != eachinnings["team"]:
                         allteamstats[match['info']['outcome']["winner"]]["Defended Scores"].append(
-                            (sum(allteamstats[match['info']['outcome']["winner"]]["inningsrunsgiven"])) +
-                            match['info']['outcome']['by']['runs'])
+                            (sum(
+                                allteamstats[match['info']['outcome']["winner"]]["inningsrunsgiven"]))
+                            + match['info']['outcome']['by']['runs'])
                     allteamstats[match['info']['outcome']["winner"]]["runmargins"].append(
                         match['info']['outcome']['by']['runs'])
                 if 'wickets' in match['info']['outcome']['by']:
@@ -422,7 +482,8 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                                                                                  allplayerstats[eachplayer][
                                                                                      "Balls Faced"], multiplier=100)
                 allplayerstats[eachplayer]["Boundary %"] = statsprocessor.ratio(
-                    (allplayerstats[eachplayer]["Fours"] + allplayerstats[eachplayer]["Sixes"]),
+                    (allplayerstats[eachplayer]["Fours"]
+                     + allplayerstats[eachplayer]["Sixes"]),
                     allplayerstats[eachplayer]["Balls Faced"], multiplier=100)
                 allplayerstats[eachplayer]["Dot Ball %"] = statsprocessor.ratio(allplayerstats[eachplayer]["Dot Balls"],
                                                                                 allplayerstats[eachplayer][
@@ -447,7 +508,8 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                     allplayerstats[eachplayer]["totaldotballsbowled"], allplayerstats[eachplayer]["Balls Bowled"],
                     multiplier=100)
                 allplayerstats[eachplayer]["Boundary Given %"] = statsprocessor.ratio(
-                    (allplayerstats[eachplayer]["totalfoursgiven"] + allplayerstats[eachplayer]["totalsixesgiven"]),
+                    (allplayerstats[eachplayer]["totalfoursgiven"]
+                     + allplayerstats[eachplayer]["totalsixesgiven"]),
                     allplayerstats[eachplayer]["Balls Bowled"], multiplier=100)
 
             if allplayerstats[eachplayer]["Wickets"] > 0:

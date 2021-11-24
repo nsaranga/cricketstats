@@ -22,29 +22,17 @@ result = getstats.getstats("/home/saranga/Documents/cricketstatsproject/data/all
 # getstats output -> pandas dataframe
 
 # Stats Comparison
-# df.to_csv("./pandasoutput.csv")
+print(result[["Average", "Boundary %", "Strike Rate",
+      "Strike Rate MeanAD", "Balls Faced"]])
 
-# playerscompresultdf["All Scores"]=playerscompresultdf["All Scores"].astype(float)
-# print(playerscompresultdf.loc["Australia", ["Chased Scores", "overschased"]])
-# print(playerscompresultdf["All Scores"])
-# playerscompresultdf.explode("All Scores")
-
-# print(playerscompresultdf.sort_values(by="Boundary Given %", ascending=False)[["Boundary Given %", "Dot Ball Bowled %", "Balls Bowled"]])
-# df.style.set_table_attributes("style='display:inline'").set_caption('Caption table')
-print(result[["Average", "Boundary %", "Strike Rate", "Strike Rate MeanAD", "Balls Faced"]])
-
-# print(playerscompresultdf.loc["SPD Smith","Average"])
-# print(playerscompresultdf[["Boundary Given %", "Economy Rate","Economy Rate MeanAD"]])
 
 # Plotting
+# Decide on what plotting package to use here.
 
-# df=playerscompresultdf.loc["Australia", "All Scores"]
-
-# playerscompresultdf.loc["Australia", "All Scores"].plot(kind="hist", fontsize=8)
 # plt.scatter(x=playerscompresultdf.loc["Australia", "All Scores"], y=playerscompresultdf.loc["Australia", "All Outs"],)
-
 # playerscompresultdf.sort_values(by="Boundary %", ascending=False)[["Boundary %", "Dot Ball %", "Balls Faced"]].plot(kind="bar", rot=15, fontsize=8, secondary_y="Balls Faced", title="Overs 1-20 in all T20s since start of 2018")
+
 # plt.grid(axis = 'y')
-plt.legend()
+# plt.legend()
 # plt.title("source: cricsheet.org", fontsize=10)
-plt.show()
+# plt.show()

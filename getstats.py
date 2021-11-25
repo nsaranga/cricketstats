@@ -43,9 +43,6 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
     matches = zipfile.ZipFile(database, 'r')
     filelist = matches.namelist()
     # create an index file for eachfile
-    datafolder = os.listdir(path="./")
-    # This check should be based on how many files there are in dict vs zip. NOT if the file exists
-    # if (len(filelist) - 1) > len(index.matchindex.values()):
     if os.path.getmtime(database) > os.path.getmtime("./index.py"):
         matchindex = {'Test': [], 'MDM': [], 'ODI': [],
                       'ODM': [], 'T20': [], 'IT20': []}
@@ -60,10 +57,8 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
         file.write("matchindex = " + repr(matchindex))
         file.close
 
-    matchindex = index.matchindex
-
     for eachmatchtype in matchtype:
-        for eachfile in matchindex[eachmatchtype]:
+        for eachfile in index.matchindex[eachmatchtype]:
             matchdata = matches.open(eachfile)
             # for eachfile in glob.glob(f"{database}*.json"):
             # print(eachfile)

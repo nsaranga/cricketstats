@@ -5,6 +5,7 @@ import time
 import pandas as pd
 import os
 import zipfile
+import index
 
 
 def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], innings=[], sex=[], playerteams=[], oppositionbatters=[], oppositionbowlers=[], oppositionteams=[], venue=[], event=[], matchtype=[], matchresult=""):
@@ -38,15 +39,16 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                                       "totalsixesgiven": 0, "Wickets": 0, "Balls Bowled": 0, "totalextras": 0,
                                       "totaldotsbowled": 0, "totalcaughts": 0, "totalrunouts": 0, "totalstumpeds": 0}
 
-
     # Ingest zipfile of data
     matches = zipfile.ZipFile(database, 'r')
     filelist = matches.namelist()
     # create an index file for eachfile
     datafolder = os.listdir(path="./")
-    if "index.py" not in datafolder:
+    # This check should be based on how many files there are in dict vs zip. NOT if the file exists
+    # if (len(filelist) - 1) > len(index.matchindex.values()):
+    if os.path.getmtime(database) > os.path.getmtime("./index.py"):
         matchindex = {'Test': [], 'MDM': [], 'ODI': [],
-                          'ODM': [], 'T20': [], 'IT20': []}
+                      'ODM': [], 'T20': [], 'IT20': []}
         for eachfile in filelist:
             if ".json" not in eachfile:
                 continue
@@ -57,7 +59,7 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
         file = open("./index.py", "w")
         file.write("matchindex = " + repr(matchindex))
         file.close
-    import index
+
     matchindex = index.matchindex
 
     for eachmatchtype in matchtype:
@@ -467,7 +469,7 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
             matchdata.close()
     matches.close()
 
-        # Derived Stats
+    # Derived Stats
     if players:
         for eachplayer in allplayerstats:
             if allplayerstats[eachplayer]["Caps"] > 0:

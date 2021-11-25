@@ -18,7 +18,7 @@ Ozbatters = ["DA Warner", "SPD Smith", "MR Marsh", "GJ Maxwell", "MP Stoinis", "
 result = getstats.getstats("/home/saranga/Documents/cricketstatsproject/data/all/", (2021, 4, 1),
                            (2021, 12, 1), betweenovers=[1, 60], players=Ozbatters, matchtype=["MDM", "Test"])
 
-# getstats input arguments.  sex=[], teams=[], opposition=[], venue=[], event=[], matchtype=[], matchresult=""
+# getstats input arguments.  sex=[], teams=[], opposition=[], venue=[], event=[], matchtype=["Test", "MDM", "ODI", "ODM", "T20", "IT20"], matchresult=""
 # getstats output -> pandas dataframe
 
 # Stats Comparison

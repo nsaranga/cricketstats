@@ -39,11 +39,9 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                                       "totaldotsbowled": 0, "totalcaughts": 0, "totalrunouts": 0, "totalstumpeds": 0}
 
 
-    # for eachmatchtype in matchtype:
-    #     for eachfile in index.matchindex[eachmatchtype]:
+    # Ingest zipfile of data
     matches = zipfile.ZipFile(database, 'r')
     filelist = matches.namelist()
-    # print(filelist)
     # create an index file for eachfile
     datafolder = os.listdir(path="./")
     if "index.py" not in datafolder:
@@ -64,14 +62,11 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
 
     for eachmatchtype in matchtype:
         for eachfile in matchindex[eachmatchtype]:
-        # for eachfile in filelist:
-            # if ".json" not in eachfile:
-                # continue
             matchdata = matches.open(eachfile)
             # for eachfile in glob.glob(f"{database}*.json"):
             # print(eachfile)
             # change to a "with open(filename) as matchdata" so it is closed even if there is an error in code?
-            #matchdata = open(eachfile)
+            # matchdata = open(eachfile)
             match = json.load(matchdata)
 
             # General Checks: Dates, event, mens/womens, matchtype, venue, oppositionteams

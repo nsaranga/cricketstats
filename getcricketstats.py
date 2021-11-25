@@ -15,7 +15,7 @@ Ozbowlers = ["PJ Cummins", "JR Hazlewood", "MA Starc", "JA Richardson", "A Zampa
              "MR Marsh", "MJ Swepson", "MG Neser", "NM Lyon", "CD Green"]
 Ozbatters = ["DA Warner", "SPD Smith", "MR Marsh", "GJ Maxwell", "MP Stoinis", "MS Wade", "JP Inglis", "M Labuschagne",
              "UT Khawaja", "TM Head", "MS Harris", "CD Green", "TD Paine"]
-result = getstats.getstats("/home/saranga/Documents/cricketstatsproject/data/all/", (2021, 4, 1),
+result = getstats.getstats("/home/saranga/Downloads/all_json.zip", (2021, 4, 1),
                            (2021, 12, 1), betweenovers=[1, 60], players=Ozbatters, matchtype=["MDM", "Test"])
 
 # getstats input arguments.  sex=[], teams=[], opposition=[], venue=[], event=[], matchtype=["Test", "MDM", "ODI", "ODM", "T20", "IT20"], matchresult=""

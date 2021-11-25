@@ -4,7 +4,7 @@ import statsprocessor
 import time
 import pandas as pd
 import os
-#import index
+import zipfile
 
 
 def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], innings=[], sex=[], playerteams=[], oppositionbatters=[], oppositionbowlers=[], oppositionteams=[], venue=[], event=[], matchtype=[], matchresult=""):
@@ -38,13 +38,21 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                                       "totalsixesgiven": 0, "Wickets": 0, "Balls Bowled": 0, "totalextras": 0,
                                       "totaldotsbowled": 0, "totalcaughts": 0, "totalrunouts": 0, "totalstumpeds": 0}
 
+
+    # for eachmatchtype in matchtype:
+    #     for eachfile in index.matchindex[eachmatchtype]:
+    matches = zipfile.ZipFile(database, 'r')
+    filelist = matches.namelist()
+    # print(filelist)
     # create an index file for eachfile
     datafolder = os.listdir(path="./")
-    matchindex = {'Test': [], 'MDM': [], 'ODI': [],
-                  'ODM': [], 'T20': [], 'IT20': []}
     if "index.py" not in datafolder:
-        for eachfile in glob.glob(f"{database}*.json"):
-            matchdata = open(eachfile)
+        matchindex = {'Test': [], 'MDM': [], 'ODI': [],
+                          'ODM': [], 'T20': [], 'IT20': []}
+        for eachfile in filelist:
+            if ".json" not in eachfile:
+                continue
+            matchdata = matches.open(eachfile)
             match = json.load(matchdata)
             matchindex[match["info"]["match_type"]].append(eachfile)
             matchdata.close
@@ -52,13 +60,18 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
         file.write("matchindex = " + repr(matchindex))
         file.close
     import index
-    for eachmatchtype in matchtype:
-        for eachfile in index.matchindex[eachmatchtype]:
+    matchindex = index.matchindex
 
+    for eachmatchtype in matchtype:
+        for eachfile in matchindex[eachmatchtype]:
+        # for eachfile in filelist:
+            # if ".json" not in eachfile:
+                # continue
+            matchdata = matches.open(eachfile)
             # for eachfile in glob.glob(f"{database}*.json"):
             # print(eachfile)
             # change to a "with open(filename) as matchdata" so it is closed even if there is an error in code?
-            matchdata = open(eachfile)
+            #matchdata = open(eachfile)
             match = json.load(matchdata)
 
             # General Checks: Dates, event, mens/womens, matchtype, venue, oppositionteams
@@ -72,8 +85,7 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
             day = str(match["info"]["dates"][0][8:])
             matchtimetuple = (int(year), int(month),
                               int(day), 0, 0, 0, 0, 0, 0)
-            if time.mktime(matchtimetuple) < time.mktime(fromtime + (0, 0, 0, 0, 0, 0)) or time.mktime(
-                    matchtimetuple) > time.mktime(totime + (0, 0, 0, 0, 0, 0)):
+            if time.mktime(matchtimetuple) < time.mktime(fromtime + (0, 0, 0, 0, 0, 0)) or time.mktime(matchtimetuple) > time.mktime(totime + (0, 0, 0, 0, 0, 0)):
                 continue
             # Event Check
             if event and ("event" not in match["info"] or match["info"]["event"]["name"] not in event):
@@ -457,61 +469,62 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                         allteamstats[match['info']['outcome']["winner"]]["wicketmargins"].append(
                             match['info']['outcome']['by']['wickets'])
 
-        matchdata.close()
+            matchdata.close()
+    matches.close()
 
         # Derived Stats
-        if players:
-            for eachplayer in allplayerstats:
-                if allplayerstats[eachplayer]["Caps"] > 0:
-                    allplayerstats[eachplayer]["Win %"] = statsprocessor.ratio(allplayerstats[eachplayer]["Won"],
-                                                                               allplayerstats[eachplayer]["Caps"],
-                                                                               multiplier=100)
+    if players:
+        for eachplayer in allplayerstats:
+            if allplayerstats[eachplayer]["Caps"] > 0:
+                allplayerstats[eachplayer]["Win %"] = statsprocessor.ratio(allplayerstats[eachplayer]["Won"],
+                                                                           allplayerstats[eachplayer]["Caps"],
+                                                                           multiplier=100)
 
-                if allplayerstats[eachplayer]["Balls Faced"] > 0 and allplayerstats[eachplayer]["Runs"] > 0:
-                    allplayerstats[eachplayer]["Strike Rate"] = statsprocessor.ratio(allplayerstats[eachplayer]["Runs"],
-                                                                                     allplayerstats[eachplayer][
-                                                                                         "Balls Faced"], multiplier=100)
-                    allplayerstats[eachplayer]["Boundary %"] = statsprocessor.ratio(
-                        (allplayerstats[eachplayer]["Fours"]
-                         + allplayerstats[eachplayer]["Sixes"]),
-                        allplayerstats[eachplayer]["Balls Faced"], multiplier=100)
-                    allplayerstats[eachplayer]["Dot Ball %"] = statsprocessor.ratio(allplayerstats[eachplayer]["Dot Balls"],
-                                                                                    allplayerstats[eachplayer][
-                                                                                        "Balls Faced"], multiplier=100)
-                    allplayerstats[eachplayer]["Strike Turnover %"] = statsprocessor.ratio(
-                        allplayerstats[eachplayer]["totalstos"], allplayerstats[eachplayer]["totalstosopp"], multiplier=100)
-                    allplayerstats[eachplayer]["Strike Rate MeanAD"] = statsprocessor.madfromlist(
-                        allplayerstats[eachplayer]["All Scores"], allplayerstats[eachplayer]["All Balls Faced"], stattype="percent")
+            if allplayerstats[eachplayer]["Balls Faced"] > 0 and allplayerstats[eachplayer]["Runs"] > 0:
+                allplayerstats[eachplayer]["Strike Rate"] = statsprocessor.ratio(allplayerstats[eachplayer]["Runs"],
+                                                                                 allplayerstats[eachplayer][
+                                                                                     "Balls Faced"], multiplier=100)
+                allplayerstats[eachplayer]["Boundary %"] = statsprocessor.ratio(
+                    (allplayerstats[eachplayer]["Fours"]
+                     + allplayerstats[eachplayer]["Sixes"]),
+                    allplayerstats[eachplayer]["Balls Faced"], multiplier=100)
+                allplayerstats[eachplayer]["Dot Ball %"] = statsprocessor.ratio(allplayerstats[eachplayer]["Dot Balls"],
+                                                                                allplayerstats[eachplayer][
+                                                                                    "Balls Faced"], multiplier=100)
+                allplayerstats[eachplayer]["Strike Turnover %"] = statsprocessor.ratio(
+                    allplayerstats[eachplayer]["totalstos"], allplayerstats[eachplayer]["totalstosopp"], multiplier=100)
+                allplayerstats[eachplayer]["Strike Rate MeanAD"] = statsprocessor.madfromlist(
+                    allplayerstats[eachplayer]["All Scores"], allplayerstats[eachplayer]["All Balls Faced"], stattype="percent")
 
-                if allplayerstats[eachplayer]["Outs"] > 0:
-                    allplayerstats[eachplayer]["Average"] = statsprocessor.ratio(allplayerstats[eachplayer]["Runs"],
-                                                                                 allplayerstats[eachplayer]["Outs"],
-                                                                                 multiplier=0)
+            if allplayerstats[eachplayer]["Outs"] > 0:
+                allplayerstats[eachplayer]["Average"] = statsprocessor.ratio(allplayerstats[eachplayer]["Runs"],
+                                                                             allplayerstats[eachplayer]["Outs"],
+                                                                             multiplier=0)
 
-                if allplayerstats[eachplayer]["Balls Bowled"] > 0:
-                    allplayerstats[eachplayer]["Economy Rate"] = statsprocessor.ratio(
-                        allplayerstats[eachplayer]["totalrunsgiven"], allplayerstats[eachplayer]["Balls Bowled"],
-                        multiplier=6)
-                    allplayerstats[eachplayer]["Economy Rate MeanAD"] = statsprocessor.madfromlist(
-                        allplayerstats[eachplayer]["All Runsgiven"], allplayerstats[eachplayer]["All Balls Faced"], stattype="perover")
-                    allplayerstats[eachplayer]["Dot Ball Bowled %"] = statsprocessor.ratio(
-                        allplayerstats[eachplayer]["totaldotballsbowled"], allplayerstats[eachplayer]["Balls Bowled"],
-                        multiplier=100)
-                    allplayerstats[eachplayer]["Boundary Given %"] = statsprocessor.ratio(
-                        (allplayerstats[eachplayer]["totalfoursgiven"]
-                         + allplayerstats[eachplayer]["totalsixesgiven"]),
-                        allplayerstats[eachplayer]["Balls Bowled"], multiplier=100)
+            if allplayerstats[eachplayer]["Balls Bowled"] > 0:
+                allplayerstats[eachplayer]["Economy Rate"] = statsprocessor.ratio(
+                    allplayerstats[eachplayer]["totalrunsgiven"], allplayerstats[eachplayer]["Balls Bowled"],
+                    multiplier=6)
+                allplayerstats[eachplayer]["Economy Rate MeanAD"] = statsprocessor.madfromlist(
+                    allplayerstats[eachplayer]["All Runsgiven"], allplayerstats[eachplayer]["All Balls Faced"], stattype="perover")
+                allplayerstats[eachplayer]["Dot Ball Bowled %"] = statsprocessor.ratio(
+                    allplayerstats[eachplayer]["totaldotballsbowled"], allplayerstats[eachplayer]["Balls Bowled"],
+                    multiplier=100)
+                allplayerstats[eachplayer]["Boundary Given %"] = statsprocessor.ratio(
+                    (allplayerstats[eachplayer]["totalfoursgiven"]
+                     + allplayerstats[eachplayer]["totalsixesgiven"]),
+                    allplayerstats[eachplayer]["Balls Bowled"], multiplier=100)
 
-                if allplayerstats[eachplayer]["Wickets"] > 0:
-                    allplayerstats[eachplayer]["Bowling Avg"] = statsprocessor.ratio(
-                        allplayerstats[eachplayer]["totalrunsgiven"], allplayerstats[eachplayer]["Wickets"], multiplier=0)
-                    allplayerstats[eachplayer]["Bowling SR"] = statsprocessor.ratio(
-                        allplayerstats[eachplayer]["Balls Bowled"], allplayerstats[eachplayer]["Wickets"], multiplier=0)
-        if players:
-            df = pd.DataFrame(allplayerstats)
-            allplayerstatsdf = df.transpose()
-            return allplayerstatsdf
-        elif teams:
-            df = pd.DataFrame(allteamstats)
-            allteamstatsdf = df.transpose()
-            return allteamstatsdf
+            if allplayerstats[eachplayer]["Wickets"] > 0:
+                allplayerstats[eachplayer]["Bowling Avg"] = statsprocessor.ratio(
+                    allplayerstats[eachplayer]["totalrunsgiven"], allplayerstats[eachplayer]["Wickets"], multiplier=0)
+                allplayerstats[eachplayer]["Bowling SR"] = statsprocessor.ratio(
+                    allplayerstats[eachplayer]["Balls Bowled"], allplayerstats[eachplayer]["Wickets"], multiplier=0)
+    if players:
+        df = pd.DataFrame(allplayerstats)
+        allplayerstatsdf = df.transpose()
+        return allplayerstatsdf
+    elif teams:
+        df = pd.DataFrame(allteamstats)
+        allteamstatsdf = df.transpose()
+        return allteamstatsdf

@@ -3,6 +3,8 @@ import json
 import statsprocessor
 import time
 import pandas as pd
+import os
+import matchindex
 
 
 def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], innings=[], sex=[], playerteams=[], oppositionbatters=[], oppositionbowlers=[], oppositionteams=[], venue=[], event=[], matchtype=[], matchresult=""):
@@ -36,12 +38,29 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                                       "totalsixesgiven": 0, "Wickets": 0, "Balls Bowled": 0, "totalextras": 0,
                                       "totaldotsbowled": 0, "totalcaughts": 0, "totalrunouts": 0, "totalstumpeds": 0}
 
-    # Open each file
-    for eachfile in glob.glob(f"{database}*.json"):
+    # create an index file for eachfile
+    datafolder = os.listdir(path="./")
+    allmatches = []
+    if "matchindex.py" not in datafolder:
+        for eachfile in glob.glob(f"{database}*.json"):
+            matchdata = open(eachfile)
+            match = json.load(matchdata)
+            allmatches.append(match)
+            matchdata.close
+        filecontent = repr(allmatches)
+        f = open(f"{database}allmatches.txt", "w")
+        f.write(filecontent)
+        f.close
+    matchdata = open(f"{database}allmatches.txt")
+    matches = f.read(matchdata)
+    for match in matches:
+
+        # Open each file
+        # for eachfile in glob.glob(f"{database}*.json"):
         # print(eachfile)
         # change to a "with open(filename) as matchdata" so it is closed even if there is an error in code?
-        matchdata = open(eachfile)
-        match = json.load(matchdata)
+        #matchdata = open(eachfile)
+        #match = json.load(matchdata)
 
         # General Checks: Dates, event, mens/womens, matchtype, venue, oppositionteams
         # For player stats, players, playerteams

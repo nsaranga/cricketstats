@@ -7,6 +7,8 @@ import os
 import zipfile
 import index
 
+# so maybe the class should be query, and then result of the query?
+
 
 def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], innings=[], sex=[], playerteams=[], oppositionbatters=[], oppositionbowlers=[], oppositionteams=[], venue=[], event=[], matchtype=[], matchresult=""):
     if players:
@@ -51,11 +53,8 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                 continue
             matchdata = matches.open(eachfile)
             match = json.load(matchdata)
-            matchindex[match["info"]["match_type"]].append(eachfile)
+            index.matchindex[match["info"]["match_type"]].append(eachfile)
             matchdata.close
-        file = open("./index.py", "w")
-        file.write("matchindex = " + repr(matchindex))
-        file.close
 
     for eachmatchtype in matchtype:
         for eachfile in index.matchindex[eachmatchtype]:

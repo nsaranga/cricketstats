@@ -24,3 +24,27 @@ def madfromlist(statlist1, statlist2, stattype=False):
     df = pd.DataFrame(data)
     stat = df[0].mad()
     return round(stat, 2)
+
+
+def mad(statlist):
+    df = pd.DataFrame(statlist)
+    stat = df.mad()
+    return round(stat, 2)
+
+
+def firstboundary(shotlist):
+    four = None
+    six = None
+    if 4 in shotlist:
+        four = (shotlist.index(4)+1)
+    if 6 in shotlist:
+        six = (shotlist.index(6)+1)
+    if four and not six:
+        return four
+    if not four and six:
+        return six
+    if four and six:
+        if four <= six:
+            return four
+        elif six <= four:
+            return six

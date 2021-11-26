@@ -12,7 +12,7 @@ This is essentially a module you can import into any python script to collect st
 2. Web wrapper
 3. ~~More efficient ingestion of database~~
 4. Reverse look up of teams and players by stats.
-5. record the nature of outs for batters
+5. ~~record the nature of outs for batters~~
 6. Scores by batting position
 7. Average balls taken to hit first Boundary
 8. ???

@@ -6,6 +6,7 @@ import pandas as pd
 import os
 import zipfile
 import index
+import numpy as np
 
 # so maybe the class should be query, and then result of the query?
 
@@ -15,8 +16,8 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
         allplayerstats = {}
         for eachplayer in players:
             allplayerstats[eachplayer] = {"Caps": 0, "Won": 0, "Drawn": 0, "All Scores": [], "All Balls Faced": [],
-                                          "inningsruns": [], "inningsballsfaced": 0, "Runs": 0, "Fours": 0, "Sixes": 0,
-                                          "Dot Balls": 0, "Outs": 0, "Balls Faced": 0, "totalstos": 0,
+                                          "inningsruns": [], "1stboundary": [], "inningsballsfaced": 0, "Runs": 0, "Fours": 0, "Sixes": 0,
+                                          "Dot Balls": 0, "Balls Faced": 0, "Outs": 0, "Bowled Outs": 0, "LBW Outs": 0, "Caught Outs": 0, "Stumped Outs": 0, "Run Outs": 0, "totalstos": 0,
                                           "totalstosopp": 0, "All Runsgiven": [], "All Wickets": [],
                                           "All Overs Bowled": [], "inningsrunsgiven": [], "inningsballsbowled": 0,
                                           "inningswickets": 0, "totalrunsgiven": 0, "totalfoursgiven": 0,
@@ -165,8 +166,7 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                     for nth, eachball in enumerate(eachover['deliveries']):
 
                         # Player Batting stats
-                        if eachball['batter'] in players and (
-                                not oppositionbowlers or eachball['bowler'] in oppositionbowlers):
+                        if eachball['batter'] in players and (not oppositionbowlers or eachball['bowler'] in oppositionbowlers):
                             allplayerstats[eachball['batter']
                                            ]["Runs"] += eachball['runs']['batter']
                             allplayerstats[eachball['batter']]["inningsruns"].append(
@@ -193,9 +193,33 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                                                    ]["inningsballsfaced"] += 1
                             if "wickets" in eachball:
                                 for eachwicket in eachball["wickets"]:
-                                    if eachball['batter'] == eachwicket["player_out"]:
+                                    allplayerstats[eachball['batter']
+                                                   ]["Outs"] += 1
+                                    if eachwicket["kind"] == "bowled":
                                         allplayerstats[eachball['batter']
-                                                       ]["Outs"] += 1
+                                                       ]["Bowled Outs"] += 1
+                                    if eachwicket["kind"] == "lbw":
+                                        allplayerstats[eachball['batter']
+                                                       ]["LBW Outs"] += 1
+                                    if eachwicket["kind"] == "caught":
+                                        allplayerstats[eachball['batter']
+                                                       ]["Caught Outs"] += 1
+                                    if eachwicket["kind"] == "stumped":
+                                        allplayerstats[eachball['batter']
+                                                       ]["Stumped Outs"] += 1
+                                    if eachwicket["kind"] == "run out":
+                                        allplayerstats[eachball['batter']
+                                                       ]["Run Outs"] += 1
+                        # Non-striker outs
+                        if "wickets" in eachball:
+                            for eachwicket in eachball["wickets"]:
+                                if eachball["non_striker"] in players and eachball['non_striker'] == eachwicket["player_out"] and not oppositionbowlers:
+                                    allplayerstats[eachball['non_striker']
+                                                   ]["Outs"] += 1
+                                    if eachwicket["kind"] == "run out":
+                                        allplayerstats[eachball['non_striker']
+                                                       ]["Run Outs"] += 1
+
                         # include legbyes and byes.
                         if nth < 5:
                             if eachball['batter'] in players:
@@ -359,10 +383,6 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                         # Non-striker outs and fielding stats
                         if "wickets" in eachball:
                             for eachwicket in eachball["wickets"]:
-                                if eachball["non_striker"] in players and eachball['non_striker'] == eachwicket["player_out"]:
-                                    allplayerstats[eachball['non_striker']
-                                                   ]["Outs"] += 1
-
                                 if "fielders" in eachwicket:
                                     for eachfielder in eachwicket["fielders"]:
                                         if "name" not in eachfielder:
@@ -418,6 +438,7 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                             allteamstats[eachteam]["4th Innings Wickets"].append(
                                 allteamstats[eachteam]["inningswickets"])
 
+                # List of Player scores.
                 if players:
                     for eachplayer in allplayerstats:
                         if allplayerstats[eachplayer]["inningsballsfaced"] > 0:
@@ -425,6 +446,9 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                                 sum(allplayerstats[eachplayer]["inningsruns"]))
                             allplayerstats[eachplayer]["All Balls Faced"].append(
                                 allplayerstats[eachplayer]["inningsballsfaced"])
+                        if 4 in allplayerstats[eachplayer]["inningsruns"] or 6 in allplayerstats[eachplayer]["inningsruns"]:
+                            allplayerstats[eachplayer]["1stboundary"].append(statsprocessor.firstboundary(
+                                allplayerstats[eachplayer]["inningsruns"]))
                         if allplayerstats[eachplayer]["inningsballsbowled"] > 0:
                             allplayerstats[eachplayer]["All Runsgiven"].append(
                                 sum(allplayerstats[eachplayer]["inningsrunsgiven"]))
@@ -472,6 +496,8 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                                                                            multiplier=100)
 
             if allplayerstats[eachplayer]["Balls Faced"] > 0 and allplayerstats[eachplayer]["Runs"] > 0:
+                allplayerstats[eachplayer]["Avg First Boundary Ball"] = round(np.mean(
+                    allplayerstats[eachplayer]["1stboundary"]))
                 allplayerstats[eachplayer]["Strike Rate"] = statsprocessor.ratio(allplayerstats[eachplayer]["Runs"],
                                                                                  allplayerstats[eachplayer][
                                                                                      "Balls Faced"], multiplier=100)
@@ -486,6 +512,8 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
                     allplayerstats[eachplayer]["totalstos"], allplayerstats[eachplayer]["totalstosopp"], multiplier=100)
                 allplayerstats[eachplayer]["Strike Rate MeanAD"] = statsprocessor.madfromlist(
                     allplayerstats[eachplayer]["All Scores"], allplayerstats[eachplayer]["All Balls Faced"], stattype="percent")
+                allplayerstats[eachplayer]["Score MeanAD"] = statsprocessor.mad(
+                    allplayerstats[eachplayer]["All Scores"])
 
             if allplayerstats[eachplayer]["Outs"] > 0:
                 allplayerstats[eachplayer]["Average"] = statsprocessor.ratio(allplayerstats[eachplayer]["Runs"],

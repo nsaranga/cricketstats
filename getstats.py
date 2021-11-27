@@ -8,8 +8,6 @@ import zipfile
 import index
 import numpy as np
 
-# so maybe the class should be query, and then result of the query?
-
 
 def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], innings=[], sex=[], playerteams=[], oppositionbatters=[], oppositionbowlers=[], oppositionteams=[], venue=[], event=[], matchtype=[], matchresult=""):
     if players:

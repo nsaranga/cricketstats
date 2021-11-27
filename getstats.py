@@ -47,15 +47,18 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
     filelist = matches.namelist()
     # create an index file for eachfile
     if os.path.getmtime(database) > index.matchindex['indexedtime']:
-        index.matchindex = {'indexedtime': 0,'Test': [], 'MDM': [], 'ODI': [], 'ODM': [], 'T20': [], 'IT20': []}
-        index.matchindex['indexedtime'] = os.path.getmtime(database)
+        matchindex = {'indexedtime': 0,'Test': [], 'MDM': [], 'ODI': [], 'ODM': [], 'T20': [], 'IT20': []}
+        matchindex['indexedtime'] = os.path.getmtime(database)
         for eachfile in filelist:
             if ".json" not in eachfile:
                 continue
             matchdata = matches.open(eachfile)
             match = json.load(matchdata)
-            index.matchindex[match["info"]["match_type"]].append(eachfile)
+            matchindex[match["info"]["match_type"]].append(eachfile)
             matchdata.close
+        file = open("index.py", "w")
+        file.write(repr(matchindex))
+        file.close
 
     for eachmatchtype in matchtype:
         for eachfile in index.matchindex[eachmatchtype]:

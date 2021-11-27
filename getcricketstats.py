@@ -23,8 +23,8 @@ result = getstats.getstats("/home/saranga/Downloads/all_json.zip", (2018, 12, 1)
 # getstats output -> pandas dataframe
 
 # Stats Comparison
-# print(result[["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD"]])
-print(result[["Avg First Boundary Ball"]])
+print(result[["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD", "Avg First Boundary Ball"]])
+# print(result[["Avg First Boundary Ball"]])
 
 
 # Plotting

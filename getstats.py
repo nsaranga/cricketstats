@@ -46,9 +46,9 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
     matches = zipfile.ZipFile(database, 'r')
     filelist = matches.namelist()
     # create an index file for eachfile
-    if os.path.getmtime(database) > os.path.getmtime("./index.py"):
-        matchindex = {'Test': [], 'MDM': [], 'ODI': [],
-                      'ODM': [], 'T20': [], 'IT20': []}
+    if os.path.getmtime(database) > index.matchindex['indexedtime']:
+        index.matchindex = {'indexedtime': 0,'Test': [], 'MDM': [], 'ODI': [], 'ODM': [], 'T20': [], 'IT20': []}
+        index.matchindex['indexedtime'] = os.path.getmtime(database)
         for eachfile in filelist:
             if ".json" not in eachfile:
                 continue

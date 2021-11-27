@@ -57,7 +57,7 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
             matchindex[match["info"]["match_type"]].append(eachfile)
             matchdata.close
         file = open("index.py", "w")
-        file.write(repr(matchindex))
+        file.write("matchindex = " + repr(matchindex))
         file.close
 
     for eachmatchtype in matchtype:

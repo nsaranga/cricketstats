@@ -63,10 +63,6 @@ def getstats(database, fromtime, totime, betweenovers=[], players=[], teams=[], 
     for eachmatchtype in matchtype:
         for eachfile in index.matchindex[eachmatchtype]:
             matchdata = matches.open(eachfile)
-            # for eachfile in glob.glob(f"{database}*.json"):
-            # print(eachfile)
-            # change to a "with open(filename) as matchdata" so it is closed even if there is an error in code?
-            # matchdata = open(eachfile)
             match = json.load(matchdata)
 
             # General Checks: Dates, event, mens/womens, matchtype, venue, oppositionteams

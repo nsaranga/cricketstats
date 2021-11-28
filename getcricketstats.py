@@ -26,6 +26,7 @@ search1 = getstats.search(players=Ozbatters)
 search1.getstats("/home/saranga/Downloads/all_json.zip", (2018, 12, 1), (2021, 12, 1), betweenovers=[], matchtype=["MDM", "Test"])
 
 # 3. Print result of the search object. getstats output is pandas dataframe
+# Use the follwing line to get a list of all the stats that are collected: print(search1.result.columns)
 print(search1.result[["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD", "Avg First Boundary Ball"]])
 
 

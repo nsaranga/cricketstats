@@ -10,6 +10,8 @@ import index
 
 # for reverse lookup, I need to look for stats. One way is to write a new type of search with new class and get stats func. Other way is to write function that lists every player for a particular stat and inputs subset of tha tlist into getstats()
 
+# Stats by batting position is just a check. to add. Hmm have to thinka bout how to do this.
+
 class search:
     def __init__(self, players=None, teams=None, result=None) -> None:
         self.players = players
@@ -54,7 +56,7 @@ class search:
                                             "totaldotballsbowled": 0, "totalbowleds": 0, "totallbws": 0,
                                             "totalhitwickets": 0, "totalcaughts": 0, "totalstumpeds": 0,
                                             "totalstosgiven": 0, "totalstosgivenopp": 0, "totalcatches": 0,
-                                            "totalrunouts": 0, "totalstumpings": 0}
+                                            "totalrunouts": 0, "totalstumpings": 0, 'Win %': 0, 'Avg First Boundary Ball': 0, 'Strike Rate': 0, 'Boundary %': 0,'Dot Ball %': 0, 'Strike Turnover %': 0, 'Strike Rate MeanAD': 0, 'Score MeanAD': 0,'Average': 0, 'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Avg': 0, 'Bowling SR': 0}
         if self.teams:
             self.result = {}
             for eachteam in self.teams:
@@ -450,8 +452,6 @@ class search:
                     
                     # Team innings scores
                     if self.teams:
-
-                        # List of Team scores.
                         if eachinnings["team"] in self.teams:
                             self.result[eachinnings["team"]]["All Scores"].append(
                                 sum(self.result[eachinnings["team"]]["inningsruns"]))

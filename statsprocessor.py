@@ -27,7 +27,8 @@ def madfromlist(statlist1, statlist2, stattype=False):
 
 
 def mad(statlist):
-    df = pd.DataFrame(statlist)
+    data = statlist
+    df = pd.DataFrame(data)
     stat = df[0].mad()
     return round(stat, 2)
 

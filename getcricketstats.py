@@ -16,18 +16,20 @@ Ozbowlers = ["PJ Cummins", "JR Hazlewood", "MA Starc", "JA Richardson", "A Zampa
 Ozbatters = ["DA Warner", "SPD Smith", "MR Marsh", "GJ Maxwell", "MP Stoinis", "MS Wade", "JP Inglis", "M Labuschagne",
              "UT Khawaja", "TM Head", "MS Harris", "CD Green", "TD Paine"]
 Indbatters = ["R Ashwin"]
-result = getstats.getstats("/home/saranga/Downloads/all_json.zip", (2018, 12, 1),
-                           (2021, 12, 1), betweenovers=[], players=Ozbatters, matchtype=["MDM", "Test"])
 
-# getstats input arguments.  sex=[], teams=[], opposition=[], venue=[], event=[], matchtype=["Test", "MDM", "ODI", "ODM", "T20", "IT20"], matchresult="", innings = []
-# getstats output -> pandas dataframe
+""" How to use this script """
 
-# Stats Comparison
-print(result[["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD", "Avg First Boundary Ball"]])
-# print(result[["Avg First Boundary Ball"]])
+# 1. Create a search object. Input arguments: players=[] or teams=[]
+search1 = getstats.search(players=Ozbatters)
+
+# 2. Apply the "getstats()" method to the search object. getstats input arguments:  sex=[], opposition=[], venue=[], event=[], matchtype=["Test", "MDM", "ODI", "ODM", "T20", "IT20"], matchresult=["winner", "draw","tie"], innings = []
+search1.getstats("/home/saranga/Downloads/all_json.zip", (2018, 12, 1), (2021, 12, 1), betweenovers=[], matchtype=["MDM", "Test"])
+
+# 3. Print result of the search object. getstats output is pandas dataframe
+print(search1.result[["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD", "Avg First Boundary Ball"]])
 
 
-# Plotting
+# 4. Plotting
 # Decide on what plotting package to use here.
 
 # plt.scatter(x=playerscompresultdf.loc["Australia", "All Scores"], y=playerscompresultdf.loc["Australia", "All Outs"],)

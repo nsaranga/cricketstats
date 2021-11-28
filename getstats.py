@@ -10,7 +10,13 @@ import index
 
 # for reverse lookup, I need to look for stats. One way is to write a new type of search with new class and get stats func. Other way is to write function that lists every player for a particular stat and inputs subset of tha tlist into getstats()
 
-# Stats by batting position is just a check. to add. Hmm have to thinka bout how to do this.
+# Stats by batting position is just a check. to add. Hmm have to think about how to do this.
+
+# CLI program plan:
+# 1 Wrapper CLI interface -> user inputs players or teams they -> create search object
+# 2 Search Object uses getstats method -> stats collected
+# 3 User is shown what stats they can see, and asks which? -> Pandas display of stats.
+# 4 ask if you want plot of dataframe and how?
 
 class search:
     def __init__(self, players=None, teams=None, result=None) -> None:

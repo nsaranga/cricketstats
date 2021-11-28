@@ -23,20 +23,20 @@ Indbatters = ["R Ashwin"]
 search1 = getstats.search(players=Ozbatters)
 
 # 2. Apply the "getstats()" method to the search object. getstats input arguments:  sex=[], opposition=[], venue=[], event=[], matchtype=["Test", "MDM", "ODI", "ODM", "T20", "IT20"], matchresult=["winner", "draw","tie"], innings = []
-search1.getstats("/home/saranga/Downloads/all_json.zip", (2018, 12, 1), (2021, 12, 1), betweenovers=[], matchtype=["MDM", "Test"])
+search1.getstats("/home/saranga/Downloads/all_json.zip", (2018, 1, 1), (2021, 12, 1), betweenovers=[], matchtype=["Test"])
 
 # 3. Print result of the search object. getstats output is pandas dataframe
 # Use the follwing line to get a list of all the stats that are collected: print(search1.result.columns)
-print(search1.result[["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD", "Avg First Boundary Ball"]])
+print(search1.result[["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD"]])
 
 
 # 4. Plotting
 # Decide on what plotting package to use here.
 
-# plt.scatter(x=playerscompresultdf.loc["Australia", "All Scores"], y=playerscompresultdf.loc["Australia", "All Outs"],)
-# playerscompresultdf.sort_values(by="Boundary %", ascending=False)[["Boundary %", "Dot Ball %", "Balls Faced"]].plot(kind="bar", rot=15, fontsize=8, secondary_y="Balls Faced", title="Overs 1-20 in all T20s since start of 2018")
+# plt.scatter(x=search1.result.loc["Australia", "All Scores"], y=search1.result.loc["Australia", "All Outs"],)
+search1.result.sort_values(by="Average", ascending=False)[["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD",]].plot(kind="bar", rot=15, fontsize=8, title="Test since start of 2018")
 
 # plt.grid(axis = 'y')
-# plt.legend()
-# plt.title("source: cricsheet.org", fontsize=10)
-# plt.show()
+plt.legend()
+# plt.title("Average vs Strike Rate" data: cricsheet.org", fontsize=10)
+plt.show()

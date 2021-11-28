@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 # Stats Processor functions
 
 def ratio(stat1, stat2, multiplier=None):

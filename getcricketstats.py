@@ -17,7 +17,7 @@ Ozbatters = ["DA Warner", "SPD Smith", "MR Marsh", "GJ Maxwell", "MP Stoinis", "
              "UT Khawaja", "TM Head", "MS Harris", "CD Green", "TD Paine"]
 Indbatters = ["R Ashwin"]
 
-""" How to use this script """
+# How to use this script
 
 # 1. Create a search object. Input arguments: players=[] or teams=[]
 search1 = getstats.search(players=Ozbatters)

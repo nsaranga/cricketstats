@@ -1,12 +1,12 @@
-import glob
 import json
-import statsprocessor
 import time
 import pandas as pd
 import os
 import zipfile
-import index
 import numpy as np
+
+import statsprocessor
+import index
 
 # for reverse lookup, I need to look for stats. One way is to write a new type of search with new class and get stats func. Other way is to write function that lists every player for a particular stat and inputs subset of tha tlist into getstats()
 
@@ -138,7 +138,7 @@ class search:
                     continue
 
                 # Caps and Wins record
-                # rewrite for test match draw and ties, and add these to stats dict.
+                # rewrite for ties and superovers, and add these to stats dict.
                 if self.players:
                     for eachplayer in self.players:
                         for eachteam in match["info"]["players"]:

@@ -178,6 +178,7 @@ class search:
                     if "overs" not in eachinnings:
                         continue
 
+                    battingorder = []
                     # Open each over in innings
                     if self.players:
                         for eachplayer in self.players:
@@ -197,6 +198,7 @@ class search:
                     for eachover in eachinnings['overs']:
                         if betweenovers and (eachover['over'] < (betweenovers[0] - 1) or eachover['over'] > (betweenovers[1] - 1)):
                             continue
+
                         # Open each ball
                         for nth, eachball in enumerate(eachover['deliveries']):
 
@@ -258,32 +260,45 @@ class search:
                                                 self.result[eachball['non_striker']
                                                             ]["Run Outs"] += 1
 
-                                # include legbyes and byes.
-                                if nth < 5:
+                                # Strike Turnover stats
+                                if nth < len(eachover['deliveries'] - 1):
                                     if eachball['batter'] in self.players:
                                         self.result[eachball['batter']
                                                     ]["totalstosopp"] += 1
-                                        if eachball['runs']['batter'] == 1 or eachball['runs']['batter'] == 3:
-                                            self.result[eachball['batter']
-                                                        ]["totalstos"] += 1
+                                        if eachball and eachball['runs']['batter'] == 1 or eachball['runs']['batter'] == 3:
+                                            self.result[eachball['batter']]["totalstos"] += 1
+                                        if "extras" in eachball:
+                                            if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']) and (eachball['runs']['extras'] == 1 or eachball['runs']['extras'] == 3):
+                                                self.result[eachball['batter']]["totalstos"] += 1
                                     if eachball['bowler'] in self.players:
                                         self.result[eachball['bowler']
                                                     ]["totalstosgivenopp"] += 1
                                         if eachball['runs']['batter'] == 1 or eachball['runs']['batter'] == 3:
                                             self.result[eachball['bowler']
                                                         ]["totalstosgiven"] += 1
-                                if nth == 5:
+                                        if "extras" in eachball:
+                                            if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']) and (eachball['runs']['extras'] == 1 or eachball['runs']['extras'] == 3):
+                                                self.result[eachball['bowler']
+                                                        ]["totalstosgiven"] += 1
+                                if nth == len(eachover['deliveries'] - 1):
                                     if eachball['batter'] in self.players:
                                         self.result[eachball['batter']
                                                     ]["totalstosopp"] += 1
                                         if eachball['runs']['batter'] == 0 or eachball['runs']['batter'] == 2:
                                             self.result[eachball['batter']
                                                         ]["totalstos"] += 1
+                                        if "extras" in eachball:
+                                            if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']) and (eachball['runs']['extras'] == 0 or eachball['runs']['extras'] == 2):
+                                                self.result[eachball['batter']]["totalstos"] += 1
                                     if eachball['bowler'] in self.players:
                                         self.result[eachball['bowler']
                                                     ]["totalstosgivenopp"] += 1
                                         if eachball['runs']['batter'] == 0 or eachball['runs']['batter'] == 2:
                                             self.result[eachball['bowler']
+                                                        ]["totalstosgiven"] += 1
+                                        if "extras" in eachball:
+                                            if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']) and (eachball['runs']['extras'] == 0 or eachball['runs']['extras'] == 2):
+                                                self.result[eachball['bowler']
                                                         ]["totalstosgiven"] += 1
 
                                 # Player Bowling stats
@@ -505,7 +520,7 @@ class search:
                                 if "target" in match['innings'][1]:
                                     self.result[match['info']['outcome']["winner"]]["Defended Scores"].append(
                                         match['innings'][1]['target']['runs'] - 1)
-                                if nthinnings == (len(match['innings']) - 1) and match['info']['outcome']["winner"] != eachinnings["team"]:
+                                if "target" not in match['innings'][1] and nthinnings == (len(match['innings']) - 1) and match['info']['outcome']["winner"] != eachinnings["team"]:
                                     self.result[match['info']['outcome']["winner"]]["Defended Scores"].append(
                                         (sum(
                                             self.result[match['info']['outcome']["winner"]]["inningsrunsgiven"]))
@@ -518,7 +533,7 @@ class search:
                                         match['innings'][1]['target']['runs'])
                                     self.result[match['info']['outcome']["winner"]]["overschased"].append(
                                         round(self.result[match['info']['outcome']["winner"]]["inningsballsfaced"] / 6))
-                                if nthinnings == (len(match['innings']) - 1) and match['info']['outcome']["winner"] == eachinnings["team"]:
+                                if "target" not in match['innings'][1] and nthinnings == (len(match['innings']) - 1) and match['info']['outcome']["winner"] == eachinnings["team"]:
                                     self.result[match['info']['outcome']["winner"]]["Chased Scores"].append(
                                         (sum(self.result[match['info']['outcome']["winner"]]["inningsruns"])))
                                     self.result[match['info']['outcome']["winner"]]["overschased"].append(

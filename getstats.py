@@ -261,11 +261,11 @@ class search:
                                                             ]["Run Outs"] += 1
 
                                 # Strike Turnover stats
-                                if nth < len(eachover['deliveries'] - 1):
+                                if nth < (len(eachover['deliveries']) - 1):
                                     if eachball['batter'] in self.players:
                                         self.result[eachball['batter']
                                                     ]["totalstosopp"] += 1
-                                        if eachball and eachball['runs']['batter'] == 1 or eachball['runs']['batter'] == 3:
+                                        if eachball['runs']['batter'] == 1 or eachball['runs']['batter'] == 3:
                                             self.result[eachball['batter']]["totalstos"] += 1
                                         if "extras" in eachball:
                                             if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']) and (eachball['runs']['extras'] == 1 or eachball['runs']['extras'] == 3):
@@ -280,7 +280,7 @@ class search:
                                             if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']) and (eachball['runs']['extras'] == 1 or eachball['runs']['extras'] == 3):
                                                 self.result[eachball['bowler']
                                                         ]["totalstosgiven"] += 1
-                                if nth == len(eachover['deliveries'] - 1):
+                                if nth == (len(eachover['deliveries']) - 1):
                                     if eachball['batter'] in self.players:
                                         self.result[eachball['batter']
                                                     ]["totalstosopp"] += 1

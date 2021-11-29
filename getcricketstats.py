@@ -11,32 +11,27 @@ import getstats
 import matplotlib.pyplot as plt
 import pandas as pd
 
-Ozbowlers = ["PJ Cummins", "JR Hazlewood", "MA Starc", "JA Richardson", "A Zampa", "AC Agar", "NT Ellis", "MP Stoinis",
-             "MR Marsh", "MJ Swepson", "MG Neser", "NM Lyon", "CD Green"]
-Ozbatters = ["DA Warner", "SPD Smith", "MR Marsh", "GJ Maxwell", "MP Stoinis", "MS Wade", "JP Inglis", "M Labuschagne",
-             "UT Khawaja", "TM Head", "MS Harris", "CD Green", "TD Paine"]
-Indbatters = ["R Ashwin"]
-
 # How to use this script
 
 # 1. Create a search object. Input arguments: players=[] or teams=[]
+#   For ease of use declare a list of players or teams to search stats for and then call that variable
+Ozbatters = ["DA Warner", "SPD Smith", "MR Marsh", "GJ Maxwell", "MP Stoinis", "MS Wade", "JP Inglis", "M Labuschagne",
+             "UT Khawaja", "TM Head", "MS Harris", "CD Green"]
+
 search1 = getstats.search(players=Ozbatters)
 
-# 2. Apply the "getstats()" method to the search object. getstats input arguments:  sex=[], opposition=[], venue=[], event=[], matchtype=["Test", "MDM", "ODI", "ODM", "T20", "IT20"], matchresult=["winner", "draw","tie"], innings = []
+# 2. Apply the "getstats()" method to the search object which is "search1" in this case. Input arguments:  sex=["male", "female"], opposition=[], venue=[], event=[], matchtype=["Test", "MDM", "ODI", "ODM", "T20", "IT20"], matchresult=["winner", "draw","tie"], innings = []
+# If arguments are not given then all matches compatible with that argument will be searched.
 search1.getstats("/home/saranga/Downloads/all_json.zip", (2018, 1, 1), (2021, 12, 1), betweenovers=[], matchtype=["Test"])
 
-# 3. Print result of the search object. getstats output is pandas dataframe
+# 3. Print result. Output is a pandas dataframe.
 # Use the follwing line to get a list of all the stats that are collected: print(search1.result.columns)
 print(search1.result[["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD"]])
 
 
 # 4. Plotting
-# Decide on what plotting package to use here.
-
-# plt.scatter(x=search1.result.loc["Australia", "All Scores"], y=search1.result.loc["Australia", "All Outs"],)
-search1.result.sort_values(by="Average", ascending=False)[["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD",]].plot(kind="bar", rot=15, fontsize=8, title="Test since start of 2018")
-
-# plt.grid(axis = 'y')
+# You can use the plotting methods from the pandas package for simple plots.
+search1.result.sort_values(by="Average", ascending=False)[["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD"]].plot(kind="bar", rot=15, fontsize=8, title="Test since start of 2018 (data: cricsheet.org)")
+plt.grid(axis = 'y')
 plt.legend()
-# plt.title("Average vs Strike Rate" data: cricsheet.org", fontsize=10)
 plt.show()

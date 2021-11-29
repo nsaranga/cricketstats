@@ -8,9 +8,10 @@ import numpy as np
 import statsprocessor
 import index
 
-# for reverse lookup, I need to look for stats. One way is to write a new type of search with new class and get stats func. Other way is to write function that lists every player for a particular stat and inputs subset of tha tlist into getstats()
+# for reverse lookup, I need to look for stats. One way is to write a new type of search with new class and get stats func. Other way is to write function that lists every player for a particular stat and inputs subset of tha tlist into getstats(). Maybe another way is first create a list/index of all players in the database. delete duplicates. then input that list into getstatsfunc.
 
-# Stats by batting position is just a check. to add. Hmm have to think about how to do this.
+
+# Do this first Stats by batting position is just a check. to add. Basically go through the innings and get batting order, then check against the number I give in input.
 
 # CLI program plan:
 # 1 Wrapper CLI interface -> user inputs players or teams they -> create search object

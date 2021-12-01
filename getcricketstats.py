@@ -26,7 +26,7 @@ search1.getstats("/home/saranga/Downloads/all_json.zip", (2018, 1, 1), (2021, 12
 
 # 3. Print result. Output is a pandas dataframe.
 # Use the follwing line to get a list of all the stats that are collected: print(search1.result.columns)
-print(search1.result[["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD"]])
+print(search1.result[["Caps", "Won", "Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD"]])
 
 
 # 4. Plotting

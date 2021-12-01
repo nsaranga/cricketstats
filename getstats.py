@@ -56,7 +56,135 @@ class search:
                                         "totalsixesgiven": 0, "Wickets": 0, "Balls Bowled": 0, "totalextras": 0,
                                         "totaldotsbowled": 0, "totalcaughts": 0, "totalrunouts": 0, "totalstumpeds": 0}
     
+    def fileindexing(self, database, matches):
+        if os.path.getmtime(database) > index.matchindex['indexedtime']:
+            matchindex = {'file': "",'indexedtime': 0,'Test': [], 'MDM': [], 'ODI': [], 'ODM': [], 'T20': [], 'IT20': []}
+            matchindex['indexedtime'] = os.path.getmtime(database)
+            matchindex['file'] = matches.filename
+            filelist = matches.namelist()
+            for eachfile in filelist:
+                if ".json" not in eachfile:
+                    continue
+                matchdata = matches.open(eachfile)
+                match = json.load(matchdata)
+                matchindex[match["info"]["match_type"]].append(eachfile)
+                matchdata.close
+            file = open("index.py", "w")
+            file.write("matchindex = " + repr(matchindex))
+            file.close
 
+    def capsandwins(self, matchplayers, matchoutcome, matchteams):
+        if self.players:
+            for eachplayer in self.players:
+                for eachteam in matchplayers:
+                    if eachplayer in matchplayers[eachteam]:
+                        self.result[eachplayer]["Caps"] += 1
+                        if "result" in matchoutcome and matchoutcome['result'] == "draw":
+                            self.result[eachplayer]["Drawn"] += 1
+                        if "winner" in matchoutcome and eachteam == matchoutcome["winner"]:
+                            self.result[eachplayer]["Won"] += 1
+
+        if self.teams:
+            for eachteam in matchteams:
+                if eachteam not in self.teams:
+                    continue
+                self.result[eachteam]["Games"] += 1
+                if "result" in matchoutcome and matchoutcome['result'] == "draw":
+                    self.result[eachteam]["Drawn"] += 1
+                if "winner" in matchoutcome and eachteam in matchoutcome["winner"]:
+                    self.result[matchoutcome
+                                ["winner"]]["Won"] += 1
+    
+    def setupinningscores(self):
+        if self.players:
+            for eachplayer in self.players:
+                self.result[eachplayer]["inningsruns"] = []
+                self.result[eachplayer]["inningsballsfaced"] = 0
+                self.result[eachplayer]["inningsrunsgiven"] = []
+                self.result[eachplayer]["inningsballsbowled"] = 0
+                self.result[eachplayer]["inningswickets"] = 0
+        if self.teams:
+            for eachteam in self.teams:
+                self.result[eachteam]["inningsouts"] = 0
+                self.result[eachteam]["inningsruns"] = []
+                self.result[eachteam]["inningsballsfaced"] = 0
+                self.result[eachteam]["inningswickets"] = 0
+                self.result[eachteam]["inningsrunsgiven"] = []
+                self.result[eachteam]["inningsballsbowled"] = 0
+
+    def strikerscore(self, eachball):
+        self.result[eachball['batter']
+                    ]["Runs"] += eachball['runs']['batter']
+        self.result[eachball['batter']]["inningsruns"].append(
+            eachball['runs']['batter'])
+        if eachball['runs']['batter'] == 4:
+            self.result[eachball['batter']
+                        ]["Fours"] += 1
+        if eachball['runs']['batter'] == 6:
+            self.result[eachball['batter']
+                        ]["Sixes"] += 1
+        if eachball['runs']['total'] == 0:
+            self.result[eachball['batter']
+                        ]["Dot Balls"] += 1
+        if "extras" not in eachball:
+            self.result[eachball['batter']
+                        ]["Balls Faced"] += 1
+            self.result[eachball['batter']
+                        ]["inningsballsfaced"] += 1
+        if "extras" in eachball:
+            if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']):
+                self.result[eachball['batter']
+                            ]["Balls Faced"] += 1
+                self.result[eachball['batter']
+                            ]["inningsballsfaced"] += 1
+        if "wickets" in eachball:
+            for eachwicket in eachball["wickets"]:
+                self.result[eachball['batter']
+                            ]["Outs"] += 1
+                if eachwicket["kind"] == "bowled":
+                    self.result[eachball['batter']
+                                ]["Bowled Outs"] += 1
+                if eachwicket["kind"] == "lbw":
+                    self.result[eachball['batter']
+                                ]["LBW Outs"] += 1
+                if eachwicket["kind"] == "caught":
+                    self.result[eachball['batter']
+                                ]["Caught Outs"] += 1
+                if eachwicket["kind"] == "stumped":
+                    self.result[eachball['batter']
+                                ]["Stumped Outs"] += 1
+                if eachwicket["kind"] == "run out":
+                    self.result[eachball['batter']
+                                ]["Run Outs"] += 1
+
+    def nonstrikerscore(self, eachball, oppositionbowlers):
+        for eachwicket in eachball["wickets"]:
+            if eachball["non_striker"] in self.players and eachball['non_striker'] == eachwicket["player_out"] and not oppositionbowlers:
+                self.result[eachball['non_striker']
+                            ]["Outs"] += 1
+                if eachwicket["kind"] == "run out":
+                    self.result[eachball['non_striker']
+                                ]["Run Outs"] += 1
+
+    def striketurnover(self, eachball, case1, case2):
+        if eachball['batter'] in self.players:
+            self.result[eachball['batter']
+                        ]["totalstosopp"] += 1
+            if eachball['runs']['batter'] == case1 or eachball['runs']['batter'] == case2:
+                self.result[eachball['batter']]["totalstos"] += 1
+            if "extras" in eachball:
+                if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']) and (eachball['runs']['extras'] == case1 or eachball['runs']['extras'] == case2):
+                    self.result[eachball['batter']]["totalstos"] += 1
+        if eachball['bowler'] in self.players:
+            self.result[eachball['bowler']
+                        ]["totalstosgivenopp"] += 1
+            if eachball['runs']['batter'] == case1 or eachball['runs']['batter'] == case2:
+                self.result[eachball['bowler']
+                            ]["totalstosgiven"] += 1
+            if "extras" in eachball:
+                if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']) and (eachball['runs']['extras'] == case1 or eachball['runs']['extras'] == case2):
+                    self.result[eachball['bowler']
+                            ]["totalstosgiven"] += 1
 
     def getstats(self, database, fromtime, totime, betweenovers=None, innings=None, sex=None, playerteams=None, oppositionbatters=None, oppositionbowlers=None, oppositionteams=None, venue=None, event=None, matchtype=None, matchresult=None):
         if betweenovers == None:
@@ -85,25 +213,12 @@ class search:
         # Setup search results according to whether search involves teams or players.
         search.resultsetup(self)
 
-        # add the filename of the zip i'm indexing.
         # Ingest zipfile of data
         matches = zipfile.ZipFile(database, 'r')
-        filelist = matches.namelist()
+
         # create an index file for eachfile
         if os.path.getmtime(database) > index.matchindex['indexedtime']:
-            matchindex = {'file': "",'indexedtime': 0,'Test': [], 'MDM': [], 'ODI': [], 'ODM': [], 'T20': [], 'IT20': []}
-            matchindex['indexedtime'] = os.path.getmtime(database)
-            matchindex['file'] = matches.filename
-            for eachfile in filelist:
-                if ".json" not in eachfile:
-                    continue
-                matchdata = matches.open(eachfile)
-                match = json.load(matchdata)
-                matchindex[match["info"]["match_type"]].append(eachfile)
-                matchdata.close
-            file = open("index.py", "w")
-            file.write("matchindex = " + repr(matchindex))
-            file.close
+            search.fileindexing(self, database, matches)
 
         # for most of these checks if i pass the required string I can setup functions with basic structure.
         # what if I don't give any matchtype? I have to make this a required arg.
@@ -157,26 +272,7 @@ class search:
 
                 # Caps and Wins record
                 # rewrite for ties and superovers, and add these to stats dict.
-                if self.players:
-                    for eachplayer in self.players:
-                        for eachteam in match["info"]["players"]:
-                            if eachplayer in match["info"]["players"][eachteam]:
-                                self.result[eachplayer]["Caps"] += 1
-                                if "result" in match["info"]["outcome"] and match["info"]["outcome"]['result'] == "draw":
-                                    self.result[eachplayer]["Drawn"] += 1
-                                if "winner" in match["info"]["outcome"] and eachteam == match["info"]["outcome"]["winner"]:
-                                    self.result[eachplayer]["Won"] += 1
-
-                if self.teams:
-                    for eachteam in match["info"]["teams"]:
-                        if eachteam not in self.teams:
-                            continue
-                        self.result[eachteam]["Games"] += 1
-                        if "result" in match["info"]["outcome"] and match["info"]["outcome"]['result'] == "draw":
-                            self.result[eachteam]["Drawn"] += 1
-                        if "winner" in match["info"]["outcome"] and eachteam in match["info"]["outcome"]["winner"]:
-                            self.result[match["info"]["outcome"]
-                                        ["winner"]]["Won"] += 1
+                search.capsandwins(self, match["info"]["players"], match["info"]["outcome"], match["info"]["teams"])
 
                 # Open each innings in match
                 for nthinnings, eachinnings in enumerate(match['innings']):
@@ -186,24 +282,11 @@ class search:
                         continue
                     if "overs" not in eachinnings:
                         continue
+                    
+                    # Setup running tally of innings scores
+                    search.setupinningscores(self)
 
-                    battingorder = []
                     # Open each over in innings
-                    if self.players:
-                        for eachplayer in self.players:
-                            self.result[eachplayer]["inningsruns"] = []
-                            self.result[eachplayer]["inningsballsfaced"] = 0
-                            self.result[eachplayer]["inningsrunsgiven"] = []
-                            self.result[eachplayer]["inningsballsbowled"] = 0
-                            self.result[eachplayer]["inningswickets"] = 0
-                    if self.teams:
-                        for eachteam in self.teams:
-                            self.result[eachteam]["inningsouts"] = 0
-                            self.result[eachteam]["inningsruns"] = []
-                            self.result[eachteam]["inningsballsfaced"] = 0
-                            self.result[eachteam]["inningswickets"] = 0
-                            self.result[eachteam]["inningsrunsgiven"] = []
-                            self.result[eachteam]["inningsballsbowled"] = 0
                     for eachover in eachinnings['overs']:
                         if betweenovers and (eachover['over'] < (betweenovers[0] - 1) or eachover['over'] > (betweenovers[1] - 1)):
                             continue
@@ -215,100 +298,19 @@ class search:
                             if self.players:
 
                                 # Player Batting stats
+                                # Striker's stats
                                 if eachball['batter'] in self.players and (not oppositionbowlers or eachball['bowler'] in oppositionbowlers):
-                                    self.result[eachball['batter']
-                                                ]["Runs"] += eachball['runs']['batter']
-                                    self.result[eachball['batter']]["inningsruns"].append(
-                                        eachball['runs']['batter'])
-                                    if eachball['runs']['batter'] == 4:
-                                        self.result[eachball['batter']
-                                                    ]["Fours"] += 1
-                                    if eachball['runs']['batter'] == 6:
-                                        self.result[eachball['batter']
-                                                    ]["Sixes"] += 1
-                                    if eachball['runs']['total'] == 0:
-                                        self.result[eachball['batter']
-                                                    ]["Dot Balls"] += 1
-                                    if "extras" not in eachball:
-                                        self.result[eachball['batter']
-                                                    ]["Balls Faced"] += 1
-                                        self.result[eachball['batter']
-                                                    ]["inningsballsfaced"] += 1
-                                    if "extras" in eachball:
-                                        if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']):
-                                            self.result[eachball['batter']
-                                                        ]["Balls Faced"] += 1
-                                            self.result[eachball['batter']
-                                                        ]["inningsballsfaced"] += 1
-                                    if "wickets" in eachball:
-                                        for eachwicket in eachball["wickets"]:
-                                            self.result[eachball['batter']
-                                                        ]["Outs"] += 1
-                                            if eachwicket["kind"] == "bowled":
-                                                self.result[eachball['batter']
-                                                            ]["Bowled Outs"] += 1
-                                            if eachwicket["kind"] == "lbw":
-                                                self.result[eachball['batter']
-                                                            ]["LBW Outs"] += 1
-                                            if eachwicket["kind"] == "caught":
-                                                self.result[eachball['batter']
-                                                            ]["Caught Outs"] += 1
-                                            if eachwicket["kind"] == "stumped":
-                                                self.result[eachball['batter']
-                                                            ]["Stumped Outs"] += 1
-                                            if eachwicket["kind"] == "run out":
-                                                self.result[eachball['batter']
-                                                            ]["Run Outs"] += 1
-                                # Non-striker outs
+                                    search.strikerscore(self, eachball)
+ 
+                                # Non-striker's outs.
                                 if "wickets" in eachball:
-                                    for eachwicket in eachball["wickets"]:
-                                        if eachball["non_striker"] in self.players and eachball['non_striker'] == eachwicket["player_out"] and not oppositionbowlers:
-                                            self.result[eachball['non_striker']
-                                                        ]["Outs"] += 1
-                                            if eachwicket["kind"] == "run out":
-                                                self.result[eachball['non_striker']
-                                                            ]["Run Outs"] += 1
+                                    search.nonstrikerscore(self, eachball, oppositionbowlers)
 
                                 # Strike Turnover stats
                                 if nth < (len(eachover['deliveries']) - 1):
-                                    if eachball['batter'] in self.players:
-                                        self.result[eachball['batter']
-                                                    ]["totalstosopp"] += 1
-                                        if eachball['runs']['batter'] == 1 or eachball['runs']['batter'] == 3:
-                                            self.result[eachball['batter']]["totalstos"] += 1
-                                        if "extras" in eachball:
-                                            if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']) and (eachball['runs']['extras'] == 1 or eachball['runs']['extras'] == 3):
-                                                self.result[eachball['batter']]["totalstos"] += 1
-                                    if eachball['bowler'] in self.players:
-                                        self.result[eachball['bowler']
-                                                    ]["totalstosgivenopp"] += 1
-                                        if eachball['runs']['batter'] == 1 or eachball['runs']['batter'] == 3:
-                                            self.result[eachball['bowler']
-                                                        ]["totalstosgiven"] += 1
-                                        if "extras" in eachball:
-                                            if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']) and (eachball['runs']['extras'] == 1 or eachball['runs']['extras'] == 3):
-                                                self.result[eachball['bowler']
-                                                        ]["totalstosgiven"] += 1
+                                    search.striketurnover(self, eachball, 1, 3)
                                 if nth == (len(eachover['deliveries']) - 1):
-                                    if eachball['batter'] in self.players:
-                                        self.result[eachball['batter']
-                                                    ]["totalstosopp"] += 1
-                                        if eachball['runs']['batter'] == 0 or eachball['runs']['batter'] == 2:
-                                            self.result[eachball['batter']
-                                                        ]["totalstos"] += 1
-                                        if "extras" in eachball:
-                                            if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']) and (eachball['runs']['extras'] == 0 or eachball['runs']['extras'] == 2):
-                                                self.result[eachball['batter']]["totalstos"] += 1
-                                    if eachball['bowler'] in self.players:
-                                        self.result[eachball['bowler']
-                                                    ]["totalstosgivenopp"] += 1
-                                        if eachball['runs']['batter'] == 0 or eachball['runs']['batter'] == 2:
-                                            self.result[eachball['bowler']
-                                                        ]["totalstosgiven"] += 1
-                                        if "extras" in eachball:
-                                            if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']) and (eachball['runs']['extras'] == 0 or eachball['runs']['extras'] == 2):
-                                                self.result[eachball['bowler']
-                                                        ]["totalstosgiven"] += 1
+                                    search.striketurnover(self, eachball, 0, 2)
 
                                 # Player Bowling stats
                                 if eachball['bowler'] in self.players and (
@@ -372,7 +374,7 @@ class search:
                                                 self.result[eachball['bowler']
                                                             ]["totalstumpeds"] += 1
 
-                                # Non-striker outs and fielding stats
+                                # fielding stats
                                 if "wickets" in eachball:
                                     for eachwicket in eachball["wickets"]:
                                         if "fielders" in eachwicket:

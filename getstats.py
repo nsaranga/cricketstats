@@ -25,31 +25,7 @@ class search:
         self.teams = teams
         self.result = result
 
-
-    def getstats(self, database, fromtime, totime, betweenovers=None, innings=None, sex=None, playerteams=None, oppositionbatters=None, oppositionbowlers=None, oppositionteams=None, venue=None, event=None, matchtype=None, matchresult=None):
-        if betweenovers == None:
-            betweenovers = []
-        if innings == None:
-            innings = []
-        if sex == None:
-            sex = []
-        if playerteams ==None:
-            playerteams = []
-        if oppositionbatters == None:
-            oppositionbatters = []
-        if oppositionbowlers == None:
-            oppositionbowlers = []
-        if oppositionteams == None:
-            oppositionteams = []
-        if venue == None:
-            venue = []
-        if event ==None:
-            event =[]
-        if matchtype == None:
-            matchtype = []
-        if matchresult == None:
-            matchresult = []
-
+    def resultsetup(self):
         if self.players:
             self.result = {}
             for eachplayer in self.players:
@@ -79,14 +55,45 @@ class search:
                                         "inningswickets": 0, "totalrunsgiven": 0, "totalfoursgiven": 0,
                                         "totalsixesgiven": 0, "Wickets": 0, "Balls Bowled": 0, "totalextras": 0,
                                         "totaldotsbowled": 0, "totalcaughts": 0, "totalrunouts": 0, "totalstumpeds": 0}
+    
 
+
+    def getstats(self, database, fromtime, totime, betweenovers=None, innings=None, sex=None, playerteams=None, oppositionbatters=None, oppositionbowlers=None, oppositionteams=None, venue=None, event=None, matchtype=None, matchresult=None):
+        if betweenovers == None:
+            betweenovers = []
+        if innings == None:
+            innings = []
+        if sex == None:
+            sex = []
+        if playerteams ==None:
+            playerteams = []
+        if oppositionbatters == None:
+            oppositionbatters = []
+        if oppositionbowlers == None:
+            oppositionbowlers = []
+        if oppositionteams == None:
+            oppositionteams = []
+        if venue == None:
+            venue = []
+        if event ==None:
+            event =[]
+        if matchtype == None:
+            matchtype = []
+        if matchresult == None:
+            matchresult = []
+
+        # Setup search results according to whether search involves teams or players.
+        search.resultsetup(self)
+
+        # add the filename of the zip i'm indexing.
         # Ingest zipfile of data
         matches = zipfile.ZipFile(database, 'r')
         filelist = matches.namelist()
         # create an index file for eachfile
         if os.path.getmtime(database) > index.matchindex['indexedtime']:
-            matchindex = {'indexedtime': 0,'Test': [], 'MDM': [], 'ODI': [], 'ODM': [], 'T20': [], 'IT20': []}
+            matchindex = {'file': "",'indexedtime': 0,'Test': [], 'MDM': [], 'ODI': [], 'ODM': [], 'T20': [], 'IT20': []}
             matchindex['indexedtime'] = os.path.getmtime(database)
+            matchindex['file'] = matches.filename
             for eachfile in filelist:
                 if ".json" not in eachfile:
                     continue
@@ -98,6 +105,8 @@ class search:
             file.write("matchindex = " + repr(matchindex))
             file.close
 
+        # for most of these checks if i pass the required string I can setup functions with basic structure.
+        # what if I don't give any matchtype? I have to make this a required arg.
         for eachmatchtype in matchtype:
             for eachfile in index.matchindex[eachmatchtype]:
                 matchdata = matches.open(eachfile)

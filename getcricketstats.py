@@ -20,20 +20,22 @@ Ozbatters = ["DA Warner", "SPD Smith", "MR Marsh", "GJ Maxwell", "MP Stoinis", "
 
 search1 = getstats.search(players=Ozbatters)
 
-# 2. Apply the "getstats()" method to the search object which is "search1" in this case.
-# Possible input arguments:
-database = "C:/Users/mane/Downloads/all_json.zip"
-from_date = (2018, 1, 1)
-to_date =  (2021, 12, 1)
-matchtype = ["Test"]
-# sex=["male", "female"]
-# opposition=[] 
-# venue=[]
-# event=[]
-# matchtype=["Test", "MDM", "ODI", "ODM", "T20", "IT20"]
-# matchresult=["winner", "draw","tie"]
-# innings = []
-# If arguments are not given then all matches compatible with that argument will be searched.
+# 2. Apply the "getstats()" method to the search object which is "search1" in this case with the necessary arguments.
+# If optional arguments are not given then all matches compatible with that argument will be searched
+
+# Required input arguments:
+database = "C:/Users/mane/Downloads/all_json.zip" # Path of cricsheet.org's all matches json zip file.
+from_date = (2018, 1, 1) # The (Year, Month, Day) from which to start search
+to_date = (2021, 12, 1) # The (Year, Month, Day) from which to end search
+matchtype = ["Test", "MDM", "ODI", "ODM", "T20", "IT20"]
+
+# Optional Arguments:
+sex = ["male", "female"]
+opposition = [] 
+venue = []
+event = []
+matchresult=["winner", "draw","tie"]
+innings = []
 
 search1.getstats(database, from_date, to_date, matchtype)
 

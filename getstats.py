@@ -465,7 +465,7 @@ class search:
                 self.result[eachplayer]["Bowling SR"] = statsprocessor.ratio(
                     self.result[eachplayer]["Balls Bowled"], self.result[eachplayer]["Wickets"], multiplier=0)
 
-    def getstats(self, database, fromtime, totime, betweenovers=None, innings=None, sex=None, playerteams=None, oppositionbatters=None, oppositionbowlers=None, oppositionteams=None, venue=None, event=None, matchtype=None, matchresult=None):
+    def getstats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playerteams=None, oppositionbatters=None, oppositionbowlers=None, oppositionteams=None, venue=None, event=None, matchresult=None):
         if betweenovers == None:
             betweenovers = []
         if innings == None:
@@ -484,8 +484,6 @@ class search:
             venue = []
         if event ==None:
             event =[]
-        if matchtype == None:
-            matchtype = []
         if matchresult == None:
             matchresult = []
 
@@ -517,16 +515,13 @@ class search:
                 day = str(match["info"]["dates"][0][8:])
                 matchtimetuple = (int(year), int(month),
                                 int(day), 0, 0, 0, 0, 0, 0)
-                if time.mktime(matchtimetuple) < time.mktime(fromtime + (0, 0, 0, 0, 0, 0)) or time.mktime(matchtimetuple) > time.mktime(totime + (0, 0, 0, 0, 0, 0)):
+                if time.mktime(matchtimetuple) < time.mktime(from_date + (0, 0, 0, 0, 0, 0)) or time.mktime(matchtimetuple) > time.mktime(to_date + (0, 0, 0, 0, 0, 0)):
                     continue
                 # Event Check
                 if event and ("event" not in match["info"] or match["info"]["event"]["name"] not in event):
                     continue
                 # Mens/Womens Check
                 if sex and match["info"]["gender"] not in sex:
-                    continue
-                # Match type check
-                if matchtype and match["info"]["match_type"] not in matchtype:
                     continue
                 # Players' Teams check
                 if playerteams and (

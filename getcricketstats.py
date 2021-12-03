@@ -29,6 +29,7 @@ from_date = (2018, 1, 1) # The (Year, Month, Day) from which to start search
 to_date = (2021, 12, 1) # The (Year, Month, Day) from which to end search
 matchtype = ["Test"] # Options: ["Test", "MDM", "ODI", "ODM", "T20", "IT20"]
 
+# I have ot put list off allpossible options for event at least.
 # Optional Arguments:
 sex = [] # Options: "male", "female" eg. sex = ["female"] 
 opposition = [] # Options: team names eg. ["Australia", "England"]
@@ -45,6 +46,7 @@ search1.getstats(database, from_date, to_date, matchtype)
 print(search1.result[["Caps", "Won", "Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD"]])
 
 
+#shoudl option with ".loc" option for rows and columns
 # 4. Plotting
 # You can use the plotting methods from the pandas package for simple plots.
 search1.result.sort_values(by="Average", ascending=False)[["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD"]].plot(kind="bar", rot=15, fontsize=8, title="Test since start of 2018 (data: cricsheet.org)")

@@ -1,4 +1,4 @@
-# get-cricket-stats is a script for getting team and player statistics from the cricsheet.org database for data analysis.
+# getcricketstats is a script for getting team and player statistics from the cricsheet.org database for data analysis.
 # Copyright (C) 2021  Saranga Sudarshan
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -21,22 +21,23 @@ Ozbatters = ["DA Warner", "SPD Smith", "MR Marsh", "GJ Maxwell", "MP Stoinis", "
 search1 = getstats.search(players=Ozbatters)
 
 # 2. Apply the "getstats()" method to the search object which is "search1" in this case with the necessary arguments.
-# If optional arguments are not given then all matches compatible with that argument will be searched
+# Arguments are mostly lists, with items separated by commans.
 
 # Required input arguments:
 database = "C:/Users/mane/Downloads/all_json.zip" # Path of cricsheet.org's all matches json zip file.
 from_date = (2018, 1, 1) # The (Year, Month, Day) from which to start search
 to_date = (2021, 12, 1) # The (Year, Month, Day) from which to end search
-matchtype = ["Test", "MDM", "ODI", "ODM", "T20", "IT20"]
+matchtype = ["Test"] # Options: ["Test", "MDM", "ODI", "ODM", "T20", "IT20"]
 
 # Optional Arguments:
-sex = ["male", "female"]
-opposition = [] 
-venue = []
-event = []
-matchresult=["winner", "draw","tie"]
-innings = []
+sex = [] # Options: "male", "female" eg. sex = ["female"] 
+opposition = [] # Options: team names eg. ["Australia", "England"]
+venue = [] # Options: Cricket Grounds eg. ["Sydney Cricket Ground", "Melbourne Cricket Ground"]
+event = [] # Options: Name of League or Tournament eg. ["Sheffield Shield", "ICC World Cup"] 
+matchresult = [] # Options "winner", "draw","tie" eg. ["winner", "draw"]
+innings = [] # Options: 1, 2, 3, 4 eg. innings = [1,3]
 
+# getstats method applied on search object
 search1.getstats(database, from_date, to_date, matchtype)
 
 # 3. Print result. Output is a pandas dataframe.

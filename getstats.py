@@ -14,6 +14,7 @@ import index
 # Do this first Stats by batting position is just a check. to add. Basically go through the innings and get batting order, then check against the number I give in input.
 
 # CLI program plan:
+# a: Need create indexes of teams, venues, events, so people cna know what it is possible to search for.
 # 1 Wrapper CLI interface -> user inputs players or teams they -> create search object
 # 2 Search Object uses getstats method -> stats collected
 # 3 User is shown what stats they can see, and asks which? -> Pandas display of stats.

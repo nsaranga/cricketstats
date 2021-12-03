@@ -641,7 +641,7 @@ class search:
 
         if self.players:
             df = pd.DataFrame(self.result)
-            self.result = df.transpose()\
+            self.result = df.transpose()
 
         elif self.teams:
             df = pd.DataFrame(self.result)

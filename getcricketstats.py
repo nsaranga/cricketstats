@@ -14,18 +14,28 @@ import pandas as pd
 # How to use this script
 
 # 1. Create a search object. Input arguments: players=[] or teams=[]
-#   For ease of use declare a list of players or teams to search stats for and then call that variable
-
-database = "C:\Users\mane\Downloads\all_json.zip"
-
+# For ease of use declare a list of players or teams to search stats for and then call that variable
 Ozbatters = ["DA Warner", "SPD Smith", "MR Marsh", "GJ Maxwell", "MP Stoinis", "MS Wade", "JP Inglis", "M Labuschagne",
              "UT Khawaja", "TM Head", "MS Harris", "CD Green"]
 
 search1 = getstats.search(players=Ozbatters)
 
-# 2. Apply the "getstats()" method to the search object which is "search1" in this case. Input arguments:  sex=["male", "female"], opposition=[], venue=[], event=[], matchtype=["Test", "MDM", "ODI", "ODM", "T20", "IT20"], matchresult=["winner", "draw","tie"], innings = []
+# 2. Apply the "getstats()" method to the search object which is "search1" in this case.
+# Possible input arguments:
+database = "C:/Users/mane/Downloads/all_json.zip"
+from_date = (2018, 1, 1)
+to_date =  (2021, 12, 1)
+matchtype = ["Test"]
+# sex=["male", "female"]
+# opposition=[] 
+# venue=[]
+# event=[]
+# matchtype=["Test", "MDM", "ODI", "ODM", "T20", "IT20"]
+# matchresult=["winner", "draw","tie"]
+# innings = []
 # If arguments are not given then all matches compatible with that argument will be searched.
-search1.getstats(database, (2018, 1, 1), (2021, 12, 1), betweenovers=[], matchtype=["Test"])
+
+search1.getstats(database, from_date, to_date, matchtype)
 
 # 3. Print result. Output is a pandas dataframe.
 # Use the follwing line to get a list of all the stats that are collected: print(search1.result.columns)

@@ -36,7 +36,7 @@ search2 = getstats.search(teams=bbl)
 
 # Required input arguments:
 database = "/home/saranga/Downloads/all_json.zip" # Path of cricsheet.org's all matches json zip file.
-from_date = (2018, 1, 1) # The (Year, Month, Day) from which to start search
+from_date = (2017, 10, 1) # The (Year, Month, Day) from which to start search
 to_date = (2021, 12, 31) # The (Year, Month, Day) from which to end search
 matchtype = ["Test", "MDM", "ODI", "ODM", "T20", "IT20"] # Options: ["Test", "MDM", "ODI", "ODM", "T20", "IT20"]
 
@@ -58,18 +58,22 @@ search2.getstats(database, from_date, to_date, matchtype, betweenovers=betweenov
 # 3. Print result. Output is a pandas dataframe.
 # Use the follwing line to get a list of all the stats that are collected: 
 # print(search1.result.columns)
-print(search2.result[["Win %", "Runs", "Runsgiven", "Wickets"]])
+#print(search2.result[["Win %", "Runs", "Runsgiven", "Wickets"]])
 # print(search1.result[["Caps", "Average", "Score MeanAD", "Balls Faced", "Economy Rate", "Economy Rate MeanAD", "Balls Bowled"]])
 
 # Data Analysis example:
 # Pythagorean Expected Win Percentage: Exponent Options: Vine2016: 7.41, SenevirathneaManage2021: maximum likelihood method, 4.71 for ODI matches and 6.06 for Twenty20. The least squares method, 5.01 and 6.56 respectively for ODI and Twenty20.
-search2.result["Exp Win %"] = ((pow(search2.result["Runs"], 7.41) / (pow(search2.result["Runs"], 7.41) + pow(search2.result["Runsgiven"], 7.41)))*100)
-print(search2.result[["Win %", "Exp Win %"]])
+#search2.result["Exp Win %"] = ((pow(search2.result["Runs"], 7.41) / (pow(search2.result["Runs"], 7.41) + pow(search2.result["Runsgiven"], 7.41)))*100)
+#print(search2.result[["Win %", "Exp Win %"]])
 
 
 #show option with ".loc" option for rows and columns
 # 4. Plotting
 # You can use the plotting methods from the pandas package or matplotlib.pyplot for plotting.
-#search1.result.sort_values(by="Average", ascending=False)[["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD"]].plot(kind="bar", rot=15, fontsize=8, title="Test since start of 2018 (data: cricsheet.org)")
-#plt.legend()
-#plt.show()
+search2.result.loc["All Teams", "Defended Scores"] = [x for sublist in search2.result["Defended Scores"] for x in sublist]
+plt.hist(search2.result.loc["All Teams", "Defended Scores"],bins=30, alpha=0.5, label="Defended Scores")
+
+#search1.result.sort_values(by="Average", ascending=False).loc["DA Warner",["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD"]].plot(kind="bar", rot=15, fontsize=8, title="Test since start of 2018 (data: cricsheet.org)")
+
+plt.legend()
+plt.show()

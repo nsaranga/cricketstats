@@ -1,3 +1,21 @@
+""" 
+getcricketstats is a script for getting team and player statistics from the cricsheet.org database for data analysis.
+Copyright (C) 2021  Saranga Sudarshan
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>. 
+"""
+
 import pandas as pd
 
 # Stats Processor functions
@@ -11,15 +29,11 @@ def ratio(stat1, stat2, multiplier=None):
     return stat
 
 
-def madfromlist(statlist1, statlist2, stattype=False):
+def madfromratio(statlist1, statlist2, multiplier=None):
     data = []
     for eachlist in zip(statlist1, statlist2):
-        if stattype == "percent":
-            percent = ratio(eachlist[0], eachlist[1], multiplier=100)
-            data.append(percent)
-        if stattype == "perover":
-            perover = ratio(eachlist[0], eachlist[1], multiplier=6)
-            data.append(perover)
+        statratio = ratio(eachlist[0], eachlist[1], multiplier=multiplier)
+        data.append(statratio)
     df = pd.DataFrame(data)
     stat = df[0].mad()
     return round(stat, 2)

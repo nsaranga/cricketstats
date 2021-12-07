@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. 
 """
 
-import getstats
+import cricketstats
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -28,8 +28,8 @@ import pandas as pd
 Ozbatters = ["DA Warner", "SPD Smith", "MR Marsh", "GJ Maxwell", "MP Stoinis", "MS Wade", "JP Inglis", "M Labuschagne",
              "UT Khawaja", "TM Head", "MS Harris", "CD Green"]
 bbl = ["Sydney Thunder", "Melbourne Renegades", "Brisbane Heat", "Sydney Sixers", "Melbourne Stars", "Perth Scorchers", "Adelaide Strikers", "Hobart Hurricanes"]
-search1 = getstats.search(players=Ozbatters)
-search2 = getstats.search(teams=bbl)
+search1 = cricketstats.search(players=Ozbatters)
+search2 = cricketstats.search(teams=bbl)
 
 # 2. Apply the "getstats()" method to the search object with the necessary arguments.
 # Arguments are mostly lists, with items separated by commans.
@@ -70,9 +70,10 @@ search2.getstats(database, from_date, to_date, matchtype, betweenovers=betweenov
 #show option with ".loc" option for rows and columns
 # 4. Plotting
 # You can use the plotting methods from the pandas package or matplotlib.pyplot for plotting.
-search2.result.loc["All Teams", "Defended Scores"] = [x for sublist in search2.result["Defended Scores"] for x in sublist]
-plt.hist(search2.result.loc["All Teams", "Defended Scores"],bins=30, alpha=0.5, label="Defended Scores")
-
+allteamsdef = [x for sublist in search2.result["Defended Scores"] for x in sublist]
+allteamschase = [x for sublist in search2.result["Chased Scores"] for x in sublist]
+plt.hist(allteamsdef,bins=30, alpha=0.5, label="Defended Scores")
+plt.hist(allteamschase,bins=30, alpha=0.5, label="Chased Scores")
 #search1.result.sort_values(by="Average", ascending=False).loc["DA Warner",["Average", "Score MeanAD", "Strike Rate", "Strike Rate MeanAD"]].plot(kind="bar", rot=15, fontsize=8, title="Test since start of 2018 (data: cricsheet.org)")
 
 plt.legend()

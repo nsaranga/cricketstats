@@ -14,3 +14,19 @@ To understand how to use the module you can use the "example.py" which provides 
 4. Scores by batting position
 5. Superover stats.
 6. ???
+Insert error message if file not found in zip ie if zip is older than index
+index more things, so they can serve as lists for seeing what teams there are in a comp. Venues by country
+also put in checks when values are null.
+For cmd:
+commands:
+for getcricketstat.py:
+Working example is confusing with search1.getstat and getstat.search (If I wanted to apply it for my own set of queries)
+Options for getstats method should be well defined (Dates? event? venue?)
+Let us know all the possibilities we can expect within result method for plotting (ie. loc?)
+
+for getstats.py
+arguments via a dict?
+fromtime? = fromdate would be better
+dicts should be defined in a separate file
+eachball will read better as this(?)ball (same for eachwicket and others)
+match - case in multiple if test for the same variable

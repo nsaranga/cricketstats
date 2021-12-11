@@ -22,9 +22,9 @@ import pandas as pd
 
 def ratio(stat1, stat2, multiplier=None):
     stat = None
-    if multiplier:
+    if multiplier and stat2 != 0:
         stat = round(((stat1 / stat2) * multiplier), 2)
-    if not multiplier:
+    if not multiplier and stat2 != 0:
         stat = round((stat1 / stat2), 2)
     return stat
 

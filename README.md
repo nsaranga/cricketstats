@@ -10,7 +10,7 @@ Some tips/warnings:
 ## What can this script do?
 This is essentially a module you can import into any python script to collect statistics from cricsheet json files.
 
-This script can find team and player statistics along any of the following parameters: Date interval, match type, overs interval, innings, opposition players, opposition teams, venue, event, match result, batting position and more.
+This script can find team and player statistics along any of the following parameters: date interval, match type, overs interval, innings, opposition players, opposition teams, venue, event, match result, batting position and more.
 
 ## How to:
  All you need to do is import cricketstats in any python script create a search object, call the "stats()" function with the necessary arguments for that search object and run the script through python3. The output of the function is a Pandas DataFrame that can be printed, analysed using pandas methods or served as the input to plotting methods like matplotlib.

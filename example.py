@@ -32,7 +32,7 @@ bblteams = ["Sydney Thunder", "Melbourne Renegades", "Brisbane Heat", "Sydney Si
 # create a search object with "cricketstats.search" based on the inputs above. Input arguments: players=[] or teams=[] You can create multiple objects at the same time.
 search1 = cricketstats.search(players=Ozbatters)
 
-""" 2. Apply the "getstats()" method to the search object with the necessary arguments. """
+""" 2. Apply the "stats()" method to the search object with the necessary arguments. """
 # Arguments are mostly lists, with items separated by commans.
 
 # First we can setup our arguments.
@@ -58,7 +58,7 @@ superover = None # Search normal innings or superover innings. Options: True, Fa
 battingposition = [] # Search stats at certain position in batting order.
 bowlingposition = [] # Search stats at certain position in bowling order.
 
-# getstats method applied on search object. You have to apply the method to every search object if you want the script to actually do teh search.
+# Apply stats() method applied on search object. You have to apply the method to every search object if you want the script to actually do teh search.
 search1.stats(database, from_date, to_date, matchtype, betweenovers=betweenovers, innings=innings, sex=sex, playerteams=playerteams, oppositionbatters=oppositionbatters, oppositionbowlers=oppositionbowlers, oppositionteams=oppositionteams, venue=venue, event=event, matchresult=matchresult, superover=superover, battingposition=battingposition, bowlingposition=bowlingposition, fielders=fielders)
 
 """ 3. Print result. Output is a pandas dataframe. """

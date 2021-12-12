@@ -5,6 +5,7 @@ Some tips/warnings:
 1. There will be bugs as this is my first python project. I'm still learning the language and programming in general.
 2. At its core the script is as good as the data, so output will depend on how quickly the data is updated on cricsheet and its accuracy.
 3. I recommend downloading and using the "all_json.zip" from cricsheet as the database.
+4. The first time you run this script it will take abotu 30-40 seconds because it is indexing filenames, after that each search shoudl take 6-7 seconds to complete.
 
 ## What can this script do?
 This is essentially a module you can import into any python script to collect statistics from cricsheet json files.

@@ -77,6 +77,7 @@ class search:
     
     def fileindexing(self, database, matches):
         if os.path.getmtime(database) > index.matchindex['indexedtime']:
+            print("It looks like your database is newer than the index, please wait while the new matches in the database are indexed.")
             matchindex = {'file': "",'indexedtime': 0,'Test': [], 'MDM': [], 'ODI': [], 'ODM': [], 'T20': [], 'IT20': []}
             matchindex['indexedtime'] = os.path.getmtime(database)
             matchindex['file'] = matches.filename

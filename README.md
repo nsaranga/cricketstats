@@ -12,6 +12,11 @@ This is essentially a module you can import into any python script to collect st
 
 This script can find team and player statistics along any of the following parameters: date interval, match type, overs interval, innings, opposition players, opposition teams, venue, event, match result, batting position and more.
 
+The script can then find the following stats for players and teams: games played, wins played in, draws played in, win %, Innings played in, Scores/Figures in each innings, Runs, Fours, Sixes, Outs(with breakdown of all kinds of dismissal), Wickets taken (with breakdown of all kinds of dismissal), catches taken as fielder, Strike Turnover %, Batting and Bowling strike rate, average, economy rate, Batting and Bowling Boundary %, Batting and Bowling Dot ball %, Score and Strike rate mean absolute deviation, net run rate, net boundary %, Successfully Defended and Chased scores, and more.
+
+As shown in the example.py file using "print(search1.result.columns)" will print all the available stats for a particular search.
+
+
 ## How to:
  All you need to do is import cricketstats in any python script create a search object, call the "stats()" function with the necessary arguments for that search object and run the script through python3. The output of the function is a Pandas DataFrame that can be printed, analysed using pandas methods or served as the input to plotting methods like matplotlib.
 

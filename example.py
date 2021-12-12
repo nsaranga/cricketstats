@@ -52,11 +52,11 @@ fielders = [] # Search bowling stats involves these fielders.
 oppositionbatters=[] # Search overs where players have bowled against certain batters. Options: batter names
 oppositionbowlers=[] # Search overs where players have batted against certain bowlers Options: bowler names
 oppositionteams=[] # Search matches where opposition is only certain teams. Options: team names eg. ["Australia", "England"]
-venue = [] # Search matches played only at these venues Options: Cricket Grounds eg. ["Sydney Cricket Ground", "Melbourne Cricket Ground"]
+venue = [] # Search matches played only at these venues Options: Cricket Grounds eg. ["Sydney Cricket Ground", "Melbourne Cricket Ground", ""Brisbane Cricket Ground, Woolloongabba""]
 event = [] # Search matches played as part of these Leagues or Tournaments Options: Name of League or Tournament eg. ["Sheffield Shield", "ICC World Cup", "Big Bash League"] 
 matchresult = [] # Search matches where players or teams have these results. Options "winner", "draw","tie" eg. ["winner", "draw"]
 superover = None # Search normal innings or superover innings. Options: True, False eg. To search only superovers superover = True
-battingposition = [1,2] # Search stats at certain position in batting order.
+battingposition = [] # Search stats at certain position in batting order.
 bowlingposition = [] # Search stats at certain position in bowling order.
 
 # getstats method applied on search object. You have to apply the method to every search object if you want the script to actually do teh search.
@@ -65,7 +65,7 @@ search1.getstats(database, from_date, to_date, matchtype, betweenovers=betweenov
 """ 3. Print result. Output is a pandas dataframe. """
 # Use the follwing line to get a list of all the stats that are collected: 
 # print(search1.result.columns) # Use this line to print the all the stats that are recorded and can be displayed.
-# print(search1.result[["Caps", "Average", "Score MeanAD", "Balls Faced", "Economy Rate", "Economy Rate MeanAD", "Balls Bowled"]])
+print(search1.result[["Games", "Batting Avg", "Score MeanAD", "Balls Faced"]])
 
 """ 4. Plotting """
 # You can use the plotting methods from the pandas package or matplotlib.pyplot for plotting.

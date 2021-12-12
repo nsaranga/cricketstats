@@ -25,8 +25,7 @@ import pandas as pd
 
 """ 1. Create a search object """
 # For ease of use first declare a list of players or teams to search stats for and then call that variable
-Ozbatters = ["DA Warner", "SPD Smith",  "M Labuschagne",  "TM Head", "MS Harris", "C Green", "AT Carey", "UT Khawaja"]
-# "MR Marsh", "GJ Maxwell", "MP Stoinis", "MS Wade", "JP Inglis",
+Ozbatters = ["DA Warner", "SPD Smith",  "M Labuschagne",  "TM Head", "MS Harris", "C Green", "AT Carey", "UT Khawaja", "MR Marsh", "GJ Maxwell", "MP Stoinis", "MS Wade", "JP Inglis"]
 Ozbowlers = ["PJ Cummins", "JR Hazlewood", "MA Starc", "NM Lyon"]
 bblteams = ["Sydney Thunder", "Melbourne Renegades", "Brisbane Heat", "Sydney Sixers", "Melbourne Stars", "Perth Scorchers", "Adelaide Strikers", "Hobart Hurricanes"]
 
@@ -41,7 +40,7 @@ search1 = cricketstats.search(players=Ozbatters)
 database = "/home/saranga/Downloads/all_json.zip" # Path of cricsheet.org's all matches json zip file.
 from_date = (2018, 10, 1) # The (Year, Month, Day) from which to start search
 to_date = (2021, 12, 31) # The (Year, Month, Day) from which to end search
-matchtype = ["Test"] # Options: ["Test", "MDM", "ODI", "ODM", "T20", "IT20"]
+matchtype = ["Test"] # Options: ["Test", "MDM", "ODI", "ODM", "T20", "IT20"] Explanation of what these mean is found at https://cricsheet.org/downloads/
 
 # Optional Arguments:
 betweenovers = [] # Search only these overs. eg. betweenovers = [1, 20]

@@ -12,7 +12,6 @@ To understand how to use the module you can use the "example.py" which provides 
 1. Command-line wrapper
 2. Web wrapper
 3. Reverse look up of teams and players by stats.
-4. add catcher check as proxy for caught behind wickets.
 6. Quick way to collect "all teams" or "all players" stats eg. if players or teams is blank then I should look at all players and all teams? or when "all teams" and "all players is included.
 7. Arbitrary Keyword Arguments for function?
 9. Expected runs model? basically sum of weighted average of runs per ball * average innings length. something along th lines of pythagorean thing.

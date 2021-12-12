@@ -1,6 +1,11 @@
 # cricketstats
 A python script which gets team and player statistics from the [cricsheet.org](https://cricsheet.org/) database for data analysis.
 
+Some tips/warnings: 
+1. There will be bugs as this is my first python project. I'm still learning the language and programming in general.
+2. At its core the script is as good as the data, so output will depend on how quickly the data is updated on cricsheet and its accuracy.
+3. I recommend downloading and using the "all_json.zip" from cricsheet as the database.
+
 ## What can this script do?
 This is essentially a module you can import into any python script to collect statistics from cricsheet json files.
 

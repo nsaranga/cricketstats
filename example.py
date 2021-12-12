@@ -37,7 +37,7 @@ search1 = cricketstats.search(players=Ozbatters)
 
 # First we can setup our arguments.
 # Required input arguments:
-database = "/home/saranga/Downloads/all_json.zip" # Path of cricsheet.org's all matches json zip file.
+database = "/home/saranga/Downloads/all_json.zip" # Path of cricsheet.org's all matches json zip file on your system. You can download the file at https://cricsheet.org/downloads/
 from_date = (2018, 10, 1) # The (Year, Month, Day) from which to start search
 to_date = (2021, 12, 31) # The (Year, Month, Day) from which to end search
 matchtype = ["Test"] # Options: ["Test", "MDM", "ODI", "ODM", "T20", "IT20"] Explanation of what these mean is found at https://cricsheet.org/downloads/

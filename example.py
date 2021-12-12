@@ -28,7 +28,7 @@ import pandas as pd
 Ozbatters = ["DA Warner", "SPD Smith",  "M Labuschagne",  "TM Head", "MS Harris", "C Green", "AT Carey", "UT Khawaja"]
 # "MR Marsh", "GJ Maxwell", "MP Stoinis", "MS Wade", "JP Inglis",
 Ozbowlers = ["PJ Cummins", "JR Hazlewood", "MA Starc", "NM Lyon"]
-bbl = ["Sydney Thunder", "Melbourne Renegades", "Brisbane Heat", "Sydney Sixers", "Melbourne Stars", "Perth Scorchers", "Adelaide Strikers", "Hobart Hurricanes"]
+bblteams = ["Sydney Thunder", "Melbourne Renegades", "Brisbane Heat", "Sydney Sixers", "Melbourne Stars", "Perth Scorchers", "Adelaide Strikers", "Hobart Hurricanes"]
 
 # create a search object with "cricketstats.search" based on the inputs above. Input arguments: players=[] or teams=[] You can create multiple objects at the same time.
 search1 = cricketstats.search(players=Ozbatters)
@@ -65,15 +65,7 @@ search1.getstats(database, from_date, to_date, matchtype, betweenovers=betweenov
 """ 3. Print result. Output is a pandas dataframe. """
 # Use the follwing line to get a list of all the stats that are collected: 
 # print(search1.result.columns) # Use this line to print the all the stats that are recorded and can be displayed.
-# print(search2.result[["Win %", "Runs", "Runsgiven", "Wickets"]])
 # print(search1.result[["Caps", "Average", "Score MeanAD", "Balls Faced", "Economy Rate", "Economy Rate MeanAD", "Balls Bowled"]])
-
-# Data Analysis example:
-# Pythagorean Expected Win Percentage: Exponent Options: Vine2016: 7.41, SenevirathneaManage2021: maximum likelihood method, 4.71 for ODI matches and 6.06 for Twenty20. The least squares method, 5.01 and 6.56 respectively for ODI and Twenty20.
-#search2.result["Exp Win %"] = ((pow(search2.result["Runs"], 7.41) / (pow(search2.result["Runs"], 7.41) + pow(search2.result["Runsgiven"], 7.41)))*100)
-#print(search2.result[["Win %", "Exp Win %"]])
-
-#show option with ".loc" option for rows and columns
 
 """ 4. Plotting """
 # You can use the plotting methods from the pandas package or matplotlib.pyplot for plotting.
@@ -82,3 +74,11 @@ search1.getstats(database, from_date, to_date, matchtype, betweenovers=betweenov
 #search1.result.sort_values(by="Balls Faced", ascending=False)[["Balls Faced", "Average", "Score MeanAD"]].plot(kind="bar", rot=15, fontsize=8, title="Tests since 2018/2019 (data: cricsheet.org)", secondary_y = "Balls Faced")
 # plt.legend()
 # plt.show()
+
+
+""" 5. Bonus Data Analysis Example"""
+# Pythagorean Expected Win Percentage for a team: This is a formula for calculating expected win percentage given runs scored and conceded by team
+# Formula: Expected Win % = (Runs scored)^exponent / ((Runs scored)^exponent + (Runs conceded)^exponent)
+# Exponent Options: Vine2016: 7.41, SenevirathneaManage2021: maximum likelihood method, 4.71 for ODI matches and 6.06 for Twenty20. The least squares method, 5.01 and 6.56 respectively for ODI and Twenty20.
+#search2.result["Exp Win %"] = ((pow(search2.result["Runs"], 7.41) / (pow(search2.result["Runs"], 7.41) + pow(search2.result["Runsgiven"], 7.41)))*100)
+#print(search2.result[["Win %", "Exp Win %"]])

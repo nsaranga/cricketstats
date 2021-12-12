@@ -1,4 +1,4 @@
-# getcricketstats
+# cricketstats
 A python script which gets team and player statistics from the [cricsheet.org](https://cricsheet.org/) database for data analysis.
 
 ## How to:

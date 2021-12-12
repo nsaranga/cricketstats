@@ -59,7 +59,7 @@ battingposition = [] # Search stats at certain position in batting order.
 bowlingposition = [] # Search stats at certain position in bowling order.
 
 # getstats method applied on search object. You have to apply the method to every search object if you want the script to actually do teh search.
-search1.getstats(database, from_date, to_date, matchtype, betweenovers=betweenovers, innings=innings, sex=sex, playerteams=playerteams, oppositionbatters=oppositionbatters, oppositionbowlers=oppositionbowlers, oppositionteams=oppositionteams, venue=venue, event=event, matchresult=matchresult, superover=superover, battingposition=battingposition, bowlingposition=bowlingposition, fielders=fielders)
+search1.stats(database, from_date, to_date, matchtype, betweenovers=betweenovers, innings=innings, sex=sex, playerteams=playerteams, oppositionbatters=oppositionbatters, oppositionbowlers=oppositionbowlers, oppositionteams=oppositionteams, venue=venue, event=event, matchresult=matchresult, superover=superover, battingposition=battingposition, bowlingposition=bowlingposition, fielders=fielders)
 
 """ 3. Print result. Output is a pandas dataframe. """
 # Use the follwing line to get a list of all the stats that are collected: 

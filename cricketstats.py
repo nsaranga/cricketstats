@@ -94,7 +94,7 @@ class search:
         if os.path.getmtime(database) < index.matchindex['indexedtime']:
             raise Exception("Your cricsheet database is older than the index, please download the newest zip file from https://cricsheet.org/downloads/all_json.zip")
             
-    def Gamesandwins(self, matchplayers, matchoutcome, matchteams):
+    def gamesandwins(self, matchplayers, matchoutcome, matchteams):
         if self.players:
             for eachplayer in self.players:
                 for eachteam in matchplayers:
@@ -212,7 +212,7 @@ class search:
                     self.result[eachball['bowler']
                             ]["totalstosgiven"] += 1
 
-    def bowlerstats(self, eachball):
+    def bowlerstats(self, eachball, fielders):
         if eachball['bowler'] in self.players:
             self.result[eachball['bowler']]["bowlinningscount"] = True
         self.result[eachball['bowler']
@@ -271,7 +271,7 @@ class search:
                 if eachwicket["kind"] == "hit wicket":
                     self.result[eachball['bowler']
                                 ]["totalhitwickets"] += 1
-                if eachwicket["kind"] == "caught":
+                if eachwicket["kind"] == "caught" and (not fielders or (fielders and (eachwicket["fielders"]["name"] in fielders))):
                     self.result[eachball['bowler']
                                 ]["totalcaughts"] += 1
                 if eachwicket["kind"] == "stumped":
@@ -566,7 +566,7 @@ class search:
                 self.result[eachteam]["Net Run Rate"] = self.result[eachteam]["Run Rate"] - self.result[eachteam]["Runsgiven Rate"]
                 self.result[eachteam]["Net Boundary %"] = self.result[eachteam]["Boundary %"] - self.result[eachteam]["Boundary Given %"]
 
-    def getstats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playerteams=None, oppositionbatters=None, oppositionbowlers=None, oppositionteams=None, venue=None, event=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None):
+    def getstats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playerteams=None, oppositionbatters=None, oppositionbowlers=None, oppositionteams=None, venue=None, event=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None, fielders=None):
         if betweenovers == None:
             betweenovers = []
         if innings == None:
@@ -575,6 +575,8 @@ class search:
             sex = []
         if playerteams ==None:
             playerteams = []
+        if fielders == None:
+            fielders = []
         if oppositionbatters == None:
             oppositionbatters = []
         if oppositionbowlers == None:
@@ -654,7 +656,7 @@ class search:
 
                 # Games and Wins record
                 # rewrite for ties and superovers, and add these to stats dict.
-                search.Gamesandwins(self, match["info"]["players"], match["info"]["outcome"], match["info"]["teams"])
+                search.gamesandwins(self, match["info"]["players"], match["info"]["outcome"], match["info"]["teams"])
 
                 # Open each innings in match
                 for nthinnings, eachinnings in enumerate(match['innings']):
@@ -711,7 +713,7 @@ class search:
 
                                 # Bowling stats
                                 if eachball['bowler'] in self.players and (not oppositionbatters or eachball['batter'] in oppositionbatters) and (not bowlingposition or (bowlingposition and ((bowlingorder.index(eachball['bowler']) + 1) in bowlingposition))):
-                                    search.bowlerstats(self, eachball)
+                                    search.bowlerstats(self, eachball, fielders)
 
                                 # Fielding  stats
                                 if "wickets" in eachball:

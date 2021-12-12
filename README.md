@@ -19,3 +19,4 @@ To understand how to use the module you can use the "example.py" which provides 
 10. arguments via a dict? dicts should be defined in a separate file
 11. eachball will read better as this(?)ball (same for eachwicket and others)
 12. match - case in multiple if test for the same variable
+13. Release as PyPi module that can be installed via pip

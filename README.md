@@ -1,6 +1,8 @@
 # cricketstats
 A python script which gets team and player statistics from the [cricsheet.org](https://cricsheet.org/) database for data analysis.
 
+If you have any questions about the script you can contact me on [Twitter](https://www.twitter.com/humesfinger/), email me at [nsaranga@hotmail.com](mailto:nsaranga@hotmail.com). If you have any bugs to report or features to suggest you can use raise ticket on the issues tab in github. 
+
 Some tips/warnings: 
 1. There will be bugs as this is my first python project. I'm still learning the language and programming in general.
 2. At its core the script is as good as the data, so output will depend on how quickly the data is updated on cricsheet and its accuracy.

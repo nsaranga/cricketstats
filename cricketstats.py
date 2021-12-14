@@ -66,13 +66,13 @@ class search:
                 self.result[eachteam] = {"Games": 0, "Innings":0, "Won": 0, "Drawn": 0, 'Win %': 0, "All Scores": [], "All Outs": [], 
                                         "All Overs Faced": [], 
                                         "1st Innings Scores": [], "2nd Innings Scores": [], "3rd Innings Scores": [], "4th Innings Scores": [], "inningsruns": [], "inningsballsfaced": 0, "inningsouts": 0, "1stboundary": [], 'Avg First Boundary Ball': 0, "Defended Scores": [], "Chased Scores": [], "runmargins": [], "wicketmargins": [], "overschased": [],
-                                        "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Outs": 0, "Balls Faced": 0, 'Dot Ball %': 0, 'Strike Turnover %': 0, 'Strike Rate': 0, 'Strike Rate MeanAD': 0,  'Average': 0, 'Score MeanAD': 0, 'Boundary %': 0, "Run Rate":0,
+                                        "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Outs": 0, "Balls Faced": 0, 'Dot Ball %': 0, 'Strike Turnover %': 0, 'Batting S/R': 0, 'Batting S/R MeanAD': 0,  'Batting Avg': 0, 'Score MeanAD': 0, 'Boundary %': 0, "Run Rate":0,
                                         "All Runsgiven": [], "All Wickets": [], "All Overs Bowled": [],
                                         "1st Innings Wickets": [], "2nd Innings Wickets": [], "3rd Innings Wickets": [],
                                         "4th Innings Wickets": [], "inningsrunsgiven": [], "inningsballsbowled": 0,
                                         "inningswickets": 0, "Runsgiven": 0, "totalfoursgiven": 0,
                                         "totalsixesgiven": 0, "Wickets": 0, "Balls Bowled": 0, "totalextras": 0, "No Balls": 0, "Wides":0, "Byes": 0, "Leg Byes": 0,
-                                        "totaldotsbowled": 0, "totalcaughts": 0, "totalrunouts": 0, "totalstumpeds": 0,  'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Average': 0, 'Bowling SR': 0,
+                                        "totaldotsbowled": 0, "totalcaughts": 0, "totalrunouts": 0, "totalstumpeds": 0,  'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Avg': 0, 'Bowling S/R': 0,
                                         "Runsgiven Rate":0, "Net Boundary %":0, "Net Run Rate":0}
     
     def fileindexing(self, database, matches):
@@ -523,7 +523,7 @@ class search:
                                                                             self.result[eachteam]["Games"],
                                                                             multiplier=100)
                 if self.result[eachteam]["Balls Faced"] > 0:
-                    self.result[eachteam]["Strike Rate"] = statsprocessor.ratio(self.result[eachteam]["Runs"],
+                    self.result[eachteam]["Batting S/R"] = statsprocessor.ratio(self.result[eachteam]["Runs"],
                                                                                     self.result[eachteam]["Balls Faced"], multiplier=100)
                     self.result[eachteam]["Boundary %"] = statsprocessor.ratio((self.result[eachteam]["Fours"] + self.result[eachteam]["Sixes"]),
                         self.result[eachteam]["Balls Faced"], multiplier=100)
@@ -539,7 +539,7 @@ class search:
 
                 if self.result[eachteam]["All Scores"]:
                     self.result[eachteam]["Score MeanAD"] = statsprocessor.mad(self.result[eachteam]["All Scores"])
-                    self.result[eachteam]["Average"] = statsprocessor.ratio(sum(self.result[eachteam]["All Scores"]), len(self.result[eachteam]["All Scores"]))
+                    self.result[eachteam]["Batting Avg"] = statsprocessor.ratio(sum(self.result[eachteam]["All Scores"]), len(self.result[eachteam]["All Scores"]))
 
                 if self.result[eachteam]["Balls Bowled"] > 0:
                     self.result[eachteam]["Economy Rate"] = statsprocessor.ratio(
@@ -559,9 +559,9 @@ class search:
                         self.result[eachteam]["All Runsgiven"], self.result[eachteam]["All Overs Bowled"])
 
                 if self.result[eachteam]["Wickets"] > 0:
-                    self.result[eachteam]["Bowling Average"] = statsprocessor.ratio(
+                    self.result[eachteam]["Bowling Avg"] = statsprocessor.ratio(
                         self.result[eachteam]["Runsgiven"], self.result[eachteam]["Wickets"], multiplier=0)
-                    self.result[eachteam]["Bowling SR"] = statsprocessor.ratio(
+                    self.result[eachteam]["Bowling S/R"] = statsprocessor.ratio(
                         self.result[eachteam]["Balls Bowled"], self.result[eachteam]["Wickets"], multiplier=0)
 
                 self.result[eachteam]["Net Run Rate"] = self.result[eachteam]["Run Rate"] - self.result[eachteam]["Runsgiven Rate"]

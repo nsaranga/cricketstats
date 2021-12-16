@@ -703,7 +703,7 @@ class search:
                                     search.strikerstats(self, eachball)
  
                                 # Non-striker's outs.
-                                if eachball["non_striker"] in self.players and "wickets" in eachball:
+                                if eachball["non_striker"] in self.players and "wickets" in eachball and (not battingposition or (battingposition and ((battingorder.index(eachball['non_striker']) + 1) in battingposition))):
                                     search.nonstrikerstats(self, eachball, oppositionbowlers)
 
                                 # Strike Turnover stats

@@ -89,7 +89,8 @@ class search:
                 match = json.load(matchdata)
                 matchindex[match["info"]["match_type"]].append(eachfile)
                 matchdata.close
-            file = open("index.py", "w")
+            currentdir = os.path.dirname(os.path.abspath(__file__))
+            file = open(f"{currentdir}/index.py", "w")
             file.write("matchindex = " + repr(matchindex))
             file.close
         if os.path.getmtime(database) < index.matchindex['indexedtime']:

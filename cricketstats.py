@@ -487,6 +487,7 @@ class search:
                         self.result[eachplayer]["All Scores"], self.result[eachplayer]["All Balls Faced"], multiplier=100)
 
                 if self.result[eachplayer]["All Scores"]:
+                    self.result[eachplayer]["Mean Score"] = statsprocessor.ratio(sum(self.result[eachplayer]["All Scores"]), len(self.result[eachplayer]["All Scores"]))
                     self.result[eachplayer]["Score MeanAD"] = statsprocessor.mad(
                         self.result[eachplayer]["All Scores"])
 
@@ -540,7 +541,7 @@ class search:
 
                 if self.result[eachteam]["All Scores"]:
                     self.result[eachteam]["Score MeanAD"] = statsprocessor.mad(self.result[eachteam]["All Scores"])
-                    self.result[eachteam]["Batting Avg"] = statsprocessor.ratio(sum(self.result[eachteam]["All Scores"]), len(self.result[eachteam]["All Scores"]))
+                    self.result[eachteam]["Mean Score"] = statsprocessor.ratio(sum(self.result[eachteam]["All Scores"]), len(self.result[eachteam]["All Scores"]))
 
                 if self.result[eachteam]["Balls Bowled"] > 0:
                     self.result[eachteam]["Economy Rate"] = statsprocessor.ratio(

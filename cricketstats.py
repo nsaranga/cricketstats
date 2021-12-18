@@ -678,9 +678,22 @@ class search:
                     battingorder = []
                     bowlingorder = []
 
+                    # Creat liste of mandatory and optional powerplays in this innings.
+                    powerplays = []
+                    if "powerplays" in eachinnings:
+                        for eachpowerplay in eachinnings["powerplays"]:
+                            thispowerplay = range(math.floor(eachpowerplay["from"]), (math.floor(eachpowerplay["to"]) + 1))
+                            powerplays.extend(thispowerplay)
+
                     # Open each over in innings
                     for eachover in eachinnings['overs']:
-                        if betweenovers and (eachover['over'] < (betweenovers[0] - 1) or eachover['over'] > (betweenovers[1] - 1)):
+
+                        # Powerplay (mandatory and optional) check.
+                        if betweenovers and "powerplays" in betweenovers and "powerplays" in eachinnings and eachover['over'] not in powerplays:
+                            continue
+
+                        # Overs interval check  
+                        if betweenovers and "powerplays" not in betweenovers and (eachover['over'] < (betweenovers[0] - 1) or eachover['over'] > (betweenovers[1] - 1)):
                             continue
 
                         # Open each ball

@@ -62,3 +62,20 @@ def firstboundary(shotlist):
             return four
         elif six <= four:
             return six
+
+def dotballseries(balllist):
+    dotballs = []
+    dotballlist = []
+    dotballseries = []
+    for nth, eachball in enumerate(balllist):
+        if eachball == 0:
+            dotballs.append(eachball)
+            if nth == (len(balllist) - 1):
+                dotballlist.append(dotballs)
+
+        if eachball != 0 and dotballs:
+            dotballlist.append(dotballs)
+            dotballs = []
+    for eachlist in dotballlist:
+        dotballseries.append(len(eachlist))
+    return dotballseries

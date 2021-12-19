@@ -59,7 +59,7 @@ class search:
                                             "totaldotballsbowled": 0, "totalbowleds": 0, "totallbws": 0,
                                             "totalhitwickets": 0, "totalcaughts": 0, "totalstumpeds": 0,
                                             "totalstosgiven": 0, "totalstosgivenopp": 0, "totalcatches": 0,
-                                            "totalrunouts": 0, "totalstumpings": 0,  'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Avg': 0, 'Bowling S/R': 0}
+                                            "totalrunouts": 0, "totalstumpings": 0,  'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Avg': 0, 'Bowling S/R': 0, "dotballseries": [], "Avg Consecutive Dot Balls": 0}
         if self.teams:
             self.result = {}
             for eachteam in self.teams:
@@ -72,7 +72,7 @@ class search:
                                         "4th Innings Wickets": [], "inningsrunsgiven": [], "inningsballsbowled": 0,
                                         "inningswickets": 0, "Runsgiven": 0, "totalfoursgiven": 0,
                                         "totalsixesgiven": 0, "Wickets": 0, "Balls Bowled": 0, "totalextras": 0, "No Balls": 0, "Wides":0, "Byes": 0, "Leg Byes": 0,
-                                        "totaldotsbowled": 0, "totalcaughts": 0, "totalrunouts": 0, "totalstumpeds": 0,  'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Avg': 0, 'Bowling S/R': 0,
+                                        "totaldotsbowled": 0, "totalcaughts": 0, "totalrunouts": 0, "totalstumpeds": 0,  'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Avg': 0, 'Bowling S/R': 0, "dotballseries": [], "Avg Consecutive Dot Balls": 0,
                                         "Runsgiven Rate":0, "Net Boundary %":0, "Net Run Rate":0}
     
     def fileindexing(self, database, matches):
@@ -219,8 +219,6 @@ class search:
             self.result[eachball['bowler']]["bowlinningscount"] = True
         self.result[eachball['bowler']
                     ]["Runsgiven"] += eachball['runs']['batter']
-        self.result[eachball['bowler']]["inningsrunsgiven"].append(
-            eachball['runs']['batter'])
         if eachball['runs']['batter'] == 4:
             self.result[eachball['bowler']
                         ]["totalfoursgiven"] += 1
@@ -235,6 +233,8 @@ class search:
                         ]["Balls Bowled"] += 1
             self.result[eachball['bowler']
                         ]["inningsballsbowled"] += 1
+            self.result[eachball['bowler']]["inningsrunsgiven"].append(
+            eachball['runs']['batter'])
         if "extras" in eachball:
             if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']):
                 self.result[eachball['bowler']
@@ -248,6 +248,8 @@ class search:
                             ]["Wides"] += eachball['extras']['wides']
                 self.result[eachball['bowler']
                             ]["totalextras"] += eachball['extras']['wides']
+                self.result[eachball['bowler']]["inningsrunsgiven"].append((
+            eachball['runs']['batter'] + eachball['extras']['wides']))
             if "noballs" in eachball['extras']:
                 self.result[eachball['bowler']
                             ]["Runsgiven"] += eachball['extras']['noballs']
@@ -255,6 +257,8 @@ class search:
                             ]["No Balls"] += eachball['extras']['noballs']
                 self.result[eachball['bowler']
                             ]["totalextras"] += eachball['extras']['noballs']
+                self.result[eachball['bowler']]["inningsrunsgiven"].append((
+            eachball['runs']['batter'] + eachball['extras']['noballs']))
         if "wickets" in eachball:
             for eachwicket in eachball["wickets"]:
                 if any([eachwicket["kind"] == "bowled", eachwicket["kind"] == "lbw",
@@ -390,6 +394,7 @@ class search:
                     self.result[eachplayer]["inningswickets"])
                 self.result[eachplayer]["All Overs Bowled"].append(
                     math.ceil(self.result[eachplayer]["inningsballsbowled"] / 6))
+                self.result[eachplayer]["dotballseries"].extend(statsprocessor.dotballseries(self.result[eachplayer]["inningsrunsgiven"]))
     
     def teambattinginnings(self, inningsteam, nthinnings):
         self.result[inningsteam]["All Scores"].append(
@@ -477,7 +482,7 @@ class search:
                                                                                     self.result[eachplayer][
                                                                                         "Balls Faced"], multiplier=100)
                 if self.result[eachplayer]["1stboundary"]:
-                    self.result[eachplayer]["Avg First Boundary Ball"] = round(np.mean(self.result[eachplayer]["1stboundary"]))
+                    self.result[eachplayer]["Avg First Boundary Ball"] = round(statsprocessor.ratio(sum(self.result[eachplayer]["1stboundary"]), len(self.result[eachplayer]["1stboundary"])))
 
                 if self.result[eachplayer]["totalstosopp"] > 0:
                     self.result[eachplayer]["Strike Turnover %"] = statsprocessor.ratio(self.result[eachplayer]["totalstos"], self.result[eachplayer]["totalstosopp"], multiplier=100)
@@ -507,6 +512,9 @@ class search:
                         (self.result[eachplayer]["totalfoursgiven"]
                         + self.result[eachplayer]["totalsixesgiven"]),
                         self.result[eachplayer]["Balls Bowled"], multiplier=100)
+                    self.result[eachplayer]["Avg Consecutive Dot Balls"] = round(
+                        statsprocessor.ratio(
+                            sum(self.result[eachplayer]["dotballseries"]), len(self.result[eachplayer]["dotballseries"])))
 
                 if self.result[eachplayer]["All Overs Bowled"]:
                     self.result[eachplayer]["Economy Rate MeanAD"] = statsprocessor.madfromratio(

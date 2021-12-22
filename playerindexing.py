@@ -28,7 +28,7 @@ try:
     players = playerindex.players
     playerlist = pd.read_csv("/home/saranga/Downloads/people.csv")
     for eachplayer in playerlist["name"]:
-        if eachplayer in players["Batting"]["Right hand"] or eachplayer in players["Batting"]["Left hand"] or eachplayer in players["Bowling"]["Right arm pace"] or eachplayer in players["Bowling"]["Left arm pace"] or eachplayer in players["Bowling"]["Right arm Off break"] or eachplayer in players["Bowling"]["Right arm Leg break"] or eachplayer in players["Bowling"]["Left arm orthodox"] or eachplayer in players["Bowling"]["Left arm wrist spin"] or eachplayer in players["Umpire"]:
+        if (eachplayer in players["Batting"]["Right hand"] or eachplayer in players["Batting"]["Left hand"]) and (eachplayer in players["Bowling"]["Right arm pace"] or eachplayer in players["Bowling"]["Left arm pace"] or eachplayer in players["Bowling"]["Right arm Off break"] or eachplayer in players["Bowling"]["Right arm Leg break"] or eachplayer in players["Bowling"]["Left arm orthodox"] or eachplayer in players["Bowling"]["Left arm wrist spin"]) or eachplayer in players["Umpire"]:
             continue
         playerdata = playerlist.loc[playerlist["name"]==f"{eachplayer}", ["key_cricinfo"]]
         if math.isnan(playerdata.at[playerdata.index[0], "key_cricinfo"]):

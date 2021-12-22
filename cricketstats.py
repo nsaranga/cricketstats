@@ -23,6 +23,7 @@ import os
 import zipfile
 import numpy as np
 import math
+import importlib
 
 import statsprocessor
 import index
@@ -78,7 +79,7 @@ class search:
     def fileindexing(self, database, matches):
         if os.path.getmtime(database) > index.matchindex['indexedtime']:
             print("It looks like your database is newer than the index, please wait while the new matches in the database are indexed.")
-            matchindex = {'file': "",'indexedtime': 0,'Test': [], 'MDM': [], 'ODI': [], 'ODM': [], 'T20': [], 'IT20': []}
+            matchindex = index.matchindex
             matchindex['indexedtime'] = os.path.getmtime(database)
             matchindex['file'] = matches.filename
             filelist = matches.namelist()
@@ -87,7 +88,8 @@ class search:
                     continue
                 matchdata = matches.open(eachfile)
                 match = json.load(matchdata)
-                matchindex[match["info"]["match_type"]].append(eachfile)
+                if eachfile not in matchindex[match["info"]["match_type"]]:
+                    matchindex[match["info"]["match_type"]].append(eachfile)
                 matchdata.close
             currentdir = os.path.dirname(os.path.abspath(__file__))
             file = open(f"{currentdir}/index.py", "w")
@@ -614,9 +616,10 @@ class search:
         matches = zipfile.ZipFile(database, 'r')
 
         # create an index file for eachfile
-        if os.path.getmtime(database) > index.matchindex['indexedtime']:
-            search.fileindexing(self, database, matches)
+        # if os.path.getmtime(database) > index.matchindex['indexedtime']:
+        search.fileindexing(self, database, matches)
 
+        importlib.reload(index)
         # for most of these checks if i pass the required string I can setup functions with basic structure.
         # what if I don't give any matchtype? I have to make this a required arg.
         for eachmatchtype in matchtype:

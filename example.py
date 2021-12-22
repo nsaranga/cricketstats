@@ -20,17 +20,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-import cricketstats
+import cricketstats, playerindex
 
 # This is an example script of how you can use cricketstats
-# If you want to import cricketstats into your own python file, and use thelines below instead of "import cricketstats"
+# If you want to import cricketstats into your own python file, and use the lines below instead of "import cricketstats, playerindex"
 """
 import os
 import sys
 module_path = os.path.abspath(os.path.join('cricketstats'))
 if module_path not in sys.path:
     sys.path.append(module_path)
-from cricketstats import cricketstats 
+from cricketstats import cricketstats, playerindex
 """
 
 
@@ -57,20 +57,24 @@ to_date = (2021, 12, 31) # The (Year, Month, Day) from which to end search
 matchtype = ["Test"] # Options: ["Test", "MDM", "ODI", "ODM", "T20", "IT20"] Explanation of what these mean is found at https://cricsheet.org/downloads/
 
 # Optional Arguments:
-betweenovers = [] # Search only these overs. eg. betweenovers = [1, 20]
-innings = [] #  Search these innings. Options: 1, 2, 3, 4 eg. innings = [1,3]
-sex = [] # Search only matches of certain sex. Options: "male", "female" eg. sex = ["female"] 
-playerteams=[] # Search matches where players have played in certain teams. Options: team names eg. ["Australia", "England"]
-fielders = [] # Search bowling stats involves these fielders.
-oppositionbatters=[] # Search overs where players have bowled against certain batters. Options: batter names
-oppositionbowlers=[] # Search overs where players have batted against certain bowlers Options: bowler names
-oppositionteams=[] # Search matches where opposition is only certain teams. Options: team names eg. ["Australia", "England"]
-venue = [] # Search matches played only at these venues Options: Cricket Grounds eg. ["Sydney Cricket Ground", "Melbourne Cricket Ground", ""Brisbane Cricket Ground, Woolloongabba""]
-event = [] # Search matches played as part of these Leagues or Tournaments Options: Name of League or Tournament eg. ["Sheffield Shield", "ICC World Cup", "Big Bash League"] 
-matchresult = [] # Search matches where players or teams have these results. Options "winner", "draw","tie" eg. ["winner", "draw"]
-superover = None # Search normal innings or superover innings. Options: True, False eg. To search only superovers superover = True
-battingposition = [] # Search stats at certain position in batting order.
-bowlingposition = [] # Search stats at certain position in bowling order.
+# First we can set overs and innings related arguments:
+betweenovers=[] # Search only these overs. eg. betweenovers = [1, 20]
+innings=[] # Search these innings. Options: 1, 2, 3, 4 eg. innings = [1,3]
+fielders=[] # Search bowling stats involves these fielders.
+oppositionbatters=[] # Search overs where players have bowled against certain batters. Options: batter names. You can also put in a list of batters by handedness by referring to playerindex. eg. oppositionbatters=playerindex.players["Batting"]["Left hand"]
+oppositionbowlers=[] # Search overs where players have batted against certain bowlers Options: bowler names You can also put in list of bowlers by type, eg. oppositionbowlers=playerindex.players["Bowling"]["Right arm pace"]. Other options include. playerindex.players["Bowling"]["Left arm pace"], players["Bowling"]["Right arm Off break"], players["Bowling"]["Right arm Leg break"], players["Bowling"]["Left arm orthodox"], players["Bowling"]["Left arm wrist spin"]
+superover=None # Search normal innings or superover innings. Options: True, False eg. superover=True
+battingposition=[] # Search stats at certain position in batting order. eg. battingposition=[1,2,3]
+bowlingposition=[] # Search stats at certain position in bowling order. eg. bowlingposition=[1,2]
+
+# second we have match related arguments
+sex=[] # Search only matches of certain sex. Options: "male", "female" eg. sex = ["female"] 
+playerteams=[] # Search matches where players have played in certain teams. Options: team names eg. playerteams=["Australia", "England"]
+oppositionteams=[] # Search matches where opposition is only certain teams. Options: team names eg. oppositionteams=["India", "England"]
+venue=[] # Search matches played only at these venues Options: Cricket Grounds eg. venue=["Sydney Cricket Ground", "Melbourne Cricket Ground", ""Brisbane Cricket Ground, Woolloongabba""]
+event=[] # Search matches played as part of these Leagues or Tournaments Options: Name of League or Tournament eg. event=["Sheffield Shield", "ICC World Cup", "Big Bash League"] 
+matchresult=[] # Search matches where players or teams have these results. Options "winner", "draw","tie" eg. matchresult=["winner", "draw"]
+
 
 # Apply stats() method applied on search object. You have to apply the method to every search object if you want the script to actually do teh search.
 search1.stats(database, from_date, to_date, matchtype, betweenovers=betweenovers, innings=innings, sex=sex, playerteams=playerteams, oppositionbatters=oppositionbatters, oppositionbowlers=oppositionbowlers, oppositionteams=oppositionteams, venue=venue, event=event, matchresult=matchresult, superover=superover, battingposition=battingposition, bowlingposition=bowlingposition, fielders=fielders)

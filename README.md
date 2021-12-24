@@ -1,7 +1,7 @@
 # cricketstats
 A python module which gets team and player statistics from the [cricsheet.org](https://cricsheet.org/) database for data analysis and analytics projects in cricket.
 
-If you have any questions about the module you can contact me on [Twitter](https://www.twitter.com/humesfinger/), email me at [nsaranga@hotmail.com](mailto:nsaranga@hotmail.com). If you have any bugs to report or features to suggest you can use raise ticket on the issues tab in github. If you want to know more about why I decide to write it you can find blog post [here](https://nsaranga.github.io/cricket/2021/12/19/TheAimOfCricketstats.html).
+If you have any questions about the module you can contact me on [Twitter](https://www.twitter.com/humesfinger/), email me at [nsaranga@hotmail.com](mailto:nsaranga@hotmail.com). If you have any bugs to report or features to suggest you can use raise ticket on the issues tab in github. If you want to know more about why I decided to write it you can find a blog post [here](https://nsaranga.github.io/cricket/2021/12/19/TheAimOfCricketstats.html), and if you want to know more about what the module can actually you do you can read another blog post [here](https://nsaranga.github.io/cricket/2021/12/24/WhatCanCricketstatsDo.html) 
 
 Some tips/warnings: 
 1. There will be bugs as this is my first python project. I'm still learning the language and programming in general.

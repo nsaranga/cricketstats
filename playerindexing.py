@@ -41,7 +41,6 @@ try:
         if main is None:
             continue
         playerinfo = main.find_all("h5", class_="player-card-description gray-900")
-        # playerinfo = main.find_all("div", class_="player_overview-grid")
         for element in playerinfo:
             # Batting
             if "Right hand bat" in element.text:

@@ -58,7 +58,7 @@ matchtype = ["Test"] # Options: ["Test", "MDM", "ODI", "ODM", "T20", "IT20"] Exp
 
 # Optional Arguments:
 # First we can set overs and innings related arguments:
-betweenovers=[] # Search only these overs. eg. betweenovers = [1, 20]
+betweenovers=[] # Search only these overs. eg. betweenovers = [1, 20]. Or if you only want to search for powerplays that are mandatory and option input "powerplays" eg. betweenovers =["powerplays"]
 innings=[] # Search these innings. Options: 1, 2, 3, 4 eg. innings = [1,3]
 fielders=[] # Search bowling stats involves these fielders.
 oppositionbatters=[] # Search overs where players have bowled against certain batters. Options: batter names. You can also put in a list of batters by handedness by referring to playerindex. eg. oppositionbatters=playerindex.players["Batting"]["Left hand"]

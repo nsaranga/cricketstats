@@ -67,17 +67,19 @@ superover=None # Search normal innings or superover innings. Options: True, Fals
 battingposition=[] # Search stats at certain position in batting order. eg. battingposition=[1,2,3]
 bowlingposition=[] # Search stats at certain position in bowling order. eg. bowlingposition=[1,2]
 
-# second we have match related arguments
+# Second we have match related arguments
 sex=[] # Search only matches of certain sex. Options: "male", "female" eg. sex = ["female"] 
 playerteams=[] # Search matches where players have played in certain teams. Options: team names eg. playerteams=["Australia", "England"]
+teammates=[] # Search matches where certain teammates play. For this to work playerteams must be populated.
 oppositionteams=[] # Search matches where opposition is only certain teams. Options: team names eg. oppositionteams=["India", "England"]
 venue=[] # Search matches played only at these venues Options: Cricket Grounds eg. venue=["Sydney Cricket Ground", "Melbourne Cricket Ground", ""Brisbane Cricket Ground, Woolloongabba""]
 event=[] # Search matches played as part of these Leagues or Tournaments Options: Name of League or Tournament eg. event=["Sheffield Shield", "ICC World Cup", "Big Bash League"] 
 matchresult=[] # Search matches where players or teams have these results. Options "winner", "draw","tie" eg. matchresult=["winner", "draw"]
+allstats=False # When switche to True, it adds an "all players" or "all teams" row at end of result that sums all players or teams stats that are searched for.
 
 
 # Apply stats() method applied on search object. You have to apply the method to every search object if you want the script to actually do teh search.
-search1.stats(database, from_date, to_date, matchtype, betweenovers=betweenovers, innings=innings, sex=sex, playerteams=playerteams, oppositionbatters=oppositionbatters, oppositionbowlers=oppositionbowlers, oppositionteams=oppositionteams, venue=venue, event=event, matchresult=matchresult, superover=superover, battingposition=battingposition, bowlingposition=bowlingposition, fielders=fielders)
+search1.stats(database, from_date, to_date, matchtype, betweenovers=betweenovers, innings=innings, sex=sex, playersteams=playerteams, oppositionbatters=oppositionbatters, oppositionbowlers=oppositionbowlers, oppositionteams=oppositionteams, venue=venue, event=event, matchresult=matchresult, superover=superover, battingposition=battingposition, bowlingposition=bowlingposition, fielders=fielders)
 
 # You can use the above template if you want or put all the values inside the brackets of the "stats()" method like I've done below for the search2 object.
 # search2.stats(database="/home/saranga/Downloads/all_json.zip", from_date=(2018, 10, 1), to_date=(2021, 12, 31), matchtype=[T20], betweenovers=[], innings=[], sex=[], playerteams=[], oppositionbatters=[], oppositionbowlers=[], oppositionteams=[], venue=[], event=["Big Bash League"], matchresult=[], superover=None, battingposition=[], bowlingposition=[], fielders=[])
@@ -96,7 +98,7 @@ print(search1.result[["Games", "Batting Avg", "Score MeanAD", "Balls Faced"]])
 # You can use the plotting methods from the pandas package or matplotlib.pyplot for plotting.
 # Handy tip, use the following list compression to extract all scores from multiple players or teams: [x for sublist in dataframe for x in sublist]
 
-#search1.result.sort_values(by="Balls Faced", ascending=False)[["Balls Faced", "Average", "Score MeanAD"]].plot(kind="bar", rot=15, fontsize=8, title="Tests since 2018/2019 (data: cricsheet.org)", secondary_y = "Balls Faced")
+#search1.result.sort_values(by="Balls Faced", ascending=False)[["Balls Faced", "Batting Avg", "Score MeanAD"]].plot(kind="bar", rot=15, fontsize=8, title="Tests since 2018/2019 (data: cricsheet.org)", secondary_y = "Balls Faced")
 # plt.legend()
 # plt.show()
 

@@ -16,6 +16,8 @@ This script can find team and player statistics along any of the following param
 
 The script can then find the following stats for players and teams: games played, wins played in, draws played in, win %, Innings played in, Scores/Figures in each innings, Runs, Fours, Sixes, Outs(with breakdown of all kinds of dismissal), Wickets taken (with breakdown of all kinds of dismissal), catches taken as fielder, Strike Turnover %, Batting and Bowling strike rate, average, economy rate, Batting and Bowling Boundary %, Batting and Bowling Dot ball %, Score and Strike rate mean absolute deviation, net run rate, net boundary %, Successfully Defended and Chased scores, and more.
 
+Also using the in built-in playerindex you can find matchup data for a player against certain types of batters (eg. Right or Left Hand) and bowlers (eg. Right arm pace, Left arm pace, Right arm Off break, Right arm Leg break, Left arm orthodox and Left arm wrist spin).
+
 As shown in the example.py file using "print(search1.result.columns)" will print all the available stats for a particular search.
 
 ## How to:

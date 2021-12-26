@@ -47,7 +47,7 @@ class search:
         if self.players:
             self.result = {}
             for eachplayer in self.players:
-                self.result[eachplayer] = {"Player": eachplayer, "Games": 0, "Won": 0, "Drawn": 0, 'Win %': 0, "Innings Batted":0, "batinningscount": False,
+                self.result[eachplayer] = {"Players": eachplayer, "Games": 0, "Won": 0, "Drawn": 0, 'Win %': 0, "Innings Batted":0, "batinningscount": False,
                                             "All Scores": [],"All Balls Faced": [],
                                             "inningsruns": [], "inningsballsfaced": 0, "1stboundary": [], 'Avg First Boundary Ball': 0, 
                                             "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Balls Faced": 0, "Outs": 0, "Bowled Outs": 0, "LBW Outs": 0, "Caught Outs": 0, "Stumped Outs": 0, "Run Outs": 0, "totalstos": 0, "totalstosopp": 0, 'Dot Ball %': 0, 'Strike Turnover %': 0, 'Batting S/R': 0, 'Batting S/R MeanAD': 0,  'Batting Avg': 0, 'Score MeanAD': 0, 'Boundary %': 0,
@@ -61,7 +61,7 @@ class search:
         if self.teams:
             self.result = {}
             for eachteam in self.teams:
-                self.result[eachteam] = {"Team": eachteam, "Games": 0, "Innings":0, "Won": 0, "Drawn": 0, 'Win %': 0, "All Scores": [], "All Outs": [], 
+                self.result[eachteam] = {"Teams": eachteam, "Games": 0, "Innings":0, "Won": 0, "Drawn": 0, 'Win %': 0, "All Scores": [], "All Outs": [], 
                                         "All Overs Faced": [], 
                                         "1st Innings Scores": [], "2nd Innings Scores": [], "3rd Innings Scores": [], "4th Innings Scores": [], "inningsruns": [], "inningsballsfaced": 0, "inningsouts": 0, "1stboundary": [], 'Avg First Boundary Ball': 0, "Defended Scores": [], "Chased Scores": [], "Runmargins": [], "Wicketmargins": [], "Overs Chased": [],
                                         "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Outs": 0, "Balls Faced": 0, 'Dot Ball %': 0, 'Strike Turnover %': 0, 'Batting S/R': 0, 'Batting S/R MeanAD': 0,  'Batting Avg': 0, 'Score MeanAD': 0, 'Boundary %': 0, "Run Rate":0,

@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. 
 """
 
+from datetime import datetime
 import json
 import time
 import pandas as pd
@@ -47,7 +48,7 @@ class search:
     # Setup the statistics to be recorded.
     def resultsetup(self):
         if self.players:
-            self.inningsresult = {"Players":[], "Date":[], "Team":[], "Opposition":[], "Innings":[], "Scores": [],"Balls Faced": [], "Batting S/R":[], "First Boundary Ball":[], "Runsgiven": [], "Wickets": [], "Overs Bowled": [], 'Economy Rate': [], 'Bowling Avg': [], 'Bowling S/R': [], "Avg Consecutive Dot Balls":[]}
+            self.inningsresult = {"Players":[], "Date":[], "Match Type":[], "Team":[], "Opposition":[], "Innings":[], "Scores": [],"Balls Faced": [], "Batting S/R":[], "First Boundary Ball":[], "Runsgiven": [], "Wickets": [], "Overs Bowled": [], 'Economy Rate': [], 'Bowling Avg': [], 'Bowling S/R': [], "Avg Consecutive Dot Balls":[]}
 
             self.result = {}
             for eachplayer in self.players:
@@ -92,15 +93,31 @@ class search:
                                         "All Runsgiven": [], "All Wickets": [], "All Overs Bowled": [],
                                         "1st Innings Wickets": [], "2nd Innings Wickets": [], "3rd Innings Wickets": [],
                                         "4th Innings Wickets": [], 
-                                        "inningsrunsgiven": [], "inningsballsbowled": 0,
-                                        "inningswickets": 0, "Runsgiven": 0, "Foursgiven": 0,
-                                        "Sixesgiven": 0, "Wickets": 0, "Balls Bowled": 0, "Extras": 0, "No Balls": 0, "Wides":0, "Byes": 0, "Leg Byes": 0, "Dot Balls Bowled": 0, 
+                                        "inningsrunsgiven": [], "inningsballsbowled": 0, "inningswickets": 0, 
+                                        "Runsgiven": 0, "Foursgiven": 0, "Sixesgiven": 0, 
+                                        "Wickets": 0, 
+                                        "Balls Bowled": 0, "Extras": 0, "No Balls": 0, "Wides":0, "Byes": 0, "Leg Byes": 0, "Dot Balls Bowled": 0, 
                                         "Bowleds": 0, "LBWs": 0, "Hitwickets": 0,  "Caughts": 0, "Runouts": 0, "Stumpeds": 0, 
-                                        'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Avg': 0, 'Bowling S/R': 0, "dotballseries": [], "Avg Consecutive Dot Balls": 0,
-                                        "Runsgiven Rate": 0, "Net Boundary %":0, "Net Run Rate":0}
+                                        'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Avg': 0, 'Bowling S/R': 0, "Runsgiven Rate": 0,
+                                        "Avg Consecutive Dot Balls": 0, "dotballseries": [],
+                                        "Net Boundary %":0, "Net Run Rate":0}
     
     # Indexes matches by match type for quick search.
     def fileindexing(self, database, matches):
+        currentdir = os.path.dirname(os.path.abspath(__file__))
+        databasemtime = os.path.getmtime(database)
+        databasetime = time.gmtime(databasemtime)
+        databaseyear = int(databasetime[0])
+        if index.matchindex['indexedtime'] == 0:
+            newmatchindex = {"file": "", 'indexedtime': 0, "matches":{"Test": {}, "MDM":{}, "ODI":{}, "ODM": {}, "T20":{}, "IT20":{}}}
+            for eachmatchtype in newmatchindex["matches"]:
+                for eachyear in range(2000, (databaseyear + 1)):
+                    newmatchindex["matches"][eachmatchtype][f"{eachyear}"] = []
+            file = open(f"{currentdir}/index.py", "w")
+            file.write("matchindex = " + repr(newmatchindex))
+            file.close()
+            importlib.reload(index)
+
         if os.path.getmtime(database) > index.matchindex['indexedtime']:
             print("It looks like your database is newer than the index, please wait while the new matches in the database are indexed.")
             matchindex = index.matchindex
@@ -112,13 +129,13 @@ class search:
                     continue
                 matchdata = matches.open(eachfile)
                 match = json.load(matchdata)
-                if eachfile not in matchindex[match["info"]["match_type"]]:
-                    matchindex[match["info"]["match_type"]].append(eachfile)
+                if eachfile not in matchindex["matches"][match["info"]["match_type"]][match["info"]["dates"][0][:4]]:
+                    matchindex["matches"][match["info"]["match_type"]][match["info"]["dates"][0][:4]].append(eachfile)
                 matchdata.close
-            currentdir = os.path.dirname(os.path.abspath(__file__))
+            
             file = open(f"{currentdir}/index.py", "w")
             file.write("matchindex = " + repr(matchindex))
-            file.close
+            file.close()
         if os.path.getmtime(database) < index.matchindex['indexedtime']:
             raise Exception("Your cricsheet database is older than the index, please download the newest zip file from https://cricsheet.org/downloads/all_json.zip")
             
@@ -424,7 +441,7 @@ class search:
                     self.result[inningsteam]["Runouts"] += 1
     
     # Record player's innings stats
-    def playerinnings(self, matchtimetuple, matchplayers, nthinnings):
+    def playerinnings(self, matchtimetuple, matchplayers, nthinnings, eachmatchtype):
         for eachplayer in self.result:
             for eachteam in matchplayers:
                 if eachplayer in matchplayers[eachteam]:
@@ -443,7 +460,8 @@ class search:
                     self.result[eachplayer]["firstboundary"].append(statsprocessor.firstboundary(self.result[eachplayer]["inningsruns"]))
 
                 self.inningsresult["Players"].append(eachplayer)
-                self.inningsresult["Date"].append(matchtimetuple)
+                self.inningsresult["Date"].append(datetime(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
+                self.inningsresult["Match Type"].append(eachmatchtype)
                 self.inningsresult["Team"].append(playersteam)
                 self.inningsresult["Opposition"].append(oppositionteam)
                 self.inningsresult["Innings"].append(nthinnings + 1)
@@ -475,7 +493,8 @@ class search:
                 self.result[eachplayer]["dotballseries"].extend(statsprocessor.dotballseries(self.result[eachplayer]["inningsrunsgiven"]))
 
                 self.inningsresult["Players"].append(eachplayer)
-                self.inningsresult["Date"].append(matchtimetuple)
+                self.inningsresult["Date"].append(datetime(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
+                self.inningsresult["Match Type"].append(eachmatchtype)
                 self.inningsresult["Team"].append(playersteam)
                 self.inningsresult["Opposition"].append(oppositionteam)
                 self.inningsresult["Innings"].append(nthinnings + 1)
@@ -918,189 +937,191 @@ class search:
         matches = zipfile.ZipFile(database, 'r')
 
         # create an index file for eachfile
-        # if os.path.getmtime(database) > index.matchindex['indexedtime']:
         search.fileindexing(self, database, matches)
 
         importlib.reload(index)
         start = time.time()
         # Open each file by searched for matchtype in index
         for eachmatchtype in matchtype:
-            for eachfile in index.matchindex[eachmatchtype]:
-                # print(eachfile)
-                matchdata = matches.open(eachfile)
-                match = json.load(matchdata)
+            for eachyear in index.matchindex["matches"][eachmatchtype]:
+                if int(eachyear) < from_date[0] or int(eachyear) > to_date[0]:
+                    continue
+                for eachfile in index.matchindex["matches"][eachmatchtype][eachyear]:
+                    # print(eachfile)
+                    matchdata = matches.open(eachfile)
+                    match = json.load(matchdata)
 
-                # Dates check
-                year = match["info"]["dates"][0][:4]
-                month = str(match["info"]["dates"][0][5:7])
-                day = str(match["info"]["dates"][0][8:])
-                matchtimetuple = (int(year), int(month),
-                                int(day))
-                if time.mktime(matchtimetuple + (0, 0, 0, 0, 0, 0)) < time.mktime(from_date + (0, 0, 0, 0, 0, 0)) or time.mktime(matchtimetuple + (0, 0, 0, 0, 0, 0)) > time.mktime(to_date + (0, 0, 0, 0, 0, 0)):
-                    continue
-                # Event Check
-                if event and ("event" not in match["info"] or match["info"]["event"]["name"] not in event):
-                    continue
-                # Mens/Womens Check
-                if sex and match["info"]["gender"] not in sex:
-                    continue
-                # Players' Teams check
-                if playersteams and (
-                        match["info"]["teams"][0] not in playersteams and match["info"]["teams"][1] not in playersteams):
-                    continue
-                # Opposition check
-                if oppositionteams and (
-                        match["info"]["teams"][0] not in oppositionteams and match["info"]["teams"][1] not in oppositionteams):
-                    continue
-                # Venue Check
-                if venue and match["info"]["venue"] not in venue:
-                    continue
-                # Match Result check
-                if matchresult and ((match['info']['outcome'] not in matchresult) or (self.teams and match['info']['outcome']["winner"] not in self.teams) or (playersteams and match['info']['outcome']["winner"] not in playersteams)):
-                    continue
-
-                # Team mate check
-                if teammates and not any(eachteammate in teammates for eachteammate in match["info"]["players"][playersteams]):
-                    continue
-
-                # Teams Check
-                if self.teams and (match["info"]["teams"][0] not in self.teams and match["info"]["teams"][1] not in self.teams):
-                    continue
-                
-                # Players Check
-                if self.players and not any(eachplayer in self.players for eachplayer in match['info']['registry']['people'].keys()):
-                    continue
-
-                # Games and Wins record
-                # rewrite for ties and add these to stats dict.
-                search.gamesandwins(self, match["info"]["players"], match["info"]["outcome"], match["info"]["teams"])
-
-                # Open each innings in match
-                for nthinnings, eachinnings in enumerate(match['innings']):
-                    if innings and (nthinnings + 1) not in innings:
+                    # Dates check
+                    year = match["info"]["dates"][0][:4]
+                    month = str(match["info"]["dates"][0][5:7])
+                    day = str(match["info"]["dates"][0][8:])
+                    matchtimetuple = (int(year), int(month),
+                                    int(day))
+                    if time.mktime(matchtimetuple + (0, 0, 0, 0, 0, 0)) < time.mktime(from_date + (0, 0, 0, 0, 0, 0)) or time.mktime(matchtimetuple + (0, 0, 0, 0, 0, 0)) > time.mktime(to_date + (0, 0, 0, 0, 0, 0)):
                         continue
-                    if "overs" not in eachinnings:
+                    # Event Check
+                    if event and ("event" not in match["info"] or match["info"]["event"]["name"] not in event):
                         continue
-                    if not superover and "super_over" in eachinnings:
+                    # Mens/Womens Check
+                    if sex and match["info"]["gender"] not in sex:
                         continue
-                    if superover and "super_over" not in eachinnings:
+                    # Players' Teams check
+                    if playersteams and (
+                            match["info"]["teams"][0] not in playersteams and match["info"]["teams"][1] not in playersteams):
+                        continue
+                    # Opposition check
+                    if oppositionteams and (
+                            match["info"]["teams"][0] not in oppositionteams and match["info"]["teams"][1] not in oppositionteams):
+                        continue
+                    # Venue Check
+                    if venue and match["info"]["venue"] not in venue:
+                        continue
+                    # Match Result check
+                    if matchresult and ((match['info']['outcome'] not in matchresult) or (self.teams and match['info']['outcome']["winner"] not in self.teams) or (playersteams and match['info']['outcome']["winner"] not in playersteams)):
+                        continue
+
+                    # Team mate check
+                    if teammates and not any(eachteammate in teammates for eachteammate in match["info"]["players"][playersteams]):
+                        continue
+
+                    # Teams Check
+                    if self.teams and (match["info"]["teams"][0] not in self.teams and match["info"]["teams"][1] not in self.teams):
                         continue
                     
-                    # Setup running tally of innings scores
-                    search.setupinningscores(self)
+                    # Players Check
+                    if self.players and not any(eachplayer in self.players for eachplayer in match['info']['registry']['people'].keys()):
+                        continue
 
-                    # Create list of batters in for this innings.
-                    battingorder = []
-                    bowlingorder = []
+                    # Games and Wins record
+                    # rewrite for ties and add these to stats dict.
+                    search.gamesandwins(self, match["info"]["players"], match["info"]["outcome"], match["info"]["teams"])
 
-                    # Creat liste of mandatory and optional powerplays in this innings.
-                    powerplays = []
-                    if "powerplays" in eachinnings:
-                        for eachpowerplay in eachinnings["powerplays"]:
-                            thispowerplay = range(math.floor(eachpowerplay["from"]), (math.floor(eachpowerplay["to"]) + 1))
-                            powerplays.extend(thispowerplay)
-
-                    # Open each over in innings
-                    for eachover in eachinnings['overs']:
-
-                        # Powerplay (mandatory and optional) check.
-                        if betweenovers and "powerplays" in betweenovers and "powerplays" in eachinnings and eachover['over'] not in powerplays:
+                    # Open each innings in match
+                    for nthinnings, eachinnings in enumerate(match['innings']):
+                        if innings and (nthinnings + 1) not in innings:
                             continue
-
-                        # Overs interval check  
-                        if betweenovers and "powerplays" not in betweenovers and (eachover['over'] < (betweenovers[0] - 1) or eachover['over'] > (betweenovers[1] - 1)):
+                        if "overs" not in eachinnings:
                             continue
+                        if not superover and "super_over" in eachinnings:
+                            continue
+                        if superover and "super_over" not in eachinnings:
+                            continue
+                        
+                        # Setup running tally of innings scores
+                        search.setupinningscores(self)
 
-                        # Open each ball
-                        for nth, eachball in enumerate(eachover['deliveries']):
+                        # Create list of batters in for this innings.
+                        battingorder = []
+                        bowlingorder = []
 
-                            # Player stats
-                            if self.players:
+                        # Creat liste of mandatory and optional powerplays in this innings.
+                        powerplays = []
+                        if "powerplays" in eachinnings:
+                            for eachpowerplay in eachinnings["powerplays"]:
+                                thispowerplay = range(math.floor(eachpowerplay["from"]), (math.floor(eachpowerplay["to"]) + 1))
+                                powerplays.extend(thispowerplay)
+
+                        # Open each over in innings
+                        for eachover in eachinnings['overs']:
+
+                            # Powerplay (mandatory and optional) check.
+                            if betweenovers and "powerplays" in betweenovers and "powerplays" in eachinnings and eachover['over'] not in powerplays:
+                                continue
+
+                            # Overs interval check  
+                            if betweenovers and "powerplays" not in betweenovers and (eachover['over'] < (betweenovers[0] - 1) or eachover['over'] > (betweenovers[1] - 1)):
+                                continue
+
+                            # Open each ball
+                            for nth, eachball in enumerate(eachover['deliveries']):
+
+                                # Player stats
+                                if self.players:
+                                    
+                                    # Record batting lineup.
+                                    if eachball['batter'] not in battingorder:
+                                        battingorder.append(eachball['batter'])
+                                    if eachball['non_striker'] not in battingorder:
+                                        battingorder.append(eachball['non_striker'])
+
+                                    # Record bowling order.
+                                    if eachball['batter'] not in bowlingorder:
+                                        bowlingorder.append(eachball['batter'])
+
+                                    # Striker's stats
+                                    if eachball['batter'] in self.players and (not oppositionbowlers or eachball['bowler'] in oppositionbowlers) and (not battingposition or (battingposition and ((battingorder.index(eachball['batter']) + 1) in battingposition))):
+                                        search.strikerstats(self, eachball)
+    
+                                    # Non-striker's outs.
+                                    if eachball["non_striker"] in self.players and "wickets" in eachball and (not battingposition or (battingposition and ((battingorder.index(eachball['non_striker']) + 1) in battingposition))):
+                                        search.nonstrikerstats(self, eachball, oppositionbowlers)
+
+                                    # Strike Turnover stats
+                                    if nth < (len(eachover['deliveries']) - 1):
+                                        search.striketurnoverstats(self, eachball, 1, 3)
+                                    if nth == (len(eachover['deliveries']) - 1):
+                                        search.striketurnoverstats(self, eachball, 0, 2)
+
+                                    # Bowling stats
+                                    if eachball['bowler'] in self.players and (not oppositionbatters or eachball['batter'] in oppositionbatters) and (not bowlingposition or (bowlingposition and ((bowlingorder.index(eachball['bowler']) + 1) in bowlingposition))):
+                                        search.bowlerstats(self, eachball, fielders)
+
+                                    # Fielding  stats
+                                    if "wickets" in eachball:
+                                        search.fieldingstats(self, eachball)
+
+                                # Team stats
+                                if self.teams:
+
+                                    # Team Batting stats
+                                    if eachinnings["team"] in self.teams:
+                                        search.teambattingstats(self, eachball, eachinnings["team"])
+
+                                    # Team Bowling stats
+                                    for eachteam in match["info"]["teams"]:
+                                        if eachteam in self.teams and eachteam not in eachinnings["team"]:
+                                            search.teambowlingstats(self, eachball, eachteam)
+
+                        # Player innings scores.
+                        if self.players:
+                            search.playerinnings(self,matchtimetuple, match["info"]["players"], nthinnings, eachmatchtype)
+                        
+                        # Team innings scores
+                        if self.teams:
+
+                            # Batting innings score
+                            if eachinnings["team"] in self.teams:
+                                search.teambattinginnings(self, eachinnings["team"], nthinnings, match["info"]["teams"], matchtimetuple, match['info']['outcome'], match['innings'])
                                 
-                                # Record batting lineup.
-                                if eachball['batter'] not in battingorder:
-                                    battingorder.append(eachball['batter'])
-                                if eachball['non_striker'] not in battingorder:
-                                    battingorder.append(eachball['non_striker'])
+                            # Bowling innings figures
+                            for eachteam in match["info"]["teams"]:
+                                if eachteam in self.teams and eachteam not in eachinnings["team"]:
+                                    search.teambowlinginnings(self, eachteam, eachinnings["team"], matchtimetuple, nthinnings)
+                                    
+                            # Successfully defended and chased scores.
+                            if 'result' not in match['info']['outcome'] and match['info']['outcome']["winner"] in self.teams:
+                                search.successfulscores(self, match['info']['outcome'], match['innings'], nthinnings, eachinnings["team"])
 
-                                # Record bowling order.
-                                if eachball['batter'] not in bowlingorder:
-                                    bowlingorder.append(eachball['batter'])
-
-                                # Striker's stats
-                                if eachball['batter'] in self.players and (not oppositionbowlers or eachball['bowler'] in oppositionbowlers) and (not battingposition or (battingposition and ((battingorder.index(eachball['batter']) + 1) in battingposition))):
-                                    search.strikerstats(self, eachball)
- 
-                                # Non-striker's outs.
-                                if eachball["non_striker"] in self.players and "wickets" in eachball and (not battingposition or (battingposition and ((battingorder.index(eachball['non_striker']) + 1) in battingposition))):
-                                    search.nonstrikerstats(self, eachball, oppositionbowlers)
-
-                                # Strike Turnover stats
-                                if nth < (len(eachover['deliveries']) - 1):
-                                    search.striketurnoverstats(self, eachball, 1, 3)
-                                if nth == (len(eachover['deliveries']) - 1):
-                                    search.striketurnoverstats(self, eachball, 0, 2)
-
-                                # Bowling stats
-                                if eachball['bowler'] in self.players and (not oppositionbatters or eachball['batter'] in oppositionbatters) and (not bowlingposition or (bowlingposition and ((bowlingorder.index(eachball['bowler']) + 1) in bowlingposition))):
-                                    search.bowlerstats(self, eachball, fielders)
-
-                                # Fielding  stats
-                                if "wickets" in eachball:
-                                    search.fieldingstats(self, eachball)
-
-                            # Team stats
-                            if self.teams:
-
-                                # Team Batting stats
-                                if eachinnings["team"] in self.teams:
-                                    search.teambattingstats(self, eachball, eachinnings["team"])
-
-                                # Team Bowling stats
-                                for eachteam in match["info"]["teams"]:
-                                    if eachteam in self.teams and eachteam not in eachinnings["team"]:
-                                        search.teambowlingstats(self, eachball, eachteam)
-
-                    # Player innings scores.
-                    if self.players:
-                        search.playerinnings(self,matchtimetuple, match["info"]["players"], nthinnings)
-                    
-                    # Team innings scores
-                    if self.teams:
-
-                        # Batting innings score
-                        if eachinnings["team"] in self.teams:
-                            search.teambattinginnings(self, eachinnings["team"], nthinnings, match["info"]["teams"], matchtimetuple, match['info']['outcome'], match['innings'])
-                            
-                        # Bowling innings figures
-                        for eachteam in match["info"]["teams"]:
-                            if eachteam in self.teams and eachteam not in eachinnings["team"]:
-                                search.teambowlinginnings(self, eachteam, eachinnings["team"], matchtimetuple, nthinnings)
-                                
-                        # Successfully defended and chased scores.
-                        if 'result' not in match['info']['outcome'] and match['info']['outcome']["winner"] in self.teams:
-                            search.successfulscores(self, match['info']['outcome'], match['innings'], nthinnings, eachinnings["team"])
-
-                matchdata.close()
+                    matchdata.close()
         matches.close()
-        # print(f'Time after collecting all stats: {time.time() - start}')
+        print(f'Time after stats(): {time.time() - start}')
         if self.players:
-            self.inningsresult = pd.DataFrame(self.inningsresult)
+            self.inningsresult = pd.DataFrame(self.inningsresult, index=pd.DatetimeIndex(self.inningsresult["Date"]))
 
-        # print(f'Time after inngings-df creation: {time.time() - start}')
+        print(f'Time after self.inningsresult creation: {time.time() - start}')
         # Derived Stats
         search.derivedstats(self)
 
-        # print(f'Time after derivedstats: {time.time() - start}')
+        print(f'Time after derivedstats(): {time.time() - start}')
         # All Player and All Teams Summing function
         if allstats:
             search.sumstats(self)
 
-            # print(f'Time after summing stats: {time.time() - start}')
+            print(f'Time after sumstats(): {time.time() - start}')
         if self.players:
             df = pd.DataFrame(self.result)
             self.result = df.transpose()
-            # print(f'Time after result-df creation: {time.time() - start}')
+            print(f'Time after transpose(): {time.time() - start}')
 
         elif self.teams:
             df = pd.DataFrame(self.result)

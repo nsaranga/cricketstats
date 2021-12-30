@@ -30,13 +30,8 @@ import statsprocessor
 import index
 
 # for reverse lookup, I need to look for stats. One way is to write a new type of search with new class and get stats func. Other way is to write function that lists every player for a particular stat and inputs subset of tha tlist into getstats(). Maybe another way is first create a list/index of all players in the database. delete duplicates. then input that list into getstatsfunc.
+# I for this I need a new function that just opens each match in a given period and creates dictionary for players and gets innings.
 
-# CLI program plan:
-# a: Need create indexes of teams, venues, events, so people cna know what it is possible to search for.
-# 1 Wrapper CLI interface -> user inputs players or teams they -> create search object
-# 2 Search Object uses getstats method -> stats collected
-# 3 User is shown what stats they can see, and asks which? -> Pandas display of stats.
-# 4 ask if you want plot of dataframe and how?
 
 class search:
     def __init__(self, players=None, teams=None, result=None, inningsresult=None) -> None:

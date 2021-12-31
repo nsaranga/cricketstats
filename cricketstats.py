@@ -43,8 +43,8 @@ class search:
     # Setup the statistics to be recorded.
     def resultsetup(self):
         if self.players:
-            self.inningsresult = {"Players":[], 
-            "Date":[], "Match Type":[], "Team":[], "Opposition":[], "Innings":[], 
+            self.inningsresult = { 
+            "Date":[], "Match Type":[],"Players":[], "Team":[], "Opposition":[], "Innings":[], 
             "Scores": [],"Balls Faced": [], 
             "Batting S/R":[], "Runs/Ball":[], "First Boundary Ball":[], 
             "Runsgiven": [], "Wickets": [], "Overs Bowled": [], 
@@ -74,10 +74,9 @@ class search:
                                             'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Avg': 0, "Bowling Avg MeanAD": 0, 'Bowling S/R': 0, "Bowling S/R MeanAD": 0,  "Runsgiven/Ball":0, "dotballseries": [], "Avg Consecutive Dot Balls": 0}
 
         if self.teams:
-            self.inningsresult = {"Teams":[], 
-            "Date":[], 
-            "Match Type":[], "Opposition":[], "Innings":[], 
-            #"Result":[], "Margin":[], 
+            self.inningsresult = {
+            "Date":[], "Match Type":[],"Teams":[], "Opposition":[], "Innings":[], 
+            "Defended Scores": [], "Chased Scores": [], "Margin":[], 
             "Scores": [],"Outs": [], "Overs Faced": [], 
             "Runs/Outs":[], "Runs/Ball":[], "Run Rate":[], "First Boundary Ball":[], 
             "Runsgiven": [], "Wickets": [], "Overs Bowled": [], 
@@ -86,11 +85,10 @@ class search:
             self.result = {}
             for eachteam in self.teams:
                 self.result[eachteam] = {"Teams": eachteam, "Games": 0, "Innings Bowled":0, "bowlinningscount": False, "Innings Batted": 0,
-                                        "batinningscount": False, "Won": 0, "Drawn": 0, 'Win %': 0, 
+                                        "batinningscount": False, "Won": 0, "Drawn": 0, 'Win %': 0, "Defended Wins": 0, "Chased Wins": 0, 
                                         "Net Boundary %":0, "Net Run Rate":0,
                                         
                                         "inningsruns": [], "inningsballsfaced": 0, "inningsouts": 0, "firstboundary": [],
-                                        "Defended Scores": [], "Chased Scores": [], 
                                         "Runmargins": [], "Wicketmargins": [], "Overs Chased": [],
                                         "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Outs": 0, "Balls Faced": 0, 
                                         "Bowled Outs": 0, "LBW Outs": 0, "Caught Outs": 0, "Stumped Outs": 0, "Run Outs": 0,
@@ -529,11 +527,6 @@ class search:
     
     # Record team's batting innings
     def teambattinginnings(self, inningsteam, nthinnings, matchteams, matchtimetuple, matchoutcome, matchinnings, eachmatchtype):
-        # self.result[inningsteam]["All Scores"].append(
-        #                         sum(self.result[inningsteam]["inningsruns"]))
-        # self.result[inningsteam]["All Outs"].append(
-        #     self.result[inningsteam]["inningsouts"])
-        # self.result[inningsteam]["All Overs Faced"].append(
         for eachteam in matchteams:
             if eachteam != inningsteam:
                 bowlingteam = eachteam
@@ -571,14 +564,34 @@ class search:
         self.inningsresult["Runsgiven Rate"].append(None)
         self.inningsresult["Avg Consecutive Dot Balls"].append(None)
 
+        if nthinnings == (len(matchinnings) - 1):
+            if "result" not in matchoutcome and matchoutcome["winner"] == inningsteam:
+                if "by" in matchoutcome and "wickets" in matchoutcome["by"]:
+                    self.result[inningsteam]["Chased Wins"] += 1
+                    self.inningsresult["Chased Scores"].append(sum(self.result[matchoutcome["winner"]]["inningsruns"]))
+                    self.inningsresult["Defended Scores"].append(None)
+                    self.inningsresult["Margin"].append(matchoutcome['by']['wickets'])
+                if "by" not in matchoutcome:
+                    self.inningsresult["Defended Scores"].append(None)
+                    self.inningsresult["Chased Scores"].append(None)
+                    self.inningsresult["Margin"].append(None)
+            if "result" in matchoutcome or matchoutcome["winner"] != inningsteam:
+                self.inningsresult["Defended Scores"].append(None)
+                self.inningsresult["Chased Scores"].append(None)
+                self.inningsresult["Margin"].append(None)
+        if nthinnings != (len(matchinnings) - 1):
+            self.inningsresult["Defended Scores"].append(None)
+            self.inningsresult["Chased Scores"].append(None)
+            self.inningsresult["Margin"].append(None)
+
+        # print(nthinnings +1)
+        # print("Def", len(self.inningsresult["Defended Scores"]))
+        # print("Cha", len(self.inningsresult["Chased Scores"]))
+
+        # self.inningsresult["Margin"].append(None)
+
     # Record team's bowling innings
-    def teambowlinginnings(self, eachteam, battingteam, matchtimetuple, nthinnings, eachmatchtype):
-        # self.result[eachteam]["All Runsgiven"].append(
-        #                             sum(self.result[eachteam]["inningsrunsgiven"]))
-        # self.result[eachteam]["All Wickets"].append(
-        #     self.result[eachteam]["inningswickets"])
-        # self.result[eachteam]["All Overs Bowled"].append(
-        #     round(self.result[eachteam]["inningsballsbowled"] / 6))
+    def teambowlinginnings(self, eachteam, battingteam, matchtimetuple, nthinnings, matchoutcome, matchinnings, eachmatchtype):
         if self.result[eachteam]["bowlinningscount"] == True:
             self.result[eachteam]["Innings Bowled"] += 1
 
@@ -612,6 +625,32 @@ class search:
             self.inningsresult["Avg Consecutive Dot Balls"].append(round(np.mean(statsprocessor.dotballseries(self.result[eachteam]["inningsrunsgiven"])), 2))
         if 0 not in self.result[eachteam]["inningsrunsgiven"]:
              self.inningsresult["Avg Consecutive Dot Balls"].append(0)
+        
+        if nthinnings == (len(matchinnings) - 1):
+            if "result" not in matchoutcome and matchoutcome["winner"] == eachteam:
+                if "by" in matchoutcome and "runs" in matchoutcome["by"]:
+                    self.result[eachteam]["Defended Wins"] += 1
+                    self.inningsresult["Defended Scores"].append(sum(self.result[matchoutcome["winner"]]["inningsrunsgiven"]) + matchoutcome['by']['runs'])
+                    self.inningsresult["Chased Scores"].append(None)
+
+                    self.inningsresult["Margin"].append(matchoutcome['by']['runs'])
+                if "by" not in matchoutcome:
+                    self.inningsresult["Defended Scores"].append(None)
+                    self.inningsresult["Chased Scores"].append(None)
+                    self.inningsresult["Margin"].append(None)
+            if "result" in matchoutcome or matchoutcome["winner"] != eachteam:
+                self.inningsresult["Defended Scores"].append(None)
+                self.inningsresult["Chased Scores"].append(None)
+                self.inningsresult["Margin"].append(None)
+        if nthinnings != (len(matchinnings) - 1):
+            self.inningsresult["Defended Scores"].append(None)
+            self.inningsresult["Chased Scores"].append(None)
+            self.inningsresult["Margin"].append(None)
+        
+        # print(nthinnings +1)
+        # print("Def", len(self.inningsresult["Defended Scores"]))
+        # print("Cha", len(self.inningsresult["Chased Scores"]))
+        # self.inningsresult["Margin"].append(None)
 
     # Record successful scores
     def successfulscores(self, matchoutcome, matchinnings, nthinnings, inningsteam):
@@ -660,15 +699,9 @@ class search:
                 if self.result[eachplayer]["totalstosopp"] > 0:
                     self.result[eachplayer]["Strike Turnover %"] = statsprocessor.ratio(self.result[eachplayer]["totalstos"], self.result[eachplayer]["totalstosopp"], multiplier=100)
 
-                # if self.result[eachplayer]["All Balls Faced"]:
-                #     self.result[eachplayer]["Batting S/R MeanAD"] = statsprocessor.madfromratio(self.result[eachplayer]["All Scores"], self.result[eachplayer]["All Balls Faced"], multiplier=100)
                 if len(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Balls Faced"].dropna().index) > 0:
                     self.result[eachplayer]["Batting S/R MeanAD"] = round(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Batting S/R"].mad(), 2)
 
-                # if self.result[eachplayer]["All Scores"]:
-                #     self.result[eachplayer]["Mean Score"] = statsprocessor.ratio(sum(self.result[eachplayer]["All Scores"]), len(self.result[eachplayer]["All Scores"]))
-                #     self.result[eachplayer]["Score MeanAD"] = statsprocessor.mad(
-                #         self.result[eachplayer]["All Scores"])
                 if len(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Scores"].dropna().index) > 0:
                     self.result[eachplayer]["Mean Score"] = round(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Scores"].mean(),2)
                     self.result[eachplayer]["Score MeanAD"] = round(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Scores"].mad(),2)
@@ -693,9 +726,6 @@ class search:
                         statsprocessor.ratio(
                             sum(self.result[eachplayer]["dotballseries"]), len(self.result[eachplayer]["dotballseries"])))
 
-                # if self.result[eachplayer]["All Overs Bowled"]:
-                #     self.result[eachplayer]["Economy Rate MeanAD"] = statsprocessor.madfromratio(
-                #         self.result[eachplayer]["All Runsgiven"], self.result[eachplayer]["All Overs Bowled"])
                 if len(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Overs Bowled"].dropna().index) > 0:
                     self.result[eachplayer]["Economy Rate MeanAD"] = round(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Economy Rate"].mad(),2)
 
@@ -1118,16 +1148,21 @@ class search:
                             # Bowling innings figures
                             for eachteam in match["info"]["teams"]:
                                 if eachteam in self.teams and eachteam not in eachinnings["team"]:
-                                    search.teambowlinginnings(self, eachteam, eachinnings["team"], matchtimetuple, nthinnings,eachmatchtype)
+                                    search.teambowlinginnings(self, eachteam, eachinnings["team"], matchtimetuple, nthinnings, match['info']['outcome'], match['innings'], eachmatchtype)
                                     
                             # Successfully defended and chased scores.
-                            if 'result' not in match['info']['outcome'] and match['info']['outcome']["winner"] in self.teams:
-                                search.successfulscores(self, match['info']['outcome'], match['innings'], nthinnings, eachinnings["team"])
+                            # if 'result' not in match['info']['outcome'] and match['info']['outcome']["winner"] in self.teams:
+                                # search.successfulscores(self, match['info']['outcome'], match['innings'], nthinnings, eachinnings["team"])
 
                     matchdata.close()
         matches.close()
         # print(f'Time after stats(): {time.time() - start}')
         
+
+        # for y in self.inningsresult.keys():
+        #     print(y, len(self.inningsresult[y]))
+        # print(self.inningsresult)
+
         self.inningsresult = pd.DataFrame(self.inningsresult)
 
         # print(f'Time after self.inningsresult creation: {time.time() - start}')

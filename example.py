@@ -74,9 +74,8 @@ teammates=[] # Search matches where certain teammates play. For this to work pla
 oppositionteams=[] # Search matches where opposition is only certain teams. Options: team names eg. oppositionteams=["India", "England"]
 venue=[] # Search matches played only at these venues Options: Cricket Grounds eg. venue=["Sydney Cricket Ground", "Melbourne Cricket Ground", ""Brisbane Cricket Ground, Woolloongabba""]
 event=[] # Search matches played as part of these Leagues or Tournaments Options: Name of League or Tournament eg. event=["Sheffield Shield", "ICC World Cup", "Big Bash League"] 
-matchresult=[] # Search matches where players or teams have these results. Options "winner", "draw","tie" eg. matchresult=["winner", "draw"]
-allstats=False # When switche to True, it adds an "all players" or "all teams" row at end of result that sums all players or teams stats that are searched for.
-
+matchresult=None # Search matches where players or teams have these results. When looking at players, this option **must** be used with at one team in playersteams variable. Options either "won" or "loss" or "draw" or "tie" eg. matchresult="won"
+allstats=False # When switched to True, it adds an "all players" or "all teams" row at end of result that sums all players or teams stats that are searched for.
 
 # Apply stats() method applied on search object. You have to apply the method to every search object if you want the script to actually do teh search.
 search1.stats(database, from_date, to_date, matchtype, betweenovers=betweenovers, innings=innings, sex=sex, playersteams=playerteams, oppositionbatters=oppositionbatters, oppositionbowlers=oppositionbowlers, oppositionteams=oppositionteams, venue=venue, event=event, matchresult=matchresult, superover=superover, battingposition=battingposition, bowlingposition=bowlingposition, fielders=fielders)

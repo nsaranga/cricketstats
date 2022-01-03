@@ -1007,7 +1007,7 @@ class search:
         if event ==None:
             event =[]
         if matchresult == None:
-            matchresult = []
+            matchresult = None
         if superover == None:
             superover = False
         if battingposition == None:
@@ -1067,9 +1067,6 @@ class search:
                     # Venue Check
                     if venue and match["info"]["venue"] not in venue:
                         continue
-                    # Match Result check
-                    if matchresult and ((match['info']['outcome'] not in matchresult) or (self.teams and match['info']['outcome']["winner"] not in self.teams) or (playersteams and match['info']['outcome']["winner"] not in playersteams)):
-                        continue
 
                     # Team mate check
                     if teammates and not any(eachteammate in teammates for eachteammate in match["info"]["players"][playersteams]):
@@ -1082,6 +1079,34 @@ class search:
                     # Players Check
                     if self.players and not any(eachplayer in self.players for eachplayer in match['info']['registry']['people'].keys()):
                         continue
+
+                    # Match Result check
+                    if matchresult and self.teams and (
+                        (("result" in match['info']['outcome'] and "no result" in match['info']['outcome']['result']) or (matchresult=="tie" and ("winner" in match['info']['outcome'] or "result" in match['info']['outcome'] and match['info']['outcome']['result']!=matchresult)) or
+                        (matchresult=="draw" and ("winner" in match['info']['outcome'] or "result" in match['info']['outcome'] and match['info']['outcome']['result']!=matchresult)) or
+                        (matchresult=="won" and ("result" in match['info']['outcome'] or "winner" in match['info']['outcome'] and match['info']['outcome']['winner'] not in self.teams)) or
+                        (matchresult=="loss" and ("result" in match['info']['outcome'] or "winner" in match['info']['outcome'] and match['info']['outcome']['winner'] in self.teams))
+
+                        )):
+                        continue
+
+                    if matchresult and self.players and playersteams and (
+                        (("result" in match['info']['outcome'] and "no result" in match['info']['outcome']['result']) or (matchresult=="tie" and ("winner" in match['info']['outcome'] or "result" in match['info']['outcome'] and match['info']['outcome']['result']!=matchresult)) or
+                        (matchresult=="draw" and ("winner" in match['info']['outcome'] or "result" in match['info']['outcome'] and match['info']['outcome']['result']!=matchresult)) or
+                        (matchresult=="won" and ("result" in match['info']['outcome'] or "winner" in match['info']['outcome'] and match['info']['outcome']['winner'] not in playersteams)) or
+                        (matchresult=="loss" and ("result" in match['info']['outcome'] or "winner" in match['info']['outcome'] and match['info']['outcome']['winner'] in playersteams))
+                        )):
+                        continue
+                        
+                        
+                        #  or ("won"==matchresult and "winner" in match['info']['outcome'] and match['info']['outcome']['winner'] not in self.teams))
+                        # ):
+                        # continue
+                        
+                        # or 
+                        # (self.players and ("result" in match['info']['outcome'] and match['info']['outcome']["result"] not in matchresult) and  
+                        # (playersteams and "winner" in matchresult and "winner" in match['info']['outcome'] and match['info']['outcome']["winner"] not in playersteams))
+
 
                     # All Players and All Teams games/wins/draw/ties record
                     # rewrite for ties and add these to stats dict. Hard because T20s have superovers to decide ties.

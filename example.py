@@ -47,7 +47,7 @@ search1 = cricketstats.search(players=Ozbatters)
 # search2 = cricketstats.search(teams=bblteams)
 
 """ 2. Apply the "stats()" method to the search object with the necessary arguments. """
-# Arguments are mostly lists, with items separated by commans.
+# Arguments are mostly lists, with items separated by commas.
 
 # First we can setup our arguments.
 # Required input arguments:
@@ -86,10 +86,14 @@ search1.stats(database, from_date, to_date, matchtype, betweenovers=betweenovers
 
 
 """ 3. Print result. Output is a pandas dataframe. """
+# The output of the search is a pandas dataframe.
 # print(search1.result.columns) # Use this line to print all the stats that are recorded and can be displayed.
 
 # The line below prints the columns of the stats. There are way more stats than just the four used in the line below.
 print(search1.result[["Games", "Batting Avg", "Score MeanAD", "Balls Faced"]]) 
+
+# To get the long form data of each innings the players/team have played use the line below. This is best displayed as dataframe in jupyter notebook.
+print(search1.inningsresult)
 
 # If you want to save the search result as a csv file that you can open in excel you can use the line below.
 # search1.result.to_csv(./YOUR FILE LOCATION)

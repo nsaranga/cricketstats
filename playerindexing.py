@@ -49,9 +49,9 @@ try:
                 players["Batting"]["Left hand"].append(eachplayer)
             
             # Bowling
-            if "Right arm fast" in element.text or "Right arm fast medium" in element.text  or "Right arm medium" in element.text :
+            if "Right arm fast" in element.text or "Right arm fast medium" in element.text  or "Right arm medium" in element.text:
                 players["Bowling"]["Right arm pace"].append(eachplayer)
-            if "Left arm fast" in element.text or "Left arm fast medium" in element.text  or "Left arm medium" in element.text :
+            if "Left arm fast" in element.text or "Left arm fast medium" in element.text  or "Left arm medium" in element.text:
                 players["Bowling"]["Left arm pace"].append(eachplayer)
 
             if "offbreak" in element.text:
@@ -66,9 +66,11 @@ try:
             # Umpire
             if "Umpire" in element.text:
                 players["Umpire"].append(eachplayer)
+
+            if "Right hand bat" not in element.text and "Left hand bat" not in element.text and "Right arm fast" not in element.text and "Right arm fast medium" not in element.text  and "Right arm medium" not in element.text and "Left arm fast" not in element.text and "Left arm fast medium" not in element.text  and "Left arm medium" not in element.text and "Legbreak" not in element.text and "Slow left arm orthodox" not in element.text and "Left arm wrist spin" not in element.text and "Left-arm googly" not in element.text:
+                players["Unknown"].append(eachplayer)
 finally:
     currentdir = os.path.dirname(os.path.abspath(__file__))
     file = open(f"{currentdir}/playerindex.py", "w")
     file.write("players = " + repr(players))
     file.close
-

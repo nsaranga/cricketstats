@@ -63,7 +63,7 @@ def firstboundary(shotlist):
         elif six <= four:
             return six
     if not four and not six:
-        return None
+        return 0
 
 def dotballseries(balllist):
     dotballs = []

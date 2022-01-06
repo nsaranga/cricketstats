@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. 
 """
 
-from datetime import datetime
+import datetime
 import json
 import time
 import pandas as pd
@@ -45,7 +45,7 @@ class search:
         if self.players:
             self.inningsresult = { 
             "Date":[], "Match Type":[], "Venue":[], "Players":[], "Team":[], "Opposition":[], "Innings":[], 
-            "Scores": [],"Balls Faced": [], 
+            "Batting Position":[], "Scores": [],"Balls Faced": [], 
             "Batting S/R":[], "Runs/Ball":[], "First Boundary Ball":[], 
             "Runsgiven": [], "Wickets": [], "Overs Bowled": [], 
             'Economy Rate': [], 'Bowling Avg': [], 'Bowling S/R': [], "Runsgiven/Ball":[], "Avg Consecutive Dot Balls":[]}
@@ -445,7 +445,7 @@ class search:
                     self.result[inningsteam]["Runouts"] += 1
     
     # Record player's innings stats
-    def playerinnings(self, matchtimetuple, matchplayers, nthinnings, eachmatchtype,matchvenue):
+    def playerinnings(self, matchtimetuple, matchplayers, nthinnings, eachmatchtype, matchvenue, battingorder, bowlingorder):
         for eachplayer in self.result:
             for eachteam in matchplayers:
                 if eachplayer in matchplayers[eachteam]:
@@ -460,12 +460,13 @@ class search:
 
                 self.inningsresult["Players"].append(eachplayer)
                 self.inningsresult["Venue"].append(matchvenue)
-                self.inningsresult["Date"].append(datetime(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
+                self.inningsresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
                 self.inningsresult["Match Type"].append(eachmatchtype)
                 self.inningsresult["Team"].append(playersteam)
                 self.inningsresult["Opposition"].append(oppositionteam)
                 self.inningsresult["Innings"].append(nthinnings + 1)
 
+                self.inningsresult["Batting Position"].append(battingorder.index(eachplayer) + 1)
                 self.inningsresult["Scores"].append(
                     sum(self.result[eachplayer]["inningsruns"]))
                 self.inningsresult["Balls Faced"].append(
@@ -489,12 +490,13 @@ class search:
                 self.result[eachplayer]["dotballseries"].extend(statsprocessor.dotballseries(self.result[eachplayer]["inningsrunsgiven"]))
                 self.inningsresult["Players"].append(eachplayer)
                 self.inningsresult["Venue"].append(matchvenue)
-                self.inningsresult["Date"].append(datetime(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
+                self.inningsresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
                 self.inningsresult["Match Type"].append(eachmatchtype)
                 self.inningsresult["Team"].append(playersteam)
                 self.inningsresult["Opposition"].append(oppositionteam)
                 self.inningsresult["Innings"].append(nthinnings + 1)
 
+                self.inningsresult["Batting Position"].append(None)
                 self.inningsresult["Scores"].append(None)
                 self.inningsresult["Balls Faced"].append(None)
                 self.inningsresult["Batting S/R"].append(None)
@@ -539,7 +541,7 @@ class search:
 
         self.inningsresult["Teams"].append(inningsteam)
         self.inningsresult["Venue"].append(matchvenue)
-        self.inningsresult["Date"].append(datetime(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
+        self.inningsresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
         self.inningsresult["Match Type"].append(eachmatchtype)
         self.inningsresult["Opposition"].append(bowlingteam)
         self.inningsresult["Innings"].append(nthinnings + 1)
@@ -604,7 +606,7 @@ class search:
 
         self.inningsresult["Teams"].append(eachteam)
         self.inningsresult["Venue"].append(matchvenue)
-        self.inningsresult["Date"].append(datetime(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
+        self.inningsresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
         self.inningsresult["Match Type"].append(eachmatchtype)
         self.inningsresult["Opposition"].append(battingteam)
         self.inningsresult["Innings"].append(nthinnings + 1)
@@ -1209,7 +1211,7 @@ class search:
 
                         # Player innings scores.
                         if self.players:
-                            search.playerinnings(self,matchtimetuple, match["info"]["players"], nthinnings, eachmatchtype,match["info"]["venue"])
+                            search.playerinnings(self,matchtimetuple, match["info"]["players"], nthinnings, eachmatchtype,match["info"]["venue"], battingorder, bowlingorder)
                         
                         # Team innings scores
                         if self.teams:

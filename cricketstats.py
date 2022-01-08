@@ -185,7 +185,7 @@ class search:
                 self.result[eachteam]["inningsballsbowled"] = 0
 
     # Record striker's stats for each ball.
-    def strikerstats(self, eachball):
+    def strikerstats(self, eachball, nthball, numdeliveries):
         if eachball['batter'] in self.players:
             self.result[eachball['batter']]["batinningscount"] = True
         self.result[eachball['batter']
@@ -231,6 +231,10 @@ class search:
                 if eachwicket["kind"] == "run out":
                     self.result[eachball['batter']
                                 ]["Run Outs"] += 1
+        if nthball < (len(numdeliveries) - 1):
+            search.striketurnoverstats(self, eachball, 1, 3)
+        if nthball == (len(numdeliveries) - 1):
+            search.striketurnoverstats(self, eachball, 0, 2)
 
     # Record non-strikers's stats for each ball. 
     def nonstrikerstats(self, eachball, oppositionbowlers):
@@ -253,6 +257,8 @@ class search:
             if "extras" in eachball:
                 if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']) and (eachball['runs']['extras'] == case1 or eachball['runs']['extras'] == case2):
                     self.result[eachball['batter']]["totalstos"] += 1
+
+    def striketurnovergivenstats(self, eachball, case1, case2):
         if eachball['bowler'] in self.players:
             self.result[eachball['bowler']
                         ]["totalstosgivenopp"] += 1
@@ -265,7 +271,7 @@ class search:
                             ]["totalstosgiven"] += 1
     
     # Record bowler's stats
-    def bowlerstats(self, eachball, fielders):
+    def bowlerstats(self, eachball, fielders, nthball, numdeliveries):
         if eachball['bowler'] in self.players:
             self.result[eachball['bowler']]["bowlinningscount"] = True
         self.result[eachball['bowler']
@@ -334,6 +340,10 @@ class search:
                 if eachwicket["kind"] == "stumped":
                     self.result[eachball['bowler']
                                 ]["Stumpeds"] += 1
+        if nthball < (len(numdeliveries) - 1):
+            search.striketurnovergivenstats(self, eachball, 1, 3)
+        if nthball == (len(numdeliveries) - 1):
+            search.striketurnovergivenstats(self, eachball, 0, 2)
     
     # Record fieling stats for players.
     def fieldingstats(self, eachball):
@@ -1173,11 +1183,10 @@ class search:
                                     # Record bowling order.
                                     if eachball['batter'] not in bowlingorder:
                                         bowlingorder.append(eachball['batter'])
-
                                     
                                     # Striker's stats
                                     if eachball['batter'] in self.players and (not oppositionbowlers or eachball['bowler'] in oppositionbowlers) and (not battingposition or (battingposition and ((battingorder.index(eachball['batter']) + 1) in battingposition))):
-                                        search.strikerstats(self, eachball)
+                                        search.strikerstats(self, eachball, nthball, eachover['deliveries'])
     
                                     # Non-striker's outs.
                                     if eachball["non_striker"] in self.players and "wickets" in eachball and (not battingposition or (battingposition and ((battingorder.index(eachball['non_striker']) + 1) in battingposition))):
@@ -1185,17 +1194,17 @@ class search:
 
                                     # Bowling stats
                                     if eachball['bowler'] in self.players and (not oppositionbatters or eachball['batter'] in oppositionbatters) and (not bowlingposition or (bowlingposition and ((bowlingorder.index(eachball['bowler']) + 1) in bowlingposition))):
-                                        search.bowlerstats(self, eachball, fielders)
+                                        search.bowlerstats(self, eachball, fielders, nthball, eachover['deliveries'])
 
                                     # Fielding stats
                                     if "wickets" in eachball:
                                         search.fieldingstats(self, eachball)
 
                                     # Strike Turnover stats
-                                    if nthball < (len(eachover['deliveries']) - 1):
-                                        search.striketurnoverstats(self, eachball, 1, 3)
-                                    if nthball == (len(eachover['deliveries']) - 1):
-                                        search.striketurnoverstats(self, eachball, 0, 2)
+                                    # if nthball < (len(eachover['deliveries']) - 1):
+                                    #     search.striketurnoverstats(self, eachball, 1, 3)
+                                    # if nthball == (len(eachover['deliveries']) - 1):
+                                    #     search.striketurnoverstats(self, eachball, 0, 2)
 
                                 # Team stats
                                 if self.teams:

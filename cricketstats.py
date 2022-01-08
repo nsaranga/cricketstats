@@ -247,7 +247,7 @@ class search:
                     self.result[eachball['non_striker']
                                 ]["Run Outs"] += 1
 
-    # Record strike turn over rstats for striker. 
+    # Record strike turn over stats for strikers. 
     def striketurnoverstats(self, eachball, case1, case2):
         if eachball['batter'] in self.players:
             self.result[eachball['batter']
@@ -258,6 +258,7 @@ class search:
                 if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']) and (eachball['runs']['extras'] == case1 or eachball['runs']['extras'] == case2):
                     self.result[eachball['batter']]["totalstos"] += 1
 
+    # Record strike turn over given stats for bowlers.
     def striketurnovergivenstats(self, eachball, case1, case2):
         if eachball['bowler'] in self.players:
             self.result[eachball['bowler']
@@ -486,6 +487,7 @@ class search:
                 self.inningsresult["First Boundary Ball"].append(statsprocessor.firstboundary(
                     self.result[eachplayer]["inningsruns"]))
 
+                self.inningsresult["Bowling Position"].append(None)
                 self.inningsresult["Runsgiven"].append(None)
                 self.inningsresult["Wickets"].append(None)
                 self.inningsresult["Overs Bowled"].append(None)
@@ -513,6 +515,7 @@ class search:
                 self.inningsresult["Runs/Ball"].append(None)
                 self.inningsresult["First Boundary Ball"].append(None)
 
+                self.inningsresult["Bowling Position"].append(bowlingorder.index(eachplayer) + 1)
                 self.inningsresult["Runsgiven"].append(
                     sum(self.result[eachplayer]["inningsrunsgiven"]))
                 self.inningsresult["Wickets"].append(
@@ -1055,7 +1058,7 @@ class search:
                     match = json.load(matchdata)
 
                     # Dates check
-                    year = match["info"]["dates"][0][:4]
+                    year = str(match["info"]["dates"][0][:4])
                     month = str(match["info"]["dates"][0][5:7])
                     day = str(match["info"]["dates"][0][8:])
                     matchtimetuple = (int(year), int(month),

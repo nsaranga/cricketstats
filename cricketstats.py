@@ -1184,8 +1184,8 @@ class search:
                                         battingorder.append(eachball['non_striker'])
 
                                     # Record bowling order.
-                                    if eachball['batter'] not in bowlingorder:
-                                        bowlingorder.append(eachball['batter'])
+                                    if eachball['bowler'] not in bowlingorder:
+                                        bowlingorder.append(eachball['bowler'])
                                     
                                     # Striker's stats
                                     if eachball['batter'] in self.players and (not oppositionbowlers or eachball['bowler'] in oppositionbowlers) and (not battingposition or (battingposition and ((battingorder.index(eachball['batter']) + 1) in battingposition))):

@@ -47,7 +47,7 @@ class search:
             "Date":[], "Match Type":[], "Venue":[], "Players":[], "Team":[], "Opposition":[], "Innings":[], 
             "Batting Position":[], "Scores": [],"Balls Faced": [], 
             "Batting S/R":[], "Runs/Ball":[], "First Boundary Ball":[], 
-            "Runsgiven": [], "Wickets": [], "Overs Bowled": [], 
+            "Bowling Position":[], "Runsgiven": [], "Wickets": [], "Overs Bowled": [], 
             'Economy Rate': [], 'Bowling Avg': [], 'Bowling S/R': [], "Runsgiven/Ball":[], "Avg Consecutive Dot Balls":[]}
 
             self.result = {}
@@ -1124,7 +1124,7 @@ class search:
 
 
                     # All Players and All Teams games/wins/draw/ties record
-                    # rewrite for ties and add these to stats dict. Hard because T20s have superovers to decide ties.
+                    # TODO rewrite for ties and add these to stats dict. Hard because T20s have superovers to decide ties.
                     if sum==True:
                         allgamesplayed += 1
                         if "result" in match["info"]["outcome"] and match["info"]["outcome"]['result'] == "draw":

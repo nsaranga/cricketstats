@@ -38,7 +38,6 @@ To understand how to use the module you can use the "example.py" which provides 
 ## To Do:
 - Clean up stats independent of checks with stats dependent on checks.
 - Command-line wrapper
-- Web wrapper
 - Reverse look up of teams and players by stats.
 - Arbitrary Keyword Arguments for function?
 - Expected runs model? basically sum of weighted average of runs per ball * average innings length. something along th lines of pythagorean thing.

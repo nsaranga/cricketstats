@@ -28,6 +28,7 @@ import importlib
 
 import statsprocessor
 import index
+import playerindex
 
 # for reverse lookup, I need to look for stats. One way is to write a new type of search with new class and get stats func. Other way is to write function that lists every player for a particular stat and inputs subset of tha tlist into getstats(). Maybe another way is first create a list/index of all players in the database. delete duplicates. then input that list into getstatsfunc.
 # I for this I need a new function that just opens each match in a given period and creates dictionary for players and gets innings.
@@ -60,7 +61,7 @@ class search:
                                             "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Balls Faced": 0, "Outs": 0, 
                                             "Bowled Outs": 0, "LBW Outs": 0, "Caught Outs": 0, "Stumped Outs": 0, "Run Outs": 0, 
                                             "totalstos": 0, "totalstosopp": 0, 
-                                            'Dot Ball %': 0, 'Strike Turnover %': 0, 'Batting S/R': 0, 'Batting S/R MeanAD': 0, 'Batting Avg': 0, "Mean Score":0, 'Score MeanAD': 0, 'Boundary %': 0, "Runs/Ball":0,
+                                            'Dot Ball %': 0, 'Strike Turnover %': 0, 'Batting S/R': 0, 'Batting S/R MeanAD': 0, 'Batting Avg': 0, "Mean Score":0, 'Score MeanAD': 0, "Consistency %":0, 'Boundary %': 0, "Runs/Ball":0,
                                             'Avg First Boundary Ball': 0,
                                             
                                             "Innings Bowled":0, "bowlinningscount": False,
@@ -93,7 +94,7 @@ class search:
                                         "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Outs": 0, "Balls Faced": 0, 
                                         "Bowled Outs": 0, "LBW Outs": 0, "Caught Outs": 0, "Stumped Outs": 0, "Run Outs": 0,
                                         "Runs/Outs":0, "Runs/Ball":0, "Run Rate":0, 'Avg First Boundary Ball': 0,
-                                        'Dot Ball %': 0, 'Score MeanAD': 0, 'Boundary %': 0, 
+                                        'Dot Ball %': 0, 'Score MeanAD': 0, "Consistency %":0, 'Boundary %': 0, 
                                         
                                         "inningsrunsgiven": [], "inningsballsbowled": 0, "inningswickets": 0, 
                                         "Runsgiven": 0, "Foursgiven": 0, "Sixesgiven": 0, 
@@ -121,6 +122,9 @@ class search:
         if os.path.getmtime(database) > index.matchindex['indexedtime']:
             print("It looks like your database is newer than the index, please wait while the new matches in the database are indexed.")
             matchindex = index.matchindex
+            for eachmatchtype in matchindex["matches"]:
+                if f"{databaseyear}" not in matchindex["matches"][eachmatchtype].keys():
+                    matchindex["matches"][eachmatchtype][f"{databaseyear}"] = []
             matchindex['indexedtime'] = os.path.getmtime(database)
             matchindex['file'] = matches.filename
             filelist = matches.namelist()
@@ -214,23 +218,24 @@ class search:
                             ]["inningsballsfaced"] += 1
         if "wickets" in eachball:
             for eachwicket in eachball["wickets"]:
-                self.result[eachball['batter']
-                            ]["Outs"] += 1
-                if eachwicket["kind"] == "bowled":
+                if eachball['batter'] == eachwicket["player_out"]:
                     self.result[eachball['batter']
-                                ]["Bowled Outs"] += 1
-                if eachwicket["kind"] == "lbw":
-                    self.result[eachball['batter']
-                                ]["LBW Outs"] += 1
-                if eachwicket["kind"] == "caught":
-                    self.result[eachball['batter']
-                                ]["Caught Outs"] += 1
-                if eachwicket["kind"] == "stumped":
-                    self.result[eachball['batter']
-                                ]["Stumped Outs"] += 1
-                if eachwicket["kind"] == "run out":
-                    self.result[eachball['batter']
-                                ]["Run Outs"] += 1
+                                ]["Outs"] += 1
+                    if eachwicket["kind"] == "bowled":
+                        self.result[eachball['batter']
+                                    ]["Bowled Outs"] += 1
+                    if eachwicket["kind"] == "lbw":
+                        self.result[eachball['batter']
+                                    ]["LBW Outs"] += 1
+                    if eachwicket["kind"] == "caught":
+                        self.result[eachball['batter']
+                                    ]["Caught Outs"] += 1
+                    if eachwicket["kind"] == "stumped":
+                        self.result[eachball['batter']
+                                    ]["Stumped Outs"] += 1
+                    if eachwicket["kind"] == "run out":
+                        self.result[eachball['batter']
+                                    ]["Run Outs"] += 1
         if nthball < (len(numdeliveries) - 1):
             search.striketurnoverstats(self, eachball, 1, 3)
         if nthball == (len(numdeliveries) - 1):
@@ -728,6 +733,7 @@ class search:
                 if len(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Scores"].dropna().index) > 0:
                     self.result[eachplayer]["Mean Score"] = round(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Scores"].mean(),2)
                     self.result[eachplayer]["Score MeanAD"] = round(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Scores"].mad(),2)
+                    self.result[eachplayer]["Consistency Factor"] = statsprocessor.ratio(self.result[eachplayer]["Score MeanAD"], self.result[eachplayer]["Mean Score"], multiplier=100)
 
                 if self.result[eachplayer]["Outs"] > 0:
                     self.result[eachplayer]["Batting Avg"] = statsprocessor.ratio(self.result[eachplayer]["Runs"],self.result[eachplayer]["Outs"], multiplier=0)
@@ -787,6 +793,7 @@ class search:
                 if len(self.inningsresult.loc[self.inningsresult["Teams"]==eachteam, "Scores"].dropna().index) > 0:
                     self.result[eachteam]["Score MeanAD"]=round(self.inningsresult.loc[self.inningsresult["Teams"]==eachteam, "Scores"].mad(), 2) 
                     self.result[eachteam]["Mean Score"]=round(self.inningsresult.loc[self.inningsresult["Teams"]==eachteam, "Scores"].mean(), 2)
+                    self.result[eachteam]["Consistency Factor"] = statsprocessor.ratio(self.result[eachteam]["Score MeanAD"], self.result[eachteam]["Mean Score"], multiplier=100)
 
                 if self.result[eachteam]["Balls Bowled"] > 0:
                     self.result[eachteam]["Runsgiven/Ball"] = statsprocessor.ratio(
@@ -883,6 +890,7 @@ class search:
             if len(self.inningsresult["Scores"].dropna().index) > 0:
                 self.result[eachplayer]["Mean Score"] = round(self.inningsresult["Scores"].mean(),2)
                 self.result[eachplayer]["Score MeanAD"] = round(self.inningsresult["Scores"].mad(),2)
+                self.result[eachplayer]["Consistency Factor"] = statsprocessor.ratio(self.result[eachplayer]["Score MeanAD"], self.result[eachplayer]["Mean Score"], multiplier=100)
             if len(self.inningsresult["Scores"].dropna().index) == 0:
                 self.result[eachplayer]["Mean Score"] = 0
                 self.result[eachplayer]["Score MeanAD"] = 0
@@ -960,6 +968,7 @@ class search:
             if len(self.inningsresult["Scores"].dropna().index) > 0:
                 self.result[eachteam]["Score MeanAD"]=round(self.inningsresult["Scores"].mad(), 2) 
                 self.result[eachteam]["Mean Score"]=round(self.inningsresult["Scores"].mean(), 2)
+                self.result[eachteam]["Consistency Factor"] = statsprocessor.ratio(self.result[eachteam]["Score MeanAD"], self.result[eachteam]["Mean Score"], multiplier=100)
 
             if self.result[eachteam]["Balls Bowled"] > 0:
                 self.result[eachteam]["Runsgiven/Ball"] = statsprocessor.ratio(
@@ -1009,10 +1018,26 @@ class search:
             fielders = []
         if oppositionbatters == None:
             oppositionbatters = []
+        if oppositionbatters == "Right hand":
+            oppositionbatters = playerindex.players["Batting"]["Right hand"]
+        if oppositionbatters == "Left hand":
+            oppositionbatters = playerindex.players["Batting"]["Left hand"]
         if oppositionbatters and type(oppositionbatters[0]) is list:
             oppositionbatters = [x for eachlist in oppositionbatters for x in eachlist]
         if oppositionbowlers == None:
             oppositionbowlers = []
+        if oppositionbatters == "Right arm pace":
+            oppositionbatters = playerindex.players["Bowling"]["Right arm pace"]
+        if oppositionbatters == "Left arm pace":
+            oppositionbatters = playerindex.players["Bowling"]["Left arm pace"]
+        if oppositionbatters == "Right arm Off break":
+            oppositionbatters = playerindex.players["Bowling"]["Right arm Off break"]
+        if oppositionbatters == "Right arm Leg break":
+            oppositionbatters = playerindex.players["Bowling"]["Right arm Leg break"]
+        if oppositionbatters == "Left arm orthodox":
+            oppositionbatters = playerindex.players["Bowling"]["Left arm orthodox"]
+        if oppositionbatters == "Left arm wrist spin":
+            oppositionbatters = playerindex.players["Bowling"]["Left arm wrist spin"]
         if oppositionbowlers and type(oppositionbowlers[0]) is list:
             oppositionbowlers = [x for eachlist in oppositionbowlers for x in eachlist]
         if oppositionteams == None:

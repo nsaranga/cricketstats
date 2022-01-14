@@ -16,8 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. 
 """
 
-import pandas as pd
-
 # Stats Processor functions
 
 def ratio(stat1, stat2, multiplier=None):
@@ -29,21 +27,21 @@ def ratio(stat1, stat2, multiplier=None):
     return stat
 
 
-def madfromratio(statlist1, statlist2, multiplier=None):
-    data = []
-    for eachlist in zip(statlist1, statlist2):
-        statratio = ratio(eachlist[0], eachlist[1], multiplier=multiplier)
-        data.append(statratio)
-    df = pd.DataFrame(data)
-    stat = df[0].mad()
-    return round(stat, 2)
+# def madfromratio(statlist1, statlist2, multiplier=None):
+#     data = []
+#     for eachlist in zip(statlist1, statlist2):
+#         statratio = ratio(eachlist[0], eachlist[1], multiplier=multiplier)
+#         data.append(statratio)
+#     df = pd.DataFrame(data)
+#     stat = df[0].mad()
+#     return round(stat, 2)
 
 
-def mad(statlist):
-    data = statlist
-    df = pd.DataFrame(data)
-    stat = df[0].mad()
-    return round(stat, 2)
+# def mad(statlist):
+#     data = statlist
+#     df = pd.DataFrame(data)
+#     stat = df[0].mad()
+#     return round(stat, 2)
 
 
 def firstboundary(shotlist):

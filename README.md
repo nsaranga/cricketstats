@@ -13,6 +13,12 @@ Some tips/warnings:
 5. The first time you run this script it will take about 30-40 seconds because it is indexing file names, after that each search should take 6-7 seconds to complete. This of course will vary based on your CPU.
 
 ## What can this module do?
+### Features:
+- Analyse players/teams across finegrained parameters.
+- Analyse matchups of player/team against particular players/teams or a group eg. by bowling style, batter handedness.
+- Analyse the progression players/team performance across innings.
+- Analyse distributions of stats according to innings, to create predictive models of player and team performance.
+
 This is essentially a module you can import into any python script to collect statistics from cricsheet json files.
 
 This script can find team and player statistics along any of the following parameters: date interval, match type, overs interval, innings, opposition players, opposition teams, venue, event, match result, batting position and more.
@@ -23,13 +29,6 @@ Also using the in built-in playerindex you can find matchup data for a player ag
 
 As shown in the example.py file using "print(search1.result.columns)" will print all the available stats for a particular search.
 
-## What can YOU do with this module?
-- Analyse players/teams across finegrained parameters.
-- Analyse matchups of player/team against particular players/teams or a group eg. by bowling style, batter handedness.
-- Analyse the progression players/team performance across innings.
-- Analyse distributions of stats according to innings, to create predictive models of player and team performance.
-
-
 ## How do you use this module?:
  All you need to do is import cricketstats in any python script create a search object, call the "stats()" function with the necessary arguments for that search object and run the script through python3. The output of the function is a Pandas DataFrame that can be printed, analysed using pandas methods or served as the input to plotting methods like matplotlib.
 
@@ -38,9 +37,7 @@ To understand how to use the module you can use the "example.py" which provides 
 ## To Do:
 - Clean up stats independent of checks with stats dependent on checks.
 - Command-line wrapper
-- Reverse look up of teams and players by stats.
-- Arbitrary Keyword Arguments for function?
-- Expected runs model? basically sum of weighted average of runs per ball * average innings length. something along th lines of pythagorean thing.
+- Expected runs model? Basically sum of weighted average of runs per ball * average innings length. Something along the lines of pythagorean thing.
 - Index more things?, so they can serve as lists for seeing what teams there are in a comp. Venues by country also put in checks when values are null.
 - Let us know all the possibilities we can expect within result method for plotting (ie. loc?)
 - Arguments via a dict? dicts should be defined in a separate file

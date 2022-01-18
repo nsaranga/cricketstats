@@ -16,16 +16,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. 
 """
 import os
-import playerindex
+import json
 
 import pandas as pd
 import math
 import requests
 from bs4 import BeautifulSoup
 
-
+currentdir = os.path.dirname(os.path.abspath(__file__))
 try:
-    players = playerindex.players
+    playerindexfile = open(f"{currentdir}/playerindex.json")
+    players = json.load(playerindexfile)
+    # players = playerindex.players
     playerlist = pd.read_csv("/home/saranga/Downloads/people.csv")
     for eachplayer in playerlist["name"]:
         if (eachplayer in players["Batting"]["Right hand"] or eachplayer in players["Batting"]["Left hand"]) and (eachplayer in players["Bowling"]["Right arm pace"] or eachplayer in players["Bowling"]["Left arm pace"] or eachplayer in players["Bowling"]["Right arm Off break"] or eachplayer in players["Bowling"]["Right arm Leg break"] or eachplayer in players["Bowling"]["Left arm orthodox"] or eachplayer in players["Bowling"]["Left arm wrist spin"]) or eachplayer in players["Umpire"]:
@@ -69,8 +71,8 @@ try:
 
             if "Right hand bat" not in element.text and "Left hand bat" not in element.text and "Right arm fast" not in element.text and "Right arm fast medium" not in element.text  and "Right arm medium" not in element.text and "Left arm fast" not in element.text and "Left arm fast medium" not in element.text  and "Left arm medium" not in element.text and "Legbreak" not in element.text and "Slow left arm orthodox" not in element.text and "Left arm wrist spin" not in element.text and "Left-arm googly" not in element.text:
                 players["Unknown"].append(eachplayer)
+            playerindexfile.close()
 finally:
-    currentdir = os.path.dirname(os.path.abspath(__file__))
-    file = open(f"{currentdir}/playerindex.py", "w")
-    file.write("players = " + repr(players))
+    file = open(f"{currentdir}/playerindex.json", "w")
+    file.write(json.dumps(players))
     file.close

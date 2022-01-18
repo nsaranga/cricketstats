@@ -18,6 +18,7 @@ Some tips/warnings:
 - Analyse matchups of player/team against particular players/teams or a group eg. by bowling style, batter handedness.
 - Analyse the progression players/team performance across innings.
 - Analyse distributions of stats according to innings, to create predictive models of player and team performance.
+- Analyse the game itself according to all players or teams in given time period, match type (ie. a reverse lookup)
 
 This is essentially a module you can import into any python script to collect statistics from cricsheet json files.
 

@@ -20,17 +20,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-import cricketstats, playerindex
+import cricketstats
 
 # This is an example script of how you can use cricketstats
-# If you want to import cricketstats into your own python file, and use the lines below instead of "import cricketstats, playerindex"
+# If you want to import cricketstats into your own python file, and use the lines below instead of "import cricketstats"
 """
 import os
 import sys
 module_path = os.path.abspath(os.path.join('cricketstats'))
 if module_path not in sys.path:
     sys.path.append(module_path)
-from cricketstats import cricketstats, playerindex
+from cricketstats import cricketstats
 """
 
 
@@ -43,8 +43,11 @@ bblteams = ["Sydney Thunder", "Melbourne Renegades", "Brisbane Heat", "Sydney Si
 # create a search object with "cricketstats.search" based on the inputs above. Input arguments: players=[] or teams=[] You can create multiple objects at the same time.
 search1 = cricketstats.search(players=Ozbatters)
 
+# If you want to find stats for all players ot teams use the "allplayers=True" or "allteams=True" option in the class.
+# search2 = cricketstats.search(allplayers=True)
+
 # You can see below another search object setup for BBL teams. Just uncomment the line to use it.
-# search2 = cricketstats.search(teams=bblteams)
+# search3 = cricketstats.search(teams=bblteams)
 
 """ 2. Apply the "stats()" method to the search object with the necessary arguments. """
 # Arguments are mostly lists, with items separated by commas.
@@ -61,8 +64,8 @@ matchtype = ["Test"] # Options: ["Test", "MDM", "ODI", "ODM", "T20", "IT20"] Exp
 betweenovers=[] # Search only these overs. eg. betweenovers = [1, 20]. Or if you only want to search for powerplays that are mandatory and option input "powerplays" eg. betweenovers =["powerplays"]
 innings=[] # Search these innings. Options: 1, 2, 3, 4 eg. innings = [1,3]
 fielders=[] # Search bowling stats involves these fielders.
-oppositionbatters=[] # Search overs where players have bowled against certain batters. Options: batter names. You can also put in a list of batters by handedness by referring to playerindex. eg. oppositionbatters=playerindex.players["Batting"]["Left hand"]
-oppositionbowlers=[] # Search overs where players have batted against certain bowlers Options: bowler names You can also put in list of bowlers by type, eg. oppositionbowlers=playerindex.players["Bowling"]["Right arm pace"]. Other options include. playerindex.players["Bowling"]["Left arm pace"], players["Bowling"]["Right arm Off break"], players["Bowling"]["Right arm Leg break"], players["Bowling"]["Left arm orthodox"], players["Bowling"]["Left arm wrist spin"]
+oppositionbatters=[] # Search overs where players have bowled against certain batters. Options: batter names. You can also put in a list of batters by handedness. eg. oppositionbatters=["Left hand", "Right Hand"]
+oppositionbowlers=[] # Search overs where players have batted against certain bowlers Options: bowler names You can also put in list of bowlers by type, eg. oppositionbowlers=["Right arm pace","Left arm pace","Right arm Off break","Right arm Leg break","Left arm orthodox","Left arm wrist spin"]
 superover=None # Search normal innings or superover innings. Options: True, False eg. superover=True
 battingposition=[] # Search stats at certain position in batting order. eg. battingposition=[1,2,3]
 bowlingposition=[] # Search stats at certain position in bowling order. eg. bowlingposition=[1,2]

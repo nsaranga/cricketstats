@@ -24,14 +24,13 @@ import os
 import zipfile
 import numpy as np
 import math
-import importlib
 
 import statsprocessor
-import index
-import playerindex
 
 
-# TODO make option to sum all players stats better. and insert "all players earlier in result"
+# TODO make option to sum players/teams stats better. Insert "all players earlier in result"?
+# TODO fix fileindexing so "index.py" can be exluded from git, and is created if it doesn't exist.
+# TODO fix period updating of player index?
 
 class search:
     def __init__(self, players=None, teams=None, allplayers=False, allteams=False) -> None:
@@ -41,6 +40,7 @@ class search:
         self.allteams = allteams
         self.result = {}
         self.inningsresult = None
+        self.ballresult = None
 
     # Setup the statistics to be recorded.
     # TODO also fix "run outs" and "runouts" thing.
@@ -62,7 +62,7 @@ class search:
                                     "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Balls Faced": 0, "Outs": 0, 
                                     "Bowled Outs": 0, "LBW Outs": 0, "Caught Outs": 0, "Stumped Outs": 0, "Run Outs": 0, "Caught and Bowled Outs": 0, 
                                     "totalstos": 0, "totalstosopp": 0, 
-                                    'Dot Ball %': 0, 'Strike Turnover %': 0, 'Batting S/R': 0, 'Batting S/R MeanAD': 0, 'Batting Avg': 0, "Mean Score":0, 'Score MeanAD': 0, "Consistency %":0, 'Boundary %': 0, "Runs/Ball":0,
+                                    'Dot Ball %': 0, 'Strike Turnover %': 0, 'Batting S/R': 0, 'Batting S/R MeanAD': 0, 'Batting Avg': 0, "Mean Score":0, 'Score MeanAD': 0, "Consistency Factor":0, 'Boundary %': 0, "Runs/Ball":0,
                                     "firstboundary": [], 'Avg First Boundary Ball': 0,
                                     
                                     "Innings Bowled":0, "bowlinningscount": False,
@@ -74,6 +74,13 @@ class search:
                                     "totalstosgiven": 0, "totalstosgivenopp": 0, 
                                     "Catches": 0, "Runouts": 0, "Stumpings": 0, 
                                     'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Avg': 0, "Bowling Avg MeanAD": 0, 'Bowling S/R': 0, "Bowling S/R MeanAD": 0,  "Runsgiven/Ball":0, "dotballseries": [], "Avg Consecutive Dot Balls": 0}
+
+    def ballresultsetup(self):
+        self.ballresult = { 
+        "Date":[], "Match Type":[], "Venue":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Over":[], "Ball":[], "Ball in Over":[], 
+        "Batting Position":[], "Batter":[], "Batter Score": [], "Non_striker": [], "How Out": [],
+        "Bowling Position":[], "Bowler": [], "Wicket": [], "How Out": [], 
+        "Extras": [], "Extras Type": [], "Total Runs": []}
 
     def teaminningsresultsetup(self):
         self.inningsresult = {
@@ -94,7 +101,7 @@ class search:
                                 "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Outs": 0, "Balls Faced": 0, 
                                 "Bowled Outs": 0, "LBW Outs": 0, "Caught Outs": 0, "Stumped Outs": 0, "Run Outs": 0, "Caught and Bowled Outs": 0,
                                 "Runs/Outs":0, "Runs/Ball":0, "Run Rate":0, 'Avg First Boundary Ball': 0,
-                                'Dot Ball %': 0, 'Score MeanAD': 0, "Consistency %":0, 'Boundary %': 0, 
+                                'Dot Ball %': 0, 'Score MeanAD': 0, "Consistency Factor":0, 'Boundary %': 0, 
                                 
                                 "inningsrunsgiven": [], "inningsballsbowled": 0, "inningswickets": 0, 
                                 "Runsgiven": 0, "Foursgiven": 0, "Sixesgiven": 0, 
@@ -110,19 +117,21 @@ class search:
         databasemtime = os.path.getmtime(database)
         databasetime = time.gmtime(databasemtime)
         databaseyear = int(databasetime[0])
-        if index.matchindex['indexedtime'] == 0:
+        if not os.path.exists(f"{currentdir}/matchindex.json"):
             newmatchindex = {"file": "", 'indexedtime': 0, "matches":{"Test": {}, "MDM":{}, "ODI":{}, "ODM": {}, "T20":{}, "IT20":{}}}
             for eachmatchtype in newmatchindex["matches"]:
                 for eachyear in range(2000, (databaseyear + 1)):
                     newmatchindex["matches"][eachmatchtype][f"{eachyear}"] = []
-            file = open(f"{currentdir}/index.py", "w")
-            file.write("matchindex = " + repr(newmatchindex))
+            file = open(f"{currentdir}/matchindex.json", "w")
+            file.write(json.dumps(newmatchindex))
             file.close()
-            importlib.reload(index)
 
-        if os.path.getmtime(database) > index.matchindex['indexedtime']:
+        matchindexfile=open(f"{currentdir}/matchindex.json")
+        matchindex = json.load(matchindexfile)
+        if os.path.getmtime(database) > matchindex['indexedtime']:
             print("It looks like your database is newer than the index, please wait while the new matches in the database are indexed.")
-            matchindex = index.matchindex
+            newmatchindex = matchindex
+            matchindexfile.close()
             for eachmatchtype in matchindex["matches"]:
                 if f"{databaseyear}" not in matchindex["matches"][eachmatchtype].keys():
                     matchindex["matches"][eachmatchtype][f"{databaseyear}"] = []
@@ -134,15 +143,17 @@ class search:
                     continue
                 matchdata = matches.open(eachfile)
                 match = json.load(matchdata)
-                if eachfile not in matchindex["matches"][match["info"]["match_type"]][match["info"]["dates"][0][:4]]:
-                    matchindex["matches"][match["info"]["match_type"]][match["info"]["dates"][0][:4]].append(eachfile)
+                if eachfile not in newmatchindex["matches"][match["info"]["match_type"]][match["info"]["dates"][0][:4]]:
+                    newmatchindex["matches"][match["info"]["match_type"]][match["info"]["dates"][0][:4]].append(eachfile)
                 matchdata.close
             
-            file = open(f"{currentdir}/index.py", "w")
-            file.write("matchindex = " + repr(matchindex))
+            file = open(f"{currentdir}/matchindex.json", "w")
+            file.write(json.dumps(newmatchindex))
             file.close()
-        if os.path.getmtime(database) < index.matchindex['indexedtime']:
+        if os.path.getmtime(database) < matchindex["indexedtime"]:
+            matchindexfile.close()
             raise Exception("Your cricsheet database is older than the index, please download the newest zip file from https://cricsheet.org/downloads/all_json.zip")
+        matchindexfile.close()
             
     # Record games played, wins, draws
     def gamesandwins(self, matchinfo):
@@ -485,9 +496,11 @@ class search:
         self.ballresult["Batting Team"].append(battingteam)
         self.ballresult["Bowling Team"].append(bowlingteam)
         self.ballresult["Innings"].append(nthinnings + 1)
-
+        over = (eachover["over"])
+        ball = (nthball + 1)
         self.ballresult["Over"].append((eachover["over"] + 1))
-        self.ballresult["Ball_Number"].append(nthball + 1)
+        self.ballresult["Ball"].append(float(f"{over}.{ball}"))
+        self.ballresult["Ball in Over"].append((nthball + 1))
         
         self.ballresult["Batting Position"].append(battingorder.index(eachball["batter"]) + 1)
         self.ballresult["Batter"].append(eachball["batter"])
@@ -1061,15 +1074,15 @@ class search:
             self.result[eachteam]["Net Boundary %"] = self.result[eachteam]["Boundary %"] - self.result[eachteam]["Boundary Given %"]
 
     def cleanup(self):
-        if self.players or self.teams:
-            for eachdict in self.result:
-                removestats = ["batinningscount", "inningsruns", "inningsballsfaced", "inningsouts", "firstboundary", "totalstos", "totalstosopp", "totalstosgiven", "totalstosgivenopp", "bowlinningscount", "inningsrunsgiven", "inningsballsbowled", "inningswickets","dotballseries"]
-                for eachstat in removestats:
-                    if eachstat in self.result[eachdict]: 
-                        self.result[eachdict].pop(eachstat)
+        for eachdict in self.result:
+            removestats = ["batinningscount", "inningsruns", "inningsballsfaced", "inningsouts", "firstboundary", "totalstos", "totalstosopp", "totalstosgiven", "totalstosgivenopp", "bowlinningscount", "inningsrunsgiven", "inningsballsbowled", "inningswickets","dotballseries", "inningshowout"]
+            for eachstat in removestats:
+                if eachstat in self.result[eachdict]: 
+                    self.result[eachdict].pop(eachstat)
 
     # This is the main function to be applied to search object.
-    def stats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playersteams=None, teammates=None, oppositionbatters=None, oppositionbowlers=None, oppositionteams=None, venue=None, event=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None, fielders=None, sumstats=False):
+    # I should make picking oppositon bowlers strongs in a list. yes and then just assign json object tfrom that list.
+    def stats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playersteams=None, teammates=None, oppositionbatters=None, oppositionbowlers = None, oppositionteams=None, venue=None, event=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None, fielders=None, sumstats=False):
         if betweenovers == None:
             betweenovers = []
         if innings == None:
@@ -1082,30 +1095,23 @@ class search:
             teammates = []
         if fielders == None:
             fielders = []
+
+        currentdir = os.path.dirname(os.path.abspath(__file__))
+        playerindexfile = open(f"{currentdir}/playerindex.json")
+        players = json.load(playerindexfile)
         if oppositionbatters == None:
             oppositionbatters = []
-        if oppositionbatters == "Right hand":
-            oppositionbatters = playerindex.players["Batting"]["Right hand"]
-        if oppositionbatters == "Left hand":
-            oppositionbatters = playerindex.players["Batting"]["Left hand"]
-        if oppositionbatters and type(oppositionbatters[0]) is list:
-            oppositionbatters = [x for eachlist in oppositionbatters for x in eachlist]
+        if oppositionbatters:
+            battingmatchups = []
+            for eachgroup in oppositionbatters:
+                battingmatchups.extend(players["Batting"][eachgroup])
         if oppositionbowlers == None:
             oppositionbowlers = []
-        if oppositionbatters == "Right arm pace":
-            oppositionbatters = playerindex.players["Bowling"]["Right arm pace"]
-        if oppositionbatters == "Left arm pace":
-            oppositionbatters = playerindex.players["Bowling"]["Left arm pace"]
-        if oppositionbatters == "Right arm Off break":
-            oppositionbatters = playerindex.players["Bowling"]["Right arm Off break"]
-        if oppositionbatters == "Right arm Leg break":
-            oppositionbatters = playerindex.players["Bowling"]["Right arm Leg break"]
-        if oppositionbatters == "Left arm orthodox":
-            oppositionbatters = playerindex.players["Bowling"]["Left arm orthodox"]
-        if oppositionbatters == "Left arm wrist spin":
-            oppositionbatters = playerindex.players["Bowling"]["Left arm wrist spin"]
-        if oppositionbowlers and type(oppositionbowlers[0]) is list:
-            oppositionbowlers = [x for eachlist in oppositionbowlers for x in eachlist]
+        if oppositionbowlers:
+            bowlingmatchups = []
+            for eachgroup in oppositionbowlers:
+                bowlingmatchups.extend(players["Bowling"][eachgroup])
+        playerindexfile.close()
         if oppositionteams == None:
             oppositionteams = []
         if venue == None:
@@ -1124,6 +1130,7 @@ class search:
 
         # Setup search results according to whether search involves teams or players.
         self.result = {}
+        search.ballresultsetup(self)
         if self.allplayers==True:
             search.playerinningsresultsetup(self)
         if self.players:
@@ -1143,20 +1150,22 @@ class search:
         # create an index file for eachfile
         search.fileindexing(self, database, matches)
 
-        importlib.reload(index)
         # start = time.time()
         
         # Setup tally of games and results for "all teams" stats.
         allgamesplayed = 0
         allgameswinloss = 0
         allgamesdrawn = 0
-
+        
+        currentdir = os.path.dirname(os.path.abspath(__file__))
+        matchindexfile = open(f"{currentdir}/matchindex.json")
+        matchindex = json.load(matchindexfile)
         # Open each file by searched for matchtype in index
         for eachmatchtype in matchtype:
-            for eachyear in index.matchindex["matches"][eachmatchtype]:
+            for eachyear in matchindex["matches"][eachmatchtype]:
                 if int(eachyear) < from_date[0] or int(eachyear) > to_date[0]:
                     continue
-                for eachfile in index.matchindex["matches"][eachmatchtype][eachyear]:
+                for eachfile in matchindex["matches"][eachmatchtype][eachyear]:
                     # print(eachfile)
                     matchdata = matches.open(eachfile)
                     match = json.load(matchdata)
@@ -1167,6 +1176,7 @@ class search:
                     day = str(match["info"]["dates"][0][8:])
                     matchtimetuple = (int(year), int(month),
                                     int(day))
+                    matchdate=datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2])
                     if time.mktime(matchtimetuple + (0, 0, 0, 0, 0, 0)) < time.mktime(from_date + (0, 0, 0, 0, 0, 0)) or time.mktime(matchtimetuple + (0, 0, 0, 0, 0, 0)) > time.mktime(to_date + (0, 0, 0, 0, 0, 0)):
                         continue
                     # Event Check
@@ -1205,7 +1215,6 @@ class search:
                         (matchresult=="draw" and ("winner" in match['info']['outcome'] or "result" in match['info']['outcome'] and match['info']['outcome']['result']!=matchresult)) or
                         (matchresult=="won" and ("result" in match['info']['outcome'] or "winner" in match['info']['outcome'] and match['info']['outcome']['winner'] not in self.teams)) or
                         (matchresult=="loss" and ("result" in match['info']['outcome'] or "winner" in match['info']['outcome'] and match['info']['outcome']['winner'] in self.teams))
-
                         )):
                         continue
 
@@ -1300,7 +1309,7 @@ class search:
                                 if self.players or self.allplayers==True:
                                     
                                     # Striker's stats
-                                    if eachball['batter'] in self.result and (not oppositionbowlers or eachball['bowler'] in oppositionbowlers) and (not battingposition or (battingposition and ((battingorder.index(eachball['batter']) + 1) in battingposition))):
+                                    if eachball['batter'] in self.result and (not oppositionbowlers or eachball['bowler'] in bowlingmatchups) and (not battingposition or (battingposition and ((battingorder.index(eachball['batter']) + 1) in battingposition))):
                                         search.strikerstats(self, eachball, nthball, eachover)
     
                                     # Non-striker's outs.
@@ -1308,7 +1317,7 @@ class search:
                                         search.nonstrikerstats(self, eachball, oppositionbowlers)
 
                                     # Bowling stats
-                                    if eachball['bowler'] in self.result and (not oppositionbatters or eachball['batter'] in oppositionbatters) and (not bowlingposition or (bowlingposition and ((bowlingorder.index(eachball['bowler']) + 1) in bowlingposition))):
+                                    if eachball['bowler'] in self.result and (not oppositionbatters or eachball['batter'] in battingmatchups) and (not bowlingposition or (bowlingposition and ((bowlingorder.index(eachball['bowler']) + 1) in bowlingposition))):
                                         search.bowlerstats(self, eachball, fielders, nthball, eachover)
 
                                     # Fielding stats
@@ -1327,6 +1336,7 @@ class search:
                                         if eachteam in self.result and eachteam not in eachinnings["team"]:
                                             search.teambowlingstats(self, eachball, eachteam)
 
+                                search.ballstats(self, matchtimetuple, match["info"], nthinnings, eachinnings, eachball, nthball, eachover, battingorder, bowlingorder)
 
                         # Player innings scores.
                         if self.players or self.allplayers==True:
@@ -1353,13 +1363,14 @@ class search:
 
                     matchdata.close()
         matches.close()
+        matchindexfile.close()
         # print(f'Time after stats(): {time.time() - start}')
         
 
         # for y in self.ballresult.keys():
         #     print(y, len(self.ballresult[y]))
         # print(self.ballresult)
-
+        self.ballresult = pd.DataFrame(self.ballresult)
         self.inningsresult = pd.DataFrame(self.inningsresult)
 
         # print(f'Time after self.inningsresult creation: {time.time() - start}')

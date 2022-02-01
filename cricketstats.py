@@ -30,9 +30,10 @@ import statsprocessor
 
 # TODO make option to sum players/teams stats better. Insert "all players earlier in result"?
 # TODO fix period updating of player index?
-# consider maing the temporary innings stats in result inside a dictionary itself so easy to access?
-# I have to fix all the players ball stats.
-# also why does every innings tally for teams have 2 values? not necessary right?
+# TODO I have to fix all the players ball stats.
+# TODO fix the way innings outs are counted. eg. make it more efficient, there's currently 3 lists for it...
+# TODO add check for batting first or second for match selection
+
 
 class search:
     def __init__(self, players=None, teams=None, allplayers=False, allteams=False) -> None:
@@ -93,8 +94,8 @@ class search:
 
     # for eachteam in self.teams:
     def addteamstoresult(self, eachteam):
-        self.result[eachteam] = {"Teams": eachteam, "Games": 0, "Innings Bowled":0, "bowlinningscount": False, "Innings Batted": 0,
-                                "batinningscount": False, "Won": 0, "Drawn": 0, 'Win %': 0, "Defended Wins": 0, "Chased Wins": 0, 
+        self.result[eachteam] = {"Teams": eachteam, "Games": 0, "Innings Bowled":0, "Innings Batted": 0,
+                                "Won": 0, "Drawn": 0, 'Win %': 0, "Defended Wins": 0, "Chased Wins": 0, 
                                 "Net Boundary %":0, "Net Run Rate":0,
                                 "firstboundary": [],
                                 "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Outs": 0, "Balls Faced": 0, 
@@ -184,7 +185,7 @@ class search:
         matchindexfile.close()
             
     # Record games played, wins, draws
-    def gamesandwins(self, matchinfo):
+    def gamesandwins(self, matchinfo,matchinnings,innings):
         if self.players or self.allplayers==True:
             for eachplayer in self.result:
                 for eachteam in matchinfo["players"]:
@@ -198,6 +199,8 @@ class search:
         if self.teams or self.allteams==True:
             for eachteam in matchinfo["teams"]:
                 if eachteam not in self.result:
+                    continue
+                if innings and not any(True for eachinnings in innings if matchinnings[(eachinnings-1)]["team"] == eachteam):
                     continue
                 self.result[eachteam]["Games"] += 1
                 if "result" in matchinfo["outcome"] and matchinfo["outcome"]['result'] == "draw":
@@ -825,6 +828,7 @@ class search:
                 self.teamsballresult["Ball in Over"].append(ballinover)
                 self.teamsballresult["Ball"].append(inningsball)
                 self.teamsballresult["Current Score"].append(sum(self.result[inningsteam]["inningstally"]["inningsruns"][:(eachball+1)]))
+                # self.teamsballresult["Current Outs"].append(sum(self.result[inningsteam]["inningstally"]["inningsouts"][:(eachball+1)]))
                 self.teamsballresult["Current Outs"].append(currentouts)
                 self.teamsballresult["Batter"].append(striker)
                 self.teamsballresult["Batting Position"].append(strikerbattingpos)
@@ -899,6 +903,7 @@ class search:
                 self.teamsballresult["Ball in Over"].append(ballinover)
                 self.teamsballresult["Ball"].append(inningsball)
                 self.teamsballresult["Current Score"].append(sum(self.result[bowlingteam]["inningstally"]["inningsruns"][:(eachball+1)]))
+                #self.teamsballresult["Current Outs"].append(sum(self.result[bowlingteam]["inningstally"]["inningsouts"][:(eachball+1)]))
                 self.teamsballresult["Current Outs"].append(currentouts)
                 self.teamsballresult["Batter"].append(striker)
                 self.teamsballresult["Batting Position"].append(strikerbattingpos)
@@ -1450,6 +1455,7 @@ class search:
                         )):
                         continue
 
+
                     # All Players and All Teams games/wins/draw/ties record
                     # TODO rewrite for ties and add these to stats dict. Hard because T20s have superovers to decide ties.
                     # TODO move this inside games and wins. and move games and wins down after innings finished.
@@ -1575,7 +1581,7 @@ class search:
                                 
 
                     # Individual team and players games/wins/draw/ties record
-                    search.gamesandwins(self, match["info"])
+                    search.gamesandwins(self, match["info"],match['innings'],innings)
 
                     matchdata.close()
         matches.close()

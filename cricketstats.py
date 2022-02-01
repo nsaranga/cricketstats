@@ -486,8 +486,7 @@ class search:
                             ]["inningstally"]["inningshowout"].append(eachwicket["kind"])
                 self.result[inningsteam
                             ]["Outs"] += 1
-                self.result[inningsteam
-                            ]["inningsouts"] += 1
+                self.result[inningsteam]["inningstally"]["inningsouts"].append(1)
                 if eachwicket["kind"] == "bowled":
                     self.result[inningsteam]["Bowled Outs"] += 1
                 if eachwicket["kind"] == "lbw":
@@ -503,6 +502,7 @@ class search:
         if "wickets" not in eachball:
             self.result[inningsteam]["inningstally"]["inningsoutsbyball"].append((len(battingorder)-2))
             self.result[inningsteam]["inningstally"]["inningshowout"].append(None)
+            self.result[inningsteam]["inningstally"]["inningsouts"].append(0)
 
     # Record team's bowling stats
     def teambowlingstats(self, eachball, inningsteam, nthball, eachover, battingorder):

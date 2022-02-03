@@ -32,8 +32,9 @@ import statsprocessor
 # TODO fix period updating of player index?
 # TODO I have to fix all the players ball stats.
 # TODO fix the way innings outs are counted. eg. make it more efficient, there's currently 3 lists for it...
+# TODO when do allteams/allplayers I should add all players/teams at beginning of match not check at each ball.
 # TODO add check for batting first or second for match selection
-
+# TODO Add a "team_type" check so that different types of teams can be isolated when searchign for T20s
 
 class search:
     def __init__(self, players=None, teams=None, allplayers=False, allteams=False) -> None:
@@ -57,7 +58,6 @@ class search:
         'Economy Rate': [], 'Bowling Avg': [], 'Bowling S/R': [], "Runsgiven/Ball":[], "Avg Consecutive Dot Balls":[]
         }
 
-
     # for eachplayer in self.players:
     def addplayerstoresult(self, eachplayer):
         self.result[eachplayer] = {"Players": eachplayer, "Games": 0, "Won": 0, "Drawn": 0, 'Win %': 0,
@@ -68,24 +68,32 @@ class search:
                                     "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Balls Faced": 0, "Outs": 0, 
                                     "Bowled Outs": 0, "LBW Outs": 0, "Caught Outs": 0, "Stumped Outs": 0, "Run Outs": 0, "Caught and Bowled Outs": 0, 
                                     "totalstos": 0, "totalstosopp": 0, 
-                                    'Dot Ball %': 0, 'Strike Turnover %': 0, 'Batting S/R': 0, 'Batting S/R MeanAD': 0, 'Batting Avg': 0, "Mean Score":0, 'Score MeanAD': 0, "Consistency Factor":0, 'Boundary %': 0, "Runs/Ball":0,
-                                    "Mean Balls Faced":0, "Balls Faced MeanAD":0,
+                                    'Dot Ball %': 0, 'Strike Turnover %': 0, 'Batting S/R': 0, 'Batting S/R MeanAD': 0, 'Batting Avg': 0, "Mean Score":0, 'Score MeanAD': 0, "Scoring Consistency":0, 'Boundary %': 0, "Runs/Ball":0,
+                                    "Mean Balls Faced":0, "Balls Faced MeanAD":0, "Survival Consistency":0,
                                     "firstboundary": [], 'Avg First Boundary Ball': 0,
                                     
                                     "Innings Bowled":0, "bowlinningscount": False,
                                     "inningsrunsgiven": [], "inningsballsbowled": 0, "inningswickets": [], "teaminningsballsbowled":[], "inningsbattersbowledat":[],"inningsbattersbowledattype":[], "inningswicketstype":[],
-                                    "teaminningsrunsgiven":[],"teaminningswickets":[],"teaminningsballsbowled":[],
+                                    "teaminningsrunsgiven":[],"teaminningswickets":[],
                                     "Runsgiven": 0, "Foursgiven": 0, "Sixesgiven": 0, 
                                     "Wickets": 0, "Balls Bowled": 0, "Extras": 0, "No Balls": 0, "Wides":0,
                                     "Dot Balls Bowled": 0, 
                                     "Bowleds": 0, "LBWs": 0, "Hitwickets": 0, "Caughts": 0, "Stumpeds": 0, "Caught and Bowleds": 0,
                                     "totalstosgiven": 0, "totalstosgivenopp": 0, 
                                     "Catches": 0, "Runouts": 0, "Stumpings": 0, 
-                                    'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Avg': 0, "Bowling Avg MeanAD": 0, 'Bowling S/R': 0, "Bowling S/R MeanAD": 0,  "Runsgiven/Ball":0, "dotballseries": [], "Avg Consecutive Dot Balls": 0}
+                                    'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Avg': 0, "Bowling Avg MeanAD": 0, 'Bowling S/R': 0, "Bowling S/R MeanAD": 0,  "Runsgiven/Ball":0, "dotballseries": [], "Avg Consecutive Dot Balls": 0,
+                                    
+                                    "inningstally":{"batinningscount": False, "bowlinningscount": False, 
+                                    "teaminningsscore":[], "teaminningsouts":[], "teaminningsballs":[],
+                                    
+                                    "inningsruns": [], "inningsballsfaced": [], "inningspartners":[], "inningshowout": [], "inningsbowlersfaced":[], "inningsbowlersfacedtype":[],
+
+                                    "inningsrunsgiven": [], "inningsballsbowled": [], "inningswickets": [], "inningsbattersbowledat":[],"inningsbattersbowledattype":[], "inningswicketstype":[]}
+                                    }
 
     def teaminningsresultsetup(self):
         self.inningsresult = {
-        "Date":[], "Match Type":[],"Venue":[],"Batting Team":[], "Bowling Team":[], "Innings":[], 
+        "Date":[], "Match Type":[],"Venue":[], "Event":[], "Batting Team":[], "Bowling Team":[], "Innings":[], 
         "Defended Score": [], "Chased Score": [], "Margin":[], 
         "Score": [],"Outs": [], "Overs": [],
         "Runs/Outs":[], "Runs/Ball":[], "Run Rate":[], "First Boundary Ball":[],
@@ -101,7 +109,7 @@ class search:
                                 "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Outs": 0, "Balls Faced": 0, 
                                 "Bowled Outs": 0, "LBW Outs": 0, "Caught Outs": 0, "Stumped Outs": 0, "Run Outs": 0, "Caught and Bowled Outs": 0,
                                 "Runs/Outs":0, "Runs/Ball":0, "Run Rate":0, 'Avg First Boundary Ball': 0,
-                                'Dot Ball %': 0, 'Score MeanAD': 0, "Consistency Factor":0, 'Boundary %': 0, 
+                                'Dot Ball %': 0, 'Score MeanAD': 0, "Scoring Consistency":0, 'Boundary %': 0, 
 
                                 "Runsgiven":0,"Foursgiven": 0, "Sixesgiven": 0, 
                                 "Wickets": 0, "Balls Bowled": 0, "Extras": 0, "No Balls": 0, "Wides":0, "Byes": 0, "Leg Byes": 0, "Dot Balls Bowled": 0, 
@@ -109,7 +117,7 @@ class search:
                                 'Dot Ball Bowled %': 0,'Boundary Given %': 0,'Runsgiven/Wicket': 0, "Runsgiven/Ball":0, "Runsgiven Rate": 0,
                                 "Avg Consecutive Dot Balls": 0, "dotballseries": [],
 
-                                "inningstally":{"batinningscount": False, "bowlinningscount": False, "inningsruns": [], "inningsballstotal": [], "inningsouts": [], "inningsballs": [], "inningsballinover":[], "inningsoutsbyball": [], "inningshowout":[], "inningsstrikers": [],"inningsnonstrikers": [],"inningsbowlers": [],"inningsstrikersbattingpos":[],"inningsstrikerstype":[],"inningsbowlerstype": [], "inningsextras":[],"inningsextrastype":[]}
+                                "inningstally":{"batinningscount": False, "bowlinningscount": False, "inningsruns": [], "inningsballstotal": [], "inningsouts": [], "inningsballs": [], "inningsballinover":[], "inningsoutsbyball": [], "inningshowout":[], "inningsstrikers": [],"inningsnonstrikers": [],"inningsbowlers": [],"inningsstrikersbattingpos":[], "inningsextras":[],"inningsextrastype":[]}
                                 }
 
     # Setup results for ball by ball stats.
@@ -782,6 +790,10 @@ class search:
         self.inningsresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
         self.inningsresult["Match Type"].append(matchinfo["match_type"])
         self.inningsresult["Venue"].append(matchinfo["venue"])
+        if "event" in matchinfo:
+            self.inningsresult["Event"].append(matchinfo["event"]["name"])
+        if "event" not in matchinfo:
+            self.inningsresult["Event"].append(None)
         self.inningsresult["Batting Team"].append(inningsteam)
         self.inningsresult["Bowling Team"].append(bowlingteam)
         self.inningsresult["Innings"].append(nthinnings + 1)
@@ -1006,11 +1018,12 @@ class search:
                     self.result[eachplayer]["Batting S/R MeanAD"] = round(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Batting S/R"].mad(), 2)
                     self.result[eachplayer]["Mean Balls Faced"] = round(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Balls Faced"].mean(), 2)
                     self.result[eachplayer]["Balls Faced MeanAD"] = round(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Balls Faced"].mad(), 2)
+                    self.result[eachplayer]["Survival Consistency"] = statsprocessor.ratio(self.result[eachplayer]["Balls Faced MeanAD"], self.result[eachplayer]["Mean Balls Faced"], multiplier=100)
 
                 if len(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Score"].dropna().index) > 0:
                     self.result[eachplayer]["Mean Score"] = round(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Score"].mean(),2)
                     self.result[eachplayer]["Score MeanAD"] = round(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer, "Score"].mad(),2)
-                    self.result[eachplayer]["Consistency Factor"] = statsprocessor.ratio(self.result[eachplayer]["Score MeanAD"], self.result[eachplayer]["Mean Score"], multiplier=100)
+                    self.result[eachplayer]["Scoring Consistency"] = statsprocessor.ratio(self.result[eachplayer]["Score MeanAD"], self.result[eachplayer]["Mean Score"], multiplier=100)
 
                 if self.result[eachplayer]["Outs"] > 0:
                     self.result[eachplayer]["Batting Avg"] = statsprocessor.ratio(self.result[eachplayer]["Runs"],self.result[eachplayer]["Outs"], multiplier=0)
@@ -1070,7 +1083,7 @@ class search:
                 if len(self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam, "Score"].dropna().index) > 0:
                     self.result[eachteam]["Score MeanAD"]=round(self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam, "Score"].mad(), 2) 
                     self.result[eachteam]["Mean Score"]=round(self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam, "Score"].mean(), 2)
-                    self.result[eachteam]["Consistency Factor"] = statsprocessor.ratio(self.result[eachteam]["Score MeanAD"], self.result[eachteam]["Mean Score"], multiplier=100)
+                    self.result[eachteam]["Scoring Consistency"] = statsprocessor.ratio(self.result[eachteam]["Score MeanAD"], self.result[eachteam]["Mean Score"], multiplier=100)
 
                 if self.result[eachteam]["Balls Bowled"] > 0:
                     self.result[eachteam]["Runsgiven/Ball"] = statsprocessor.ratio(
@@ -1157,9 +1170,11 @@ class search:
             if len(self.inningsresult["Balls Faced"].dropna().index) > 0:
                 self.result[eachplayer]["Mean Balls Faced"] = round(self.inningsresult["Balls Faced"].mean(),2)
                 self.result[eachplayer]["Balls Faced MeanAD"] = round(self.inningsresult["Balls Faced"].mad(),2)
+                self.result[eachplayer]["Survival Consistency"] = statsprocessor.ratio(self.result[eachplayer]["Balls Faced MeanAD"], self.result[eachplayer]["Mean Balls Faced"], multiplier=100)
             if len(self.inningsresult["Balls Faced"].dropna().index) == 0:
                 self.result[eachplayer]["Mean Balls Faced"] = 0
                 self.result[eachplayer]["Balls Faced MeanAD"] = 0
+                self.result[eachplayer]["Survival Consistency"] = 0
 
             if self.result[eachplayer]["firstboundary"]:
                 self.result[eachplayer]["Avg First Boundary Ball"] = round(np.mean(self.result[eachplayer]["firstboundary"]))
@@ -1175,10 +1190,11 @@ class search:
             if len(self.inningsresult["Score"].dropna().index) > 0:
                 self.result[eachplayer]["Mean Score"] = round(self.inningsresult["Score"].mean(),2)
                 self.result[eachplayer]["Score MeanAD"] = round(self.inningsresult["Score"].mad(),2)
-                self.result[eachplayer]["Consistency Factor"] = statsprocessor.ratio(self.result[eachplayer]["Score MeanAD"], self.result[eachplayer]["Mean Score"], multiplier=100)
+                self.result[eachplayer]["Scoring Consistency"] = statsprocessor.ratio(self.result[eachplayer]["Score MeanAD"], self.result[eachplayer]["Mean Score"], multiplier=100)
             if len(self.inningsresult["Score"].dropna().index) == 0:
                 self.result[eachplayer]["Mean Score"] = 0
                 self.result[eachplayer]["Score MeanAD"] = 0
+                self.result[eachplayer]["Scoring Consistency"] = 0
 
             if self.result[eachplayer]["Outs"] > 0:
                 self.result[eachplayer]["Batting Avg"] = statsprocessor.ratio(self.result[eachplayer]["Runs"],self.result[eachplayer]["Outs"], multiplier=0)
@@ -1253,7 +1269,7 @@ class search:
             if len(self.inningsresult["Score"].dropna().index) > 0:
                 self.result[eachteam]["Score MeanAD"]=round(self.inningsresult["Score"].mad(), 2) 
                 self.result[eachteam]["Mean Score"]=round(self.inningsresult["Score"].mean(), 2)
-                self.result[eachteam]["Consistency Factor"] = statsprocessor.ratio(self.result[eachteam]["Score MeanAD"], self.result[eachteam]["Mean Score"], multiplier=100)
+                self.result[eachteam]["Scoring Consistency"] = statsprocessor.ratio(self.result[eachteam]["Score MeanAD"], self.result[eachteam]["Mean Score"], multiplier=100)
 
             if self.result[eachteam]["Balls Bowled"] > 0:
                 self.result[eachteam]["Runsgiven/Ball"] = statsprocessor.ratio(
@@ -1282,7 +1298,7 @@ class search:
 
     def cleanup(self):
         for eachdict in self.result:
-            removestats = ["batinningscount", "inningsruns", "inningsballsfaced", "inningsouts", "firstboundary", "totalstos", "totalstosopp", "totalstosgiven", "totalstosgivenopp", "bowlinningscount", "inningsrunsgiven", "inningsballsbowled", "inningswickets","dotballseries", "inningshowout", "inningsbowlersfaced", "inningspartners", "teaminningsscore", "teaminningsballs", "inningsbattersbowledat", "inningswicketstype", "teaminningsrunsgiven", "teaminningswickets","teaminningsballsbowled", "inningstally"]
+            removestats = ["batinningscount", "inningsruns", "inningsballsfaced", "inningsouts", "firstboundary", "totalstos", "totalstosopp", "totalstosgiven", "totalstosgivenopp", "bowlinningscount", "inningsrunsgiven", "inningsballsbowled", "inningswickets","dotballseries", "inningshowout", "inningsbowlersfaced", "inningspartners", "teaminningsscore", "teaminningsballs", "inningsbattersbowledat", "inningswicketstype", "teaminningsrunsgiven", "teaminningswickets","teaminningsballsbowled", "inningsbowlersfacedtype", "inningstally"]
             for eachstat in removestats:
                 if eachstat in self.result[eachdict]: 
                     self.result[eachdict].pop(eachstat)
@@ -1455,6 +1471,11 @@ class search:
                         )):
                         continue
 
+                    # Add teams for allteams search
+                    if self.allteams==True:
+                        for eachteam in match["info"]["teams"]:
+                            if eachteam not in self.result:
+                                search.addteamstoresult(self, eachteam)
 
                     # All Players and All Teams games/wins/draw/ties record
                     # TODO rewrite for ties and add these to stats dict. Hard because T20s have superovers to decide ties.
@@ -1527,15 +1548,10 @@ class search:
                                                 for eachfielder in eachwicket["fielders"]:
                                                     if "name" not in eachfielder:
                                                         continue
-                                                    search.addplayerstoresult(self, eachfielder["name"])
+                                                    if eachfielder["name"] not in self.result:
+                                                        search.addplayerstoresult(self, eachfielder["name"])
 
-                                # Add teams for allteams search
-                                if self.allteams==True:
-                                    for eachteam in match["info"]["teams"]:
-                                        if eachteam not in self.result:
-                                            search.addteamstoresult(self, eachteam)
-
-                                # Player stats
+                                # Record Player stats
                                 if self.players or self.allplayers==True:
                                     
                                     # Striker's stats
@@ -1554,7 +1570,7 @@ class search:
                                     if "wickets" in eachball:
                                         search.fieldingstats(self, eachball)
 
-                                # Team stats
+                                # Record Team stats
                                 if self.teams or self.allteams==True:
 
                                     # Team Batting stats
@@ -1568,11 +1584,11 @@ class search:
 
                                 # search.ballstats(self, matchtimetuple, match["info"], nthinnings, eachinnings, eachball, nthball, eachover, battingorder, bowlingorder)
 
-                        # Player innings scores.
+                        # Record Player innings
                         if self.players or self.allplayers==True:
                             search.playerinnings(self,matchtimetuple, match["info"], nthinnings, eachmatchtype, battingorder, bowlingorder,tempplayerindex)
                         
-                        # Team innings scores
+                        # Record Team innings
                         if self.teams or self.allteams==True:
 
                             # Team innings score
@@ -1602,6 +1618,10 @@ class search:
 
         # print(f'Time after self.ballresult creation: {time.time() - start}')
         self.inningsresult = pd.DataFrame(self.inningsresult)
+
+        # This is commented out because it auto-includes time which doesn't look good for plotting.
+        # self.ballresult["Date"] = pd.to_datetime(self.ballresult["Date"])
+        # self.inningsresult["Date"] = pd.to_datetime(self.inningsresult["Date"])
 
         # print(f'Time after self.inningsresult creation: {time.time() - start}')
         # Derived Stats

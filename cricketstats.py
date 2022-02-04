@@ -124,7 +124,7 @@ class search:
 
     def playersballresultsetup(self):
         self.playersballresult = { 
-        "Date":[], "Match Type":[], "Venue":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Innings Ball":[], "Innings Outs":[],
+        "Date":[], "Match Type":[], "Venue":[], "Event":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Innings Ball":[], "Innings Outs":[],
         "Batter":[], "Batting Position":[], "Batter Type":[], "Non_striker": [], "Batter Score": [], "Balls Faced":[],
         "Runs/Ball": [], "Current Score":[], "Final Score":[], "How Out": [],
 
@@ -136,7 +136,7 @@ class search:
 
     def teamsballresultsetup(self):
         self.teamsballresult = { 
-        "Date":[], "Match Type":[], "Venue":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Ball":[], "Ball in Over":[],
+        "Date":[], "Match Type":[], "Venue":[], "Event":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Ball":[], "Ball in Over":[],
         "Current Score":[], "Current Outs":[], "Final Score":[],
         "Batter":[], "Batting Position":[],"Batter Type":[], "Non_striker": [], "Runs Scored": [], "Runs/Ball": [], "How Out": [],
         "Bowler": [], "Bowler Type":[], "Extras":[], "Extras Type": [], "Out/NotOut":[],
@@ -664,6 +664,10 @@ class search:
                     self.playersballresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
                     self.playersballresult["Match Type"].append(matchinfo["match_type"])
                     self.playersballresult["Venue"].append(matchinfo["venue"])
+                    if "event" in matchinfo:
+                        self.playersballresult["Event"].append(matchinfo["event"]["name"])
+                    if "event" not in matchinfo:
+                        self.playersballresult["Event"].append(None)
                     self.playersballresult["Batting Team"].append(playersteam)
                     self.playersballresult["Bowling Team"].append(oppositionteam)
                     self.playersballresult["Innings"].append(nthinnings + 1)
@@ -773,6 +777,10 @@ class search:
                     self.playersballresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
                     self.playersballresult["Match Type"].append(matchinfo["match_type"])
                     self.playersballresult["Venue"].append(matchinfo["venue"])
+                    if "event" in matchinfo:
+                        self.playersballresult["Event"].append(matchinfo["event"]["name"])
+                    if "event" not in matchinfo:
+                        self.playersballresult["Event"].append(None)
                     self.playersballresult["Batting Team"].append(oppositionteam)
                     self.playersballresult["Bowling Team"].append(playersteam)
                     self.playersballresult["Innings"].append(nthinnings + 1)
@@ -870,6 +878,10 @@ class search:
                 self.teamsballresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
                 self.teamsballresult["Match Type"].append(matchinfo["match_type"])
                 self.teamsballresult["Venue"].append(matchinfo["venue"])
+                if "event" in matchinfo:
+                    self.teamsballresult["Event"].append(matchinfo["event"]["name"])
+                if "event" not in matchinfo:
+                    self.teamsballresult["Event"].append(None)
                 self.teamsballresult["Batting Team"].append(inningsteam)
                 self.teamsballresult["Bowling Team"].append(bowlingteam)
                 self.teamsballresult["Innings"].append(nthinnings + 1)
@@ -945,6 +957,10 @@ class search:
                 self.teamsballresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
                 self.teamsballresult["Match Type"].append(matchinfo["match_type"])
                 self.teamsballresult["Venue"].append(matchinfo["venue"])
+                if "event" in matchinfo:
+                    self.teamsballresult["Event"].append(matchinfo["event"]["name"])
+                if "event" not in matchinfo:
+                    self.teamsballresult["Event"].append(None)
                 self.teamsballresult["Batting Team"].append(inningsteam)
                 self.teamsballresult["Bowling Team"].append(bowlingteam)
                 self.teamsballresult["Innings"].append(nthinnings + 1)

@@ -89,7 +89,7 @@ class search:
         "Date":[], "Match Type":[],"Venue":[], "Event":[], "Batting Team":[], "Bowling Team":[], "Innings":[], 
         "Defended Score": [], "Chased Score": [], "Margin":[], 
         "Score": [],"Outs": [], "Overs": [],
-        "Runs/Outs":[], "Runs/Ball":[], "Run Rate":[], "First Boundary Ball":[],
+        "Runs/Wicket":[], "Runs/Ball":[], "Run Rate":[], "First Boundary Ball":[],
         "Avg Consecutive Dot Balls":[]
         }
 
@@ -101,7 +101,7 @@ class search:
                                 "firstboundary": [],
                                 "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Outs": 0, "Balls Faced": 0, 
                                 "Bowled Outs": 0, "LBW Outs": 0, "Caught Outs": 0, "Stumped Outs": 0, "Run Outs": 0, "Caught and Bowled Outs": 0,
-                                "Runs/Outs":0, "Runs/Ball":0, "Run Rate":0, 'Avg First Boundary Ball': 0,
+                                "Runs/Wicket":0, "Runs/Ball":0, "Run Rate":0, 'Avg First Boundary Ball': 0,
                                 'Dot Ball %': 0, 'Score MeanAD': 0, "Scoring Consistency":0, 'Boundary %': 0, 
 
                                 "Runsgiven":0,"Foursgiven": 0, "Sixesgiven": 0, 
@@ -860,9 +860,9 @@ class search:
             self.inningsresult["Overs"].append(
                 math.ceil(sum(self.result[inningsteam]["inningstally"]["inningsballstotal"])/6))
             if sum(self.result[inningsteam]["inningstally"]["inningsouts"]) > 0:
-                self.inningsresult["Runs/Outs"].append(statsprocessor.ratio(sum(self.result[inningsteam]["inningstally"]["inningsruns"]), sum(self.result[inningsteam]["inningstally"]["inningsouts"])))
+                self.inningsresult["Runs/Wicket"].append(statsprocessor.ratio(sum(self.result[inningsteam]["inningstally"]["inningsruns"]), sum(self.result[inningsteam]["inningstally"]["inningsouts"])))
             if sum(self.result[inningsteam]["inningstally"]["inningsouts"])==0:
-                self.inningsresult["Runs/Outs"].append(
+                self.inningsresult["Runs/Wicket"].append(
                 sum(self.result[inningsteam]["inningstally"]["inningsruns"]))
             self.inningsresult["Runs/Ball"].append(statsprocessor.ratio(sum(self.result[inningsteam]["inningstally"]["inningsruns"]), sum(self.result[inningsteam]["inningstally"]["inningsballstotal"])))
             self.inningsresult["Run Rate"].append(statsprocessor.ratio(sum(self.result[inningsteam]["inningstally"]["inningsruns"]), sum(self.result[inningsteam]["inningstally"]["inningsballstotal"]), multiplier=6))
@@ -939,9 +939,9 @@ class search:
             self.inningsresult["Overs"].append(
                 math.ceil(sum(self.result[bowlingteam]["inningstally"]["inningsballstotal"])/6))
             if sum(self.result[bowlingteam]["inningstally"]["inningsouts"]) > 0:
-                self.inningsresult["Runs/Outs"].append(statsprocessor.ratio(sum(self.result[bowlingteam]["inningstally"]["inningsruns"]), sum(self.result[bowlingteam]["inningstally"]["inningsouts"])))
+                self.inningsresult["Runs/Wicket"].append(statsprocessor.ratio(sum(self.result[bowlingteam]["inningstally"]["inningsruns"]), sum(self.result[bowlingteam]["inningstally"]["inningsouts"])))
             if sum(self.result[bowlingteam]["inningstally"]["inningsouts"])==0:
-                self.inningsresult["Runs/Outs"].append(
+                self.inningsresult["Runs/Wicket"].append(
                 sum(self.result[bowlingteam]["inningstally"]["inningsruns"]))
             self.inningsresult["Runs/Ball"].append(statsprocessor.ratio(sum(self.result[bowlingteam]["inningstally"]["inningsruns"]), sum(self.result[bowlingteam]["inningstally"]["inningsballstotal"])))
             self.inningsresult["Run Rate"].append(statsprocessor.ratio(sum(self.result[bowlingteam]["inningstally"]["inningsruns"]), sum(self.result[bowlingteam]["inningstally"]["inningsballstotal"]), multiplier=6))
@@ -1681,7 +1681,7 @@ class search:
 
         # This is commented out because it auto-includes time which doesn't look good for plotting.
         # self.ballresult["Date"] = pd.to_datetime(self.ballresult["Date"])
-        # self.inningsresult["Date"] = pd.to_datetime(self.inningsresult["Date"])
+        self.inningsresult["Date"] = pd.to_datetime(self.inningsresult["Date"])
 
         # print(f'Time after self.inningsresult creation: {time.time() - start}')
         # Derived Stats

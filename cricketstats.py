@@ -425,13 +425,13 @@ class search:
             search.striketurnovergivenstats(self, eachball, 0, 2)
     
     # Record fieling stats for players.
-    def fieldingstats(self, eachball):
+    def fieldingstats(self, eachball, eachinnings, oppositionbatters, battingmatchups, oppositionteams):
         for eachwicket in eachball["wickets"]:
             if "fielders" in eachwicket:
                 for eachfielder in eachwicket["fielders"]:
                     if "name" not in eachfielder:
                         continue
-                    if eachfielder["name"] in self.result:
+                    if eachfielder["name"] in self.result and (not oppositionbatters or eachball['batter'] in battingmatchups) and (not oppositionteams or eachinnings["team"] in oppositionteams):
                         if eachwicket["kind"] == "caught":
                             self.result[eachfielder["name"]
                                         ]["Catches"] += 1
@@ -1014,7 +1014,7 @@ class search:
                 if "by" in matchinfo["outcome"] and "wickets" in matchinfo["outcome"]["by"]:
                     if inningsteam in self.result:
                         self.result[inningsteam]["Chased Wins"] += 1
-                        self.inningsresult["Chased Score"].append(sum(self.result[matchinfo["outcome"]["winner"]]["inningstally"]["inningsruns"]))
+                        self.inningsresult["Chased Score"].append(sum(self.result[inningsteam]["inningstally"]["inningsruns"]))
                     if inningsteam not in self.result:
                         self.inningsresult["Chased Score"].append(sum(self.result[bowlingteam]["inningstally"]["inningsruns"]))
                     self.inningsresult["Defended Score"].append(None)
@@ -1022,7 +1022,7 @@ class search:
                 if "by" in matchinfo["outcome"] and "runs" in matchinfo["outcome"]["by"]:
                     if bowlingteam in self.result:
                         self.result[bowlingteam]["Defended Wins"] += 1
-                        self.inningsresult["Defended Score"].append(sum(self.result[matchinfo["outcome"]["winner"]]["inningstally"]["inningsruns"]) + matchinfo["outcome"]['by']['runs'])
+                        self.inningsresult["Defended Score"].append(sum(self.result[bowlingteam]["inningstally"]["inningsruns"]) + matchinfo["outcome"]['by']['runs'])
                     if bowlingteam not in self.result:
                         self.inningsresult["Defended Score"].append(sum(self.result[inningsteam]["inningstally"]["inningsruns"]) + matchinfo["outcome"]['by']['runs'])
                     self.inningsresult["Chased Score"].append(None)
@@ -1165,40 +1165,47 @@ class search:
 
     # Sum and record stats from all players and teams in a search
     def sumstats(self, allgamesplayed, allgameswinloss, allgamesdrawn):    
-        if self.players:
-            self.result["All Players"] = {}
-            for eachstat in self.result[self.players[0]].keys():
-                if eachstat == "Players":
-                    self.result["All Players"][eachstat] = "All Players"
-                if type(self.result[self.players[0]][eachstat]) == int:
-                    self.result["All Players"][eachstat] = 0
-                if type(self.result[self.players[0]][eachstat]) == list:
-                    self.result["All Players"][eachstat] = []
+        if self.players or self.allplayers==True:
+            search.addplayerstoresult(self, "All Players")
+            # self.result["All Players"] = {}
+            # for eachstat in self.result[0].keys():
+            #     if eachstat == "Players":
+            #         self.result["All Players"][eachstat] = "All Players"
+            #     if type(self.result[0][eachstat]) == int:
+            #         self.result["All Players"][eachstat] = 0
+            #     if type(self.result[0][eachstat]) == list:
+            #         self.result["All Players"][eachstat] = []
             
             for eachstat in self.result["All Players"]:
                 if type(self.result["All Players"][eachstat]) == int:
-                    for eachplayer in self.players:
-                        self.result["All Players"][eachstat] += self.result[eachplayer][eachstat]
+                    for eachplayer in self.result:
+                        if eachplayer != "All Players":
+                            self.result["All Players"][eachstat] += self.result[eachplayer][eachstat]
                 if type(self.result["All Players"][eachstat]) == list:
-                    for eachplayer in self.players:
-                        self.result["All Players"][eachstat].extend(self.result[eachplayer][eachstat])
-        if self.teams:
-            self.result["All Teams"] = {}
-            for eachstat in self.result[self.teams[0]].keys():
-                if eachstat == "Teams":
-                    self.result["All Teams"][eachstat] = "All Teams"
-                if type(self.result[self.teams[0]][eachstat]) == int:
-                    self.result["All Teams"][eachstat] = 0
-                if type(self.result[self.teams[0]][eachstat]) == list:
-                    self.result["All Teams"][eachstat] = []
+                    for eachplayer in self.result:
+                        if eachplayer != "All Players":
+                            self.result["All Players"][eachstat].extend(self.result[eachplayer][eachstat])
+
+        if self.teams or self.allteams==True:
+            search.addteamstoresult(self, "All Teams")
+            # self.result["All Teams"] = {}
+            # for eachstat in self.result[0].keys():
+            #     if eachstat == "Teams":
+            #         self.result["All Teams"][eachstat] = "All Teams"
+            #     if type(self.result[0][eachstat]) == int:
+            #         self.result["All Teams"][eachstat] = 0
+            #     if type(self.result[0][eachstat]) == list:
+            #         self.result["All Teams"][eachstat] = []
             
             for eachstat in self.result["All Teams"]:
                 if type(self.result["All Teams"][eachstat]) == int:
-                    for eachteam in self.teams:
-                        self.result["All Teams"][eachstat] += self.result[eachteam][eachstat]
+                    for eachteam in self.result:
+                        if eachteam != "All Teams":
+                            self.result["All Teams"][eachstat] += self.result[eachteam][eachstat]
                 if type(self.result["All Teams"][eachstat]) == list:
-                    for eachteam in self.teams:
-                        self.result["All Teams"][eachstat].extend(self.result[eachteam][eachstat])
+                    for eachteam in self.result:
+                        if eachteam != "All Teams":
+                            self.result["All Teams"][eachstat].extend(self.result[eachteam][eachstat])
                 if eachstat == "Games":
                     self.result["All Teams"][eachstat] = allgamesplayed
                 if eachstat == "Won":
@@ -1358,7 +1365,7 @@ class search:
 
     # This is the main function to be applied to search object.
     # I should make picking oppositon bowlers strongs in a list. yes and then just assign json object tfrom that list.
-    def stats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playersteams=None, teammates=None, oppositionbatters=None, oppositionbowlers = None, oppositionteams=None, venue=None, event=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None, fielders=None, sumstats=False):
+    def stats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playersteams=None, teammates=None, oppositionbatters=None, oppositionbowlers = None, oppositionteams=None, venue=None, event=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None, fielders=None, sumstats=False,battingmatchups=None,bowlingmatchups=None):
         if betweenovers == None:
             betweenovers = []
         if innings == None:
@@ -1377,6 +1384,7 @@ class search:
         players = json.load(playerindexfile)
         if oppositionbatters == None:
             oppositionbatters = []
+            battingmatchups = []
         if oppositionbatters:
             battingmatchups = []
             for eachname in oppositionbatters:
@@ -1387,6 +1395,7 @@ class search:
                         battingmatchups.append(eachname)
         if oppositionbowlers == None:
             oppositionbowlers = []
+            bowlingmatchups = []
         if oppositionbowlers:
             bowlingmatchups = []
             for eachname in oppositionbowlers:
@@ -1615,20 +1624,20 @@ class search:
                                 if self.players or self.allplayers==True:
                                     
                                     # Striker's stats
-                                    if eachball['batter'] in self.result and (not oppositionbowlers or eachball['bowler'] in bowlingmatchups) and (not battingposition or (battingposition and ((battingorder.index(eachball['batter']) + 1) in battingposition))):
+                                    if eachball['batter'] in self.result and (not oppositionbowlers or eachball['bowler'] in bowlingmatchups) and (not oppositionteams or eachinnings["team"] in oppositionteams) and (not battingposition or (battingposition and ((battingorder.index(eachball['batter']) + 1) in battingposition))):
                                         search.strikerstats(self, eachball, nthball, eachover,battingorder)
     
                                     # Non-striker's outs.
-                                    if eachball["non_striker"] in self.result and "wickets" in eachball and (not battingposition or (battingposition and ((battingorder.index(eachball['non_striker']) + 1) in battingposition))):
+                                    if eachball["non_striker"] in self.result and "wickets" in eachball and (not oppositionteams or eachinnings["team"] in oppositionteams) and (not battingposition or (battingposition and ((battingorder.index(eachball['non_striker']) + 1) in battingposition))):
                                         search.nonstrikerstats(self, eachball, oppositionbowlers)
 
                                     # Bowling stats
-                                    if eachball['bowler'] in self.result and (not oppositionbatters or eachball['batter'] in battingmatchups) and (not bowlingposition or (bowlingposition and ((bowlingorder.index(eachball['bowler']) + 1) in bowlingposition))):
+                                    if eachball['bowler'] in self.result and (not oppositionbatters or eachball['batter'] in battingmatchups) and (not oppositionteams or eachinnings["team"] in oppositionteams) and (not bowlingposition or (bowlingposition and ((bowlingorder.index(eachball['bowler']) + 1) in bowlingposition))):
                                         search.bowlerstats(self, eachball, fielders, nthball, eachover,battingorder)
 
                                     # Fielding stats
                                     if "wickets" in eachball:
-                                        search.fieldingstats(self, eachball)
+                                        search.fieldingstats(self, eachball, eachinnings, oppositionbatters, battingmatchups, oppositionteams)
 
                                 # Record Team stats
                                 if self.teams or self.allteams==True:

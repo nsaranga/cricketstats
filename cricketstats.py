@@ -640,10 +640,10 @@ class search:
                     sum(self.result[eachplayer]["inningstally"]["inningsruns"]))
                 self.inningsresult["Balls Faced"].append(
                     self.result[eachplayer]["inningstally"]["inningsballsfaced"])
-                if self.result[eachplayer]["inningstally"]["inningshowout"]:
-                    self.inningsresult["How Out"].append(self.result[eachplayer]["inningstally"]["inningshowout"])
-                if not self.result[eachplayer]["inningstally"]["inningshowout"]:
-                    self.inningsresult["How Out"].append("Not Out")
+                if self.result[eachplayer]["inningstally"]["inningshowout"] and self.result[eachplayer]["inningstally"]["inningshowout"][-1]!=None:
+                    self.inningsresult["How Out"].append(self.result[eachplayer]["inningstally"]["inningshowout"][-1])
+                if (self.result[eachplayer]["inningstally"]["inningshowout"] and self.result[eachplayer]["inningstally"]["inningshowout"][-1]==None) or (not self.result[eachplayer]["inningstally"]["inningshowout"]):
+                    self.inningsresult["How Out"].append("not out")
                 self.inningsresult["Batting S/R"].append(statsprocessor.ratio(sum(self.result[eachplayer]["inningstally"]["inningsruns"]), self.result[eachplayer]["inningstally"]["inningsballsfaced"], multiplier=100))
                 self.inningsresult["Runs/Ball"].append(statsprocessor.ratio(sum(self.result[eachplayer]["inningstally"]["inningsruns"]), self.result[eachplayer]["inningstally"]["inningsballsfaced"]))
                 self.inningsresult["First Boundary Ball"].append(statsprocessor.firstboundary(
@@ -682,7 +682,7 @@ class search:
                     self.playersballresult["Balls Faced"].append((eachball + 1))
                     self.playersballresult["Final Score"].append(sum(self.result[eachplayer]["inningstally"]["inningsruns"]))
                     if eachball == (len(self.result[eachplayer]["inningstally"]["inningshowout"])-1) and howout==None:
-                        self.playersballresult["How Out"].append("Not Out")
+                        self.playersballresult["How Out"].append("not out")
                     if eachball!=(len(self.result[eachplayer]["inningstally"]["inningshowout"])-1) or (eachball == (len(self.result[eachplayer]["inningstally"]["inningshowout"])-1) and howout!=None):
                         self.playersballresult["How Out"].append(howout)
                     # if howout==None:
@@ -901,13 +901,13 @@ class search:
                     round(sum(self.result[inningsteam]["inningstally"]["inningsruns"][:(eachball+1)])/(eachball+1),2))
                 self.teamsballresult["Final Score"].append(sum(self.result[inningsteam]["inningstally"]["inningsruns"]))
                 if eachball == (len(self.result[inningsteam]["inningstally"]["inningsruns"])-1) and howout==None:
-                    self.teamsballresult["How Out"].append("Not Out")
+                    self.teamsballresult["How Out"].append("not out")
                 if eachball == (len(self.result[inningsteam]["inningstally"]["inningsruns"])-1) and howout!=None:
                     self.teamsballresult["How Out"].append(howout)
                 if eachball != (len(self.result[inningsteam]["inningstally"]["inningsruns"])-1):
                     self.teamsballresult["How Out"].append(howout)
                 if howout==None:
-                    self.teamsballresult["Out/NotOut"].append("Not Out")
+                    self.teamsballresult["Out/NotOut"].append("not out")
                 if howout!=None:
                     self.teamsballresult["Out/NotOut"].append("Out")    
                 self.teamsballresult["Bowler"].append(bowler)
@@ -979,13 +979,13 @@ class search:
                 self.teamsballresult["Runs/Ball"].append(round(sum(self.result[bowlingteam]["inningstally"]["inningsruns"][:(eachball+1)])/(eachball+1),2))
                 self.teamsballresult["Final Score"].append(sum(self.result[bowlingteam]["inningstally"]["inningsruns"]))
                 if eachball == (len(self.result[bowlingteam]["inningstally"]["inningsruns"])-1) and howout==None:
-                    self.teamsballresult["How Out"].append("Not Out")
+                    self.teamsballresult["How Out"].append("not out")
                 if eachball == (len(self.result[bowlingteam]["inningstally"]["inningsruns"])-1) and howout!=None:
                     self.teamsballresult["How Out"].append(howout)
                 if eachball != (len(self.result[bowlingteam]["inningstally"]["inningsruns"])-1):
                     self.teamsballresult["How Out"].append(howout)
                 if howout==None:
-                    self.teamsballresult["Out/NotOut"].append("Not Out")
+                    self.teamsballresult["Out/NotOut"].append("not out")
                 if howout!=None:
                     self.teamsballresult["Out/NotOut"].append("Out") 
                 self.teamsballresult["Bowler"].append(bowler)

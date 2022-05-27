@@ -461,7 +461,7 @@ class search:
         if (nthball+1) == len(eachover["deliveries"]):
             search.striketurnovergivenstats(self, eachball, 0, 2)
     
-    # Record fieling stats for players.
+    # Record fielding stats for players.
     def fieldingstats(self, eachball, eachinnings, oppositionbatters, battingmatchups, oppositionteams):
         for eachwicket in eachball["wickets"]:
             if "fielders" in eachwicket:
@@ -1663,7 +1663,7 @@ class search:
                         battingorder = []
                         bowlingorder = []
 
-                        # Creat liste of mandatory and optional powerplays in this innings.
+                        # Creat list of mandatory and optional powerplays in this innings.
                         powerplays = []
                         if "powerplays" in eachinnings:
                             for eachpowerplay in eachinnings["powerplays"]:
@@ -1712,11 +1712,11 @@ class search:
                                 if self.players or self.allplayers==True:
                                     
                                     # Striker's stats
-                                    if eachball['batter'] in self.result and (not oppositionbowlers or eachball['bowler'] in bowlingmatchups) and (not oppositionteams or eachinnings["team"] in oppositionteams) and (not battingposition or (battingposition and ((battingorder.index(eachball['batter']) + 1) in battingposition))):
+                                    if eachball['batter'] in self.result and (not oppositionbowlers or eachball['bowler'] in bowlingmatchups) and (not oppositionteams or eachinnings["team"] not in oppositionteams) and (not battingposition or (battingposition and ((battingorder.index(eachball['batter']) + 1) in battingposition))):
                                         search.strikerstats(self, eachball, nthball, eachover,battingorder)
     
                                     # Non-striker's outs.
-                                    if eachball["non_striker"] in self.result and "wickets" in eachball and (not oppositionteams or eachinnings["team"] in oppositionteams) and (not battingposition or (battingposition and ((battingorder.index(eachball['non_striker']) + 1) in battingposition))):
+                                    if eachball["non_striker"] in self.result and "wickets" in eachball and (not oppositionteams or eachinnings["team"] not in oppositionteams) and (not battingposition or (battingposition and ((battingorder.index(eachball['non_striker']) + 1) in battingposition))):
                                         search.nonstrikerstats(self, eachball, oppositionbowlers)
 
                                     # Bowling stats

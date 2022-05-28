@@ -23,56 +23,57 @@ import math
 import requests
 from bs4 import BeautifulSoup
 
-currentdir = os.path.dirname(os.path.abspath(__file__))
-try:
-    playerindexfile = open(f"{currentdir}/playerindex.json")
-    players = json.load(playerindexfile)
-    # players = playerindex.players
-    playerlist = pd.read_csv("/home/saranga/Downloads/people.csv")
-    for eachplayer in playerlist["name"]:
-        if (eachplayer in players["Batting"]["Right hand"] or eachplayer in players["Batting"]["Left hand"]) and (eachplayer in players["Bowling"]["Right arm pace"] or eachplayer in players["Bowling"]["Left arm pace"] or eachplayer in players["Bowling"]["Right arm Off break"] or eachplayer in players["Bowling"]["Right arm Leg break"] or eachplayer in players["Bowling"]["Left arm orthodox"] or eachplayer in players["Bowling"]["Left arm wrist spin"]) or eachplayer in players["Umpire"]:
-            continue
-        playerdata = playerlist.loc[playerlist["name"]==f"{eachplayer}", ["key_cricinfo"]]
-        if math.isnan(playerdata.at[playerdata.index[0], "key_cricinfo"]):
-            continue
-        playerid = math.floor(playerdata.at[playerdata.index[0], "key_cricinfo"])
-        print(eachplayer + ", "+ f"https://www.espncricinfo.com/*/content/player/{playerid}.html")
-        webpage = requests.get(f"https://www.espncricinfo.com/*/content/player/{playerid}.html")
-        playerpage = BeautifulSoup(webpage.content, "html.parser")
-        main = playerpage.find(id="main-container")
-        if main is None:
-            continue
-        playerinfo = main.find_all("h5", class_="player-card-description gray-900")
-        for element in playerinfo:
-            # Batting
-            if "Right hand bat" in element.text:
-                players["Batting"]["Right hand"].append(eachplayer)            
-            if "Left hand bat" in element.text:
-                players["Batting"]["Left hand"].append(eachplayer)
-            
-            # Bowling
-            if "Right arm fast" in element.text or "Right arm fast medium" in element.text  or "Right arm medium" in element.text:
-                players["Bowling"]["Right arm pace"].append(eachplayer)
-            if "Left arm fast" in element.text or "Left arm fast medium" in element.text  or "Left arm medium" in element.text:
-                players["Bowling"]["Left arm pace"].append(eachplayer)
+def index(playerdatabase):
+    currentdir = os.path.dirname(os.path.abspath(__file__))
+    try:
+        playerindexfile = open(f"{currentdir}/playerindex.json")
+        players = json.load(playerindexfile)
+        # players = playerindex.players
+        playerlist = pd.read_csv(playerdatabase)
+        for eachplayer in playerlist["name"]:
+            if (eachplayer in players["Batting"]["Right hand"] or eachplayer in players["Batting"]["Left hand"]) and (eachplayer in players["Bowling"]["Right arm pace"] or eachplayer in players["Bowling"]["Left arm pace"] or eachplayer in players["Bowling"]["Right arm Off break"] or eachplayer in players["Bowling"]["Right arm Leg break"] or eachplayer in players["Bowling"]["Left arm orthodox"] or eachplayer in players["Bowling"]["Left arm wrist spin"]) or eachplayer in players["Umpire"]:
+                continue
+            playerdata = playerlist.loc[playerlist["name"]==f"{eachplayer}", ["key_cricinfo"]]
+            if math.isnan(playerdata.at[playerdata.index[0], "key_cricinfo"]):
+                continue
+            playerid = math.floor(playerdata.at[playerdata.index[0], "key_cricinfo"])
+            print(eachplayer + ", "+ f"https://www.espncricinfo.com/*/content/player/{playerid}.html")
+            webpage = requests.get(f"https://www.espncricinfo.com/*/content/player/{playerid}.html")
+            playerpage = BeautifulSoup(webpage.content, "html.parser")
+            main = playerpage.find(id="main-container")
+            if main is None:
+                continue
+            playerinfo = main.find_all("h5", class_="player-card-description gray-900")
+            for element in playerinfo:
+                # Batting
+                if "Right hand bat" in element.text:
+                    players["Batting"]["Right hand"].append(eachplayer)            
+                if "Left hand bat" in element.text:
+                    players["Batting"]["Left hand"].append(eachplayer)
+                
+                # Bowling
+                if "Right arm fast" in element.text or "Right arm fast medium" in element.text  or "Right arm medium" in element.text:
+                    players["Bowling"]["Right arm pace"].append(eachplayer)
+                if "Left arm fast" in element.text or "Left arm fast medium" in element.text  or "Left arm medium" in element.text:
+                    players["Bowling"]["Left arm pace"].append(eachplayer)
 
-            if "offbreak" in element.text:
-                players["Bowling"]["Right arm Off break"].append(eachplayer)
-            if "Legbreak" in element.text:
-                players["Bowling"]["Right arm Leg break"].append(eachplayer)
-            if "Slow left arm orthodox" in element.text:
-                players["Bowling"]["Left arm orthodox"].append(eachplayer)
-            if "Left arm wrist spin" in element.text or "Left-arm googly" in element.text:
-                players["Bowling"]["Left arm wrist spin"].append(eachplayer)
-            
-            # Umpire
-            if "Umpire" in element.text:
-                players["Umpire"].append(eachplayer)
+                if "offbreak" in element.text:
+                    players["Bowling"]["Right arm Off break"].append(eachplayer)
+                if "Legbreak" in element.text:
+                    players["Bowling"]["Right arm Leg break"].append(eachplayer)
+                if "Slow left arm orthodox" in element.text:
+                    players["Bowling"]["Left arm orthodox"].append(eachplayer)
+                if "Left arm wrist spin" in element.text or "Left-arm googly" in element.text:
+                    players["Bowling"]["Left arm wrist spin"].append(eachplayer)
+                
+                # Umpire
+                if "Umpire" in element.text:
+                    players["Umpire"].append(eachplayer)
 
-            if "Right hand bat" not in element.text and "Left hand bat" not in element.text and "Right arm fast" not in element.text and "Right arm fast medium" not in element.text  and "Right arm medium" not in element.text and "Left arm fast" not in element.text and "Left arm fast medium" not in element.text  and "Left arm medium" not in element.text and "Legbreak" not in element.text and "Slow left arm orthodox" not in element.text and "Left arm wrist spin" not in element.text and "Left-arm googly" not in element.text:
-                players["Unknown"].append(eachplayer)
-            playerindexfile.close()
-finally:
-    file = open(f"{currentdir}/playerindex.json", "w")
-    file.write(json.dumps(players))
-    file.close
+                if "Right hand bat" not in element.text and "Left hand bat" not in element.text and "Right arm fast" not in element.text and "Right arm fast medium" not in element.text  and "Right arm medium" not in element.text and "Left arm fast" not in element.text and "Left arm fast medium" not in element.text  and "Left arm medium" not in element.text and "Legbreak" not in element.text and "Slow left arm orthodox" not in element.text and "Left arm wrist spin" not in element.text and "Left-arm googly" not in element.text:
+                    players["Unknown"].append(eachplayer)
+                playerindexfile.close()
+    finally:
+        file = open(f"{currentdir}/playerindex.json", "w")
+        file.write(json.dumps(players))
+        file.close

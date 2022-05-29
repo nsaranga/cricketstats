@@ -1794,5 +1794,5 @@ class search:
         # print(f'Time after sumstats(): {time.time() - start}')
         # if self.players or self.teams:
         df = pd.DataFrame(self.result)
-        self.result = df.transpose()
+        self.result = df.transpose().convert_dtypes()
         # print(f'Time after transpose(): {time.time() - start}')

@@ -34,6 +34,7 @@ import statsprocessor
 # TODO when do allteams/allplayers I should add all players/teams at beginning of match not check at each ball. this counts less for palyers for some reason
 # TODO add check for batting first or second for match selection
 # TODO Add a "team_type" check so that different types of teams can be isolated when searchign for T20s
+# TODO show stats by season in IPL, battign avg by year
 
 class search:
     def __init__(self, players=None, teams=None, allplayers=False, allteams=False) -> None:

@@ -31,11 +31,12 @@ from cricketstats import cricketstats
 # input parameters: score, wicket, extras? but maybe make these each spearate random choices for a ball. yes
 # simulations should run until 10 wickets are taken. or declare?
 # Indexing to venue/country?
-# for first attempt include batting team propabilities only, leave out bowling.
 
+# TODO gettied varieous stats would require simplifying cricketstats code as well.
 # TODO Get p-values for first or second innings separately.
 # TODO Get p-values for toss choice.
 # TODO Add player statistics into teams?
+# TODO separate batters runs and extras - this reuires writing cricketstats a little on collection of team innings and ball results
 
 class matchsim:
     def __init__(self,simteams=None) -> None:
@@ -52,10 +53,11 @@ class matchsim:
         simstats = {}
         for eachteam in self.simteams:
             simstats[eachteam]={"BattingPs":{}, "BowlingPs":{}}
-            simstats[eachteam]["BattingPs"]["RunsP"] = simteamsstats.ballresult[["Runs Scored"]].loc[simteamsstats.ballresult["Batting Team"]==eachteam].value_counts(normalize=True,sort=False)
-            simstats[eachteam]["BattingPs"]["WicketgivenP"] = simteamsstats.ballresult[['Out/NotOut']].loc[simteamsstats.ballresult["Batting Team"]==eachteam].value_counts(normalize=True,sort=False)
 
+            simstats[eachteam]["BattingPs"]["RunsP"] = simteamsstats.ballresult[["Runs Scored"]].loc[simteamsstats.ballresult["Batting Team"]==eachteam].value_counts(normalize=True,sort=False)
             simstats[eachteam]["BowlingPs"]["RunsgivenP"] = simteamsstats.ballresult[["Runs Scored"]].loc[simteamsstats.ballresult["Bowling Team"]==eachteam].value_counts(normalize=True,sort=False)
+
+            simstats[eachteam]["BattingPs"]["WicketgivenP"] = simteamsstats.ballresult[['Out/NotOut']].loc[simteamsstats.ballresult["Batting Team"]==eachteam].value_counts(normalize=True,sort=False)
             simstats[eachteam]["BowlingPs"]["WicketP"] = simteamsstats.ballresult[["Out/NotOut"]].loc[simteamsstats.ballresult["Bowling Team"]==eachteam].value_counts(normalize=True,sort=False)
 
         # match generator
@@ -85,33 +87,35 @@ class matchsim:
                     inningslenth=120
                 if statsmatchtype=="ODI" or statsmatchtype=="ODM":
                     inningslenth=300
-                    
+
+                for thisover in range(20):
+
                 # ball outcome generator
-                for thisball in range(inningslenth):
-                    if inningswickets == 10:
-                        break
-                    wicketfallP = simstats[thisinnings]['BattingPs']["WicketgivenP"].add(simstats[bowlingteam]['BowlingPs']["WicketP"]).divide(2)
-                    wicket = rng.choice(simstats[thisinnings]['BattingPs']["WicketgivenP"].index, p=wicketfallP.tolist(), shuffle=False) 
+                    for thisball in range(1,7):
+                        if inningswickets == 10:
+                            break
+                        wicketfallP = simstats[thisinnings]['BattingPs']["WicketgivenP"].add(simstats[bowlingteam]['BowlingPs']["WicketP"]).divide(2)
+                        wicket = rng.choice(simstats[thisinnings]['BattingPs']["WicketgivenP"].index, p=wicketfallP.tolist(), shuffle=False) 
 
-                    #wicketgiven = rng.choice(simstats[thisinnings]['BattingPs']["WicketgivenP"].index, p=simstats[thisinnings]['BattingPs']["WicketgivenP"].values, shuffle=False) 
-                    #wicketaken = rng.choice(simstats[bowlingteam]['BowlingPs']["WicketP"].index, p=simstats[bowlingteam]['BowlingPs']["WicketP"].values, shuffle=False)
-                    
-                    if wicket[0]=="Out":
-                        inningswickets += 1
-                    if inningswickets == 10:
-                        break
-                    if inningsorder.index(thisinnings) == 1 and inningsscore > matchresults["Innings 1 Score"][-1]:
-                        break
-                    # add superover tie thing.
-                    
-                    # scoreP = np.divide((np.add(simstats[thisinnings]['BattingPs']["RunsP"].values,simstats[bowlingteam]['BowlingPs']["RunsgivenP"].values)),2)
-                    scoreP = simstats[thisinnings]['BattingPs']["RunsP"].add(simstats[bowlingteam]['BowlingPs']["RunsgivenP"],fill_value=0).divide(2)
-                    # scoreP = pd.trudiv((np.add(simstats[thisinnings]['BattingPs']["RunsP"].values,simstats[bowlingteam]['BowlingPs']["RunsgivenP"].values)),2)
-                    score = rng.choice(simstats[thisinnings]['BattingPs']["RunsP"].index, p=scoreP.tolist(), shuffle=False)
-                    #score = rng.choice(simstats[thisinnings]['BattingPs']["RunsP"].index, p=simstats[thisinnings]['BattingPs']["RunsP"].values, shuffle=False)
+                        #wicketgiven = rng.choice(simstats[thisinnings]['BattingPs']["WicketgivenP"].index, p=simstats[thisinnings]['BattingPs']["WicketgivenP"].values, shuffle=False) 
+                        #wicketaken = rng.choice(simstats[bowlingteam]['BowlingPs']["WicketP"].index, p=simstats[bowlingteam]['BowlingPs']["WicketP"].values, shuffle=False)
+                        
+                        if wicket[0]=="Out":
+                            inningswickets += 1
+                        if inningswickets == 10:
+                            break
+                        if inningsorder.index(thisinnings) == 1 and inningsscore > matchresults["Innings 1 Score"][-1]:
+                            break
+                        # add superover tie thing.
+                        
+                        #perballstats scoring
+                        # scoreP = simteamsstats.ballresult[["Runs Scored"]].loc[(simteamsstats.ballresult["Batting Team"]==thisinnings)&(simteamsstats.ballresult["Ball"]>(thisover))&(simteamsstats.ballresult["Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)
+                        # score = rng.choice(scoreP.index, p=scoreP.tolist(), shuffle=False)
 
-
-                    inningsscore += score[0]
+                        # Old Scoring
+                        scoreP = simstats[thisinnings]['BattingPs']["RunsP"].add(simstats[bowlingteam]['BowlingPs']["RunsgivenP"],fill_value=0).divide(2)
+                        score = rng.choice(simstats[thisinnings]['BattingPs']["RunsP"].index, p=scoreP.tolist(), shuffle=False)
+                        inningsscore += score[0]
 
                 matchresults[f"Innings {inningsorder.index(thisinnings)+1} Team"].append(thisinnings)
                 matchresults[f"Innings {inningsorder.index(thisinnings)+1} Score"].append(inningsscore)

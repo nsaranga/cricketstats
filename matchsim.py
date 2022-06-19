@@ -51,10 +51,12 @@ class matchsim:
         # setup p-values for simulations
         simstats = {}
         for eachteam in self.simteams:
-            simstats[eachteam]={}
-            simstats[eachteam]["Batpvalues"] = simteamsstats.ballresult[["Runs Scored"]].loc[simteamsstats.ballresult["Batting Team"]==eachteam].value_counts(normalize=True,sort=False)
-            simstats[eachteam]["Outspvalues"] = simteamsstats.ballresult[['Out/NotOut']].loc[simteamsstats.ballresult["Batting Team"]==eachteam].value_counts(normalize=True,sort=False)
+            simstats[eachteam]={"BattingPs":{}, "BowlingPs":{}}
+            simstats[eachteam]["BattingPs"]["RunsP"] = simteamsstats.ballresult[["Runs Scored"]].loc[simteamsstats.ballresult["Batting Team"]==eachteam].value_counts(normalize=True,sort=False)
+            simstats[eachteam]["BattingPs"]["WicketgivenP"] = simteamsstats.ballresult[['Out/NotOut']].loc[simteamsstats.ballresult["Batting Team"]==eachteam].value_counts(normalize=True,sort=False)
 
+            simstats[eachteam]["BowlingPs"]["RunsgivenP"] = simteamsstats.ballresult[["Runs Scored"]].loc[simteamsstats.ballresult["Bowling Team"]==eachteam].value_counts(normalize=True,sort=False)
+            simstats[eachteam]["BowlingPs"]["WicketP"] = simteamsstats.ballresult[["Out/NotOut"]].loc[simteamsstats.ballresult["Bowling Team"]==eachteam].value_counts(normalize=True,sort=False)
 
         # match generator
         
@@ -72,6 +74,11 @@ class matchsim:
                 inningsscore = 0
                 inningswickets = 0
                 inningsballs = 0
+                bowlingteam = None
+
+                for eachteam in inningsorder:
+                    if eachteam!=thisinnings:
+                        bowlingteam = eachteam
 
                 inningslenth = 0
                 if statsmatchtype=="T20":
@@ -83,7 +90,12 @@ class matchsim:
                 for thisball in range(inningslenth):
                     if inningswickets == 10:
                         break
-                    wicket = rng.choice(simstats[thisinnings]["Outspvalues"].index, p=simstats[thisinnings]["Outspvalues"].values, shuffle=False)
+                    wicketfallP = simstats[thisinnings]['BattingPs']["WicketgivenP"].add(simstats[bowlingteam]['BowlingPs']["WicketP"]).divide(2)
+                    wicket = rng.choice(simstats[thisinnings]['BattingPs']["WicketgivenP"].index, p=wicketfallP.tolist(), shuffle=False) 
+
+                    #wicketgiven = rng.choice(simstats[thisinnings]['BattingPs']["WicketgivenP"].index, p=simstats[thisinnings]['BattingPs']["WicketgivenP"].values, shuffle=False) 
+                    #wicketaken = rng.choice(simstats[bowlingteam]['BowlingPs']["WicketP"].index, p=simstats[bowlingteam]['BowlingPs']["WicketP"].values, shuffle=False)
+                    
                     if wicket[0]=="Out":
                         inningswickets += 1
                     if inningswickets == 10:
@@ -91,8 +103,14 @@ class matchsim:
                     if inningsorder.index(thisinnings) == 1 and inningsscore > matchresults["Innings 1 Score"][-1]:
                         break
                     # add superover tie thing.
+                    
+                    # scoreP = np.divide((np.add(simstats[thisinnings]['BattingPs']["RunsP"].values,simstats[bowlingteam]['BowlingPs']["RunsgivenP"].values)),2)
+                    scoreP = simstats[thisinnings]['BattingPs']["RunsP"].add(simstats[bowlingteam]['BowlingPs']["RunsgivenP"],fill_value=0).divide(2)
+                    # scoreP = pd.trudiv((np.add(simstats[thisinnings]['BattingPs']["RunsP"].values,simstats[bowlingteam]['BowlingPs']["RunsgivenP"].values)),2)
+                    score = rng.choice(simstats[thisinnings]['BattingPs']["RunsP"].index, p=scoreP.tolist(), shuffle=False)
+                    #score = rng.choice(simstats[thisinnings]['BattingPs']["RunsP"].index, p=simstats[thisinnings]['BattingPs']["RunsP"].values, shuffle=False)
 
-                    score = rng.choice(simstats[thisinnings]["Batpvalues"].index, p=simstats[thisinnings]["Batpvalues"].values, shuffle=False)
+
                     inningsscore += score[0]
 
                 matchresults[f"Innings {inningsorder.index(thisinnings)+1} Team"].append(thisinnings)

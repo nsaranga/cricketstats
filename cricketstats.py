@@ -1,5 +1,5 @@
 """ 
-getcricketstats is a script for getting team and player statistics from the cricsheet.org database for data analysis.
+cricketstats is a script for getting team and player statistics from the cricsheet.org database for data analysis.
 Copyright (C) 2021  Saranga Sudarshan
 
 This program is free software: you can redistribute it and/or modify
@@ -680,7 +680,7 @@ class search:
             self.ballresult["How Out"].append(eachball["wickets"][0]["kind"])
         if "wickets" not in eachball:
             self.ballresult["Wicket"].append(False)
-            self.ballresult["How Out"].append(None)
+            self.ballresult["How Out"].append("No Wicket")
         if "extras" in eachball:
             self.ballresult["Extras"].append(eachball["runs"]["extras"])
             self.ballresult["Extras Type"].append( eachball['extras'].keys())
@@ -992,7 +992,7 @@ class search:
                 if eachball == (len(self.result[inningsteam]["inningstally"]["inningsruns"])-1) and howout!=None:
                     self.teamsballresult["How Out"].append(howout)
                 if eachball != (len(self.result[inningsteam]["inningstally"]["inningsruns"])-1):
-                    self.teamsballresult["How Out"].append(howout)
+                    self.teamsballresult["How Out"].append("No Wicket")
                 if howout==None:
                     self.teamsballresult["Out/NotOut"].append("not out")
                 if howout!=None:
@@ -1071,7 +1071,7 @@ class search:
                 if eachball == (len(self.result[bowlingteam]["inningstally"]["inningsruns"])-1) and howout!=None:
                     self.teamsballresult["How Out"].append(howout)
                 if eachball != (len(self.result[bowlingteam]["inningstally"]["inningsruns"])-1):
-                    self.teamsballresult["How Out"].append(howout)
+                    self.teamsballresult["How Out"].append("No Wicket")
                 if howout==None:
                     self.teamsballresult["Out/NotOut"].append("not out")
                 if howout!=None:

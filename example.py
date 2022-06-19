@@ -1,5 +1,5 @@
 """ 
-getcricketstats is a script for getting team and player statistics from the cricsheet.org database for data analysis.
+cricketstats is a script for getting team and player statistics from the cricsheet.org database for data analysis.
 Copyright (C) 2021  Saranga Sudarshan
 
 This program is free software: you can redistribute it and/or modify

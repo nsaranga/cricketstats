@@ -48,17 +48,9 @@ class search:
         self.playersballresult = None
         self.teamsballresult = None
 
-    # Setup the statistics to be recorded.
-    def playerinningsresultsetup(self):
-        self.inningsresult = { 
-        "Date":[], "Match Type":[], "Venue":[], "Event":[], "Players":[], "Team":[], "Opposition":[], "Innings":[], 
-        "Batter Type":[], "Batting Position":[], "Score": [], "Balls Faced": [], "How Out": [],
-        "Batting S/R":[], "Runs/Ball":[], "First Boundary Ball":[], 
-        "Bowler Type":[], "Bowling Position":[], "Runsgiven": [], "Wickets": [], "Overs Bowled": [], 
-        'Economy Rate': [], 'Bowling Avg': [], 'Bowling S/R': [], "Runsgiven/Ball":[], "Avg Consecutive Dot Balls":[]
-        }
+    # Setup Player statistics to be recorded.
 
-    # for eachplayer in self.players:
+    # Player aggregate results
     def addplayerstoresult(self, eachplayer):
         self.result[eachplayer] = {"Players": eachplayer, "Games": 0, "Won": 0, "Drawn": 0, 'Win %': 0,
 
@@ -81,20 +73,35 @@ class search:
                                     
                                     "inningstally":{"batinningscount": False, "bowlinningscount": False, 
                                     "teaminningsscore":[], "teaminningsouts":[], "teaminningsballs":[], "inningsfielder":[],
-                                    "inningsruns": [], "inningsballsfaced": 0, "inningspartners":[], "inningshowout": [], "inningsbowlersfaced":[],
-                                    "inningsrunsgiven": [], "inningsballsbowled": 0, "inningswickets": [], "inningsbattersbowledat":[],"inningswicketstype":[]}
+                                    "inningsruns": [], "inningsballsfaced": 0, "inningspartners":[], "inningshowout": [], "inningsbowlersfaced":[], "inningsextras": [],
+                                    "inningsrunsgiven": [], "inningsballsbowled": 0, "inningswickets": [], "inningsbattersbowledat":[],"inningswicketstype":[], "inningsextrasgiven": []}
                                     }
-
-    def teaminningsresultsetup(self):
-        self.inningsresult = {
-        "Date":[], "Match Type":[],"Venue":[], "Event":[], "Batting Team":[], "Bowling Team":[], "Innings":[], 
-        "Defended Score": [], "Chased Score": [], "Margin":[], 
-        "Score": [],"Outs": [], "Overs": [],
-        "Runs/Wicket":[], "Runs/Ball":[], "Run Rate":[], "First Boundary Ball":[],
-        "Avg Consecutive Dot Balls":[]
+    
+    # Player innings results
+    def playerinningsresultsetup(self):
+        self.inningsresult = { 
+        "Date":[], "Match Type":[], "Venue":[], "Event":[], "Players":[], "Team":[], "Opposition":[], "Innings":[], 
+        "Batter Type":[], "Batting Position":[], "Score": [], "Balls Faced": [], "How Out": [],
+        "Batting S/R":[], "Runs/Ball":[], "First Boundary Ball":[], 
+        "Bowler Type":[], "Bowling Position":[], "Runsgiven": [], "Wickets": [], "Overs Bowled": [], 
+        'Economy Rate': [], 'Bowling Avg': [], 'Bowling S/R': [], "Runsgiven/Ball":[], "Avg Consecutive Dot Balls":[]
         }
 
-    # for eachteam in self.teams:
+    # Player ball results
+    def playersballresultsetup(self):
+        self.playersballresult = { 
+        "Date":[], "Match Type":[], "Venue":[], "Event":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Innings Ball":[], "Innings Outs":[], "Fielder":[],
+        "Batter":[], "Batting Position":[], "Batter Type":[], "Non_striker": [], "Batter Score": [], "Balls Faced":[],
+        "Runs/Ball": [], "Current Score":[], "Final Score":[], "How Out": [],
+
+        "Bowler": [],"Bowler Type":[], "Bowling Position":[], "Balls Bowled":[], "Wicket": [],
+        "Extras": [], "Extras Type": [],
+        "Current Wickets": [], "Final Wickets":[], 
+        "Runsgiven": [], "Runsgiven/Ball": [], "Current Runsgiven": [], "Final Runsgiven":[]
+        }
+
+    # Setup teams statistics to be recorded
+    # Team aggregate results
     def addteamstoresult(self, eachteam):
         self.result[eachteam] = {"Teams": eachteam, "Games": 0, "Innings Bowled":0, "Innings Batted": 0,
                                 "Won": 0, "Drawn": 0, 'Win %': 0, "Defended Wins": 0, "Chased Wins": 0, 
@@ -114,34 +121,34 @@ class search:
                                 "inningstally":{"batinningscount": False, "bowlinningscount": False, "inningsruns": [], "inningsballstotal": [], "inningsouts": [], "inningsballs": [], "inningsballinover":[], "inningsoutsbyball": [], "inningshowout":[], "inningsstrikers": [],"inningsnonstrikers": [],"inningsbowlers": [],"inningsstrikersbattingpos":[], "inningsextras":[],"inningsextrastype":[], "inningsfielder":[]}
                                 }
 
-    # Setup results for ball by ball stats.
-    def ballresultsetup(self):
-        self.ballresult = { 
-        "Date":[], "Match Type":[], "Venue":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Ball":[], "Ball in Over":[], 
-        "Batting Position":[], "Batter":[], "Batter Score": [], "Non_striker": [],
-        "Bowling Position":[], "Bowler": [], "Wicket": [], "How Out": [], 
-        "Extras": [], "Extras Type": [], "Total Runs": []
+    # Team innings results
+    def teaminningsresultsetup(self):
+        self.inningsresult = {
+        "Date":[], "Match Type":[],"Venue":[], "Event":[], "Batting Team":[], "Bowling Team":[], "Innings":[], 
+        "Defended Score": [], "Chased Score": [], "Margin":[], 
+        "Score": [], "Outs": [], "Overs": [], "Extras": [],
+        "Runs/Wicket":[], "Runs/Ball":[], "Run Rate":[], "First Boundary Ball":[],
+        "Avg Consecutive Dot Balls":[]
         }
 
-    def playersballresultsetup(self):
-        self.playersballresult = { 
-        "Date":[], "Match Type":[], "Venue":[], "Event":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Innings Ball":[], "Innings Outs":[], "Fielder":[],
-        "Batter":[], "Batting Position":[], "Batter Type":[], "Non_striker": [], "Batter Score": [], "Balls Faced":[],
-        "Runs/Ball": [], "Current Score":[], "Final Score":[], "How Out": [],
-
-        "Bowler": [],"Bowler Type":[], "Bowling Position":[], "Balls Bowled":[], "Wicket": [],
-        "Extras": [], "Extras Type": [],
-        "Current Wickets": [], "Final Wickets":[], 
-        "Runsgiven": [], "Runsgiven/Ball": [], "Current Runsgiven": [], "Final Runsgiven":[]
-        }
-
+    # Team ball results
     def teamsballresultsetup(self):
         self.teamsballresult = { 
         "Date":[], "Match Type":[], "Venue":[], "Event":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Ball":[], "Ball in Over":[],
         "Current Score":[], "Current Outs":[], "Final Score":[],
-        "Batter":[], "Batting Position":[],"Batter Type":[], "Non_striker": [], "Runs Scored": [], "Runs/Ball": [], "How Out": [], "Fielder":[],
+        "Batter":[], "Batting Position":[],"Batter Type":[], "Non_striker": [], "Runs Scored": [], "Batter Score":[], "Runs/Ball": [], "How Out": [], "Fielder":[],
         "Bowler": [], "Bowler Type":[], "Extras":[], "Extras Type": [], "Out/NotOut":[],
         }
+
+    # Setup results for ball by ball stats.
+    # DELETE THIS
+    # def ballresultsetup(self):
+    #     self.ballresult = { 
+    #     "Date":[], "Match Type":[], "Venue":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Ball":[], "Ball in Over":[], 
+    #     "Batting Position":[], "Batter":[], "Batter Score": [], "Non_striker": [],
+    #     "Bowling Position":[], "Bowler": [], "Wicket": [], "How Out": [], 
+    #     "Extras": [], "Extras Type": [], "Total Runs": []
+    #     }
 
     # Indexes matches by match type for quick search.
     def fileindexing(self, database, matches):
@@ -913,7 +920,7 @@ class search:
                         self.playersballresult["Bowler Type"].append(None)
                 
     # Record team inningsresult
-    # TODO have to fix overs faced. it should be "17.5" format. not diviede by 6
+    # TODO have to fix overs faced. it should be "17.5" format. not divided by 6
     def teaminnings(self, inningsteam, nthinnings, matchinfo, matchtimetuple, matchinnings,tempplayerindex):
         for eachteam in matchinfo["teams"]:
             if eachteam != inningsteam:
@@ -944,6 +951,7 @@ class search:
             self.inningsresult["Score"].append(
                 sum(self.result[inningsteam]["inningstally"]["inningsruns"]))
             self.inningsresult["Outs"].append(sum(self.result[inningsteam]["inningstally"]["inningsouts"]))
+            self.inningsresult["Extras"].append(sum(self.result[inningsteam]["inningstally"]["inningsextras"]))
             self.inningsresult["Overs"].append(
                 math.ceil(sum(self.result[inningsteam]["inningstally"]["inningsballstotal"])/6))
             if sum(self.result[inningsteam]["inningstally"]["inningsouts"]) > 0:
@@ -982,6 +990,7 @@ class search:
                 self.teamsballresult["Batting Position"].append(strikerbattingpos)
                 self.teamsballresult["Non_striker"].append(nonstriker)
                 self.teamsballresult["Runs Scored"].append(eachshot)
+                self.teamsballresult["Batter Score"].append(eachshot-extras)
                 self.teamsballresult["Extras"].append(extras)
                 self.teamsballresult["Extras Type"].append(None)
                 self.teamsballresult["Runs/Ball"].append(
@@ -1024,6 +1033,7 @@ class search:
             self.inningsresult["Score"].append(
                 sum(self.result[bowlingteam]["inningstally"]["inningsruns"]))
             self.inningsresult["Outs"].append(sum(self.result[bowlingteam]["inningstally"]["inningsouts"]))
+            self.inningsresult["Extras"].append(sum(self.result[bowlingteam]["inningstally"]["inningsextras"]))
             self.inningsresult["Overs"].append(
                 math.ceil(sum(self.result[bowlingteam]["inningstally"]["inningsballstotal"])/6))
             if sum(self.result[bowlingteam]["inningstally"]["inningsouts"]) > 0:
@@ -1062,6 +1072,7 @@ class search:
                 self.teamsballresult["Batting Position"].append(strikerbattingpos)
                 self.teamsballresult["Non_striker"].append(nonstriker)
                 self.teamsballresult["Runs Scored"].append(eachshot)
+                self.teamsballresult["Batter Score"].append(eachshot-extras)
                 self.teamsballresult["Extras"].append(extras)
                 self.teamsballresult["Extras Type"].append(None)
                 self.teamsballresult["Runs/Ball"].append(round(sum(self.result[bowlingteam]["inningstally"]["inningsruns"][:(eachball+1)])/(eachball+1),2))
@@ -1742,11 +1753,11 @@ class search:
 
                                 # search.ballstats(self, matchtimetuple, match["info"], nthinnings, eachinnings, eachball, nthball, eachover, battingorder, bowlingorder)
 
-                        # Record Player innings
+                        # Record Player innings and ball by ball stats
                         if self.players or self.allplayers==True:
                             search.playerinnings(self,matchtimetuple, match["info"], nthinnings, eachmatchtype, battingorder, bowlingorder,tempplayerindex)
                         
-                        # Record Team innings
+                        # Record Team innings and ball by ball stats
                         if self.teams or self.allteams==True:
 
                             # Team innings score

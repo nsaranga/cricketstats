@@ -216,10 +216,11 @@ class matchsim:
                 matchover +=1
 
                 # rain rng
-                if rainaffected=="rain":
-                    rainaffected="no_rain"
-                    overslost = rng.integers(low=15, high=60)
-                    matchover+=overslost
+                if rain:
+                    if rainaffected=="rain":
+                        rainaffected="no_rain"
+                        overslost = rng.integers(low=15, high=60)
+                        matchover+=overslost
             
             #print(thisover)
             self.results[f"Innings {nthinnings+1} Team"].append(thisinnings)

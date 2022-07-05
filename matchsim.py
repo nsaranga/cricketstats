@@ -68,7 +68,7 @@ class matchsim:
         #     simstats[eachteam]["BattingPs"]["WicketgivenP"] = self.simteamstats.ballresult[['Out/NotOut']].loc[self.simteamstats.ballresult["Batting Team"]==eachteam].value_counts(normalize=True,sort=False)
         #     simstats[eachteam]["BowlingPs"]["WicketP"] = self.simteamstats.ballresult[["Out/NotOut"]].loc[self.simteamstats.ballresult["Bowling Team"]==eachteam].value_counts(normalize=True,sort=False)
 
-    def limitedovers(self,rng,statsmatchtype):
+    def limitedovers(self,rng,statsmatchtype,inningsorder):
         # toss rng to decide inningsorder
         inningsorder = rng.choice(self.simteams, p=[0.5,0.5],size=2, replace=False, shuffle=False).tolist()
 
@@ -138,12 +138,15 @@ class matchsim:
             self.results[f"Innings {nthinnings+1} Score"].append(self.inningsscore)
             self.results[f"Innings {nthinnings+1} Wickets"].append(self.inningswickets)
 
-    def testmatch(self,rng,statsmatchtype):
+    def testmatch(self,rng,statsmatchtype,inningsorder, rain):
         # toss rng to decide inningsorder
-        toss = rng.choice(self.simteams, p=[0.5,0.5],size=2, replace=False, shuffle=False).tolist()
-        inningsorder = toss+toss
-
-        rainaffected = rng.choice(["rain","no_rain"], p=[0.1,0.9],size=1, replace=False, shuffle=False)
+        if not inningsorder:
+            toss = rng.choice(self.simteams, p=[0.5,0.5],size=2, replace=False, shuffle=False).tolist()
+            inningsorder = toss+toss
+        
+        if rain:
+            rainaffected = rng.choice(["rain","no_rain"], p=[0.1,0.9],size=1, replace=False, shuffle=False)
+        
         matchover = 0
         inningsnumber=0
         # innings generator
@@ -211,6 +214,8 @@ class matchsim:
                 matchsim.over(self,rng,wicketfallP,scoreP, extrasP,nthinnings,statsmatchtype)
                 thisover +=1
                 matchover +=1
+
+                # rain rng
                 if rainaffected=="rain":
                     rainaffected="no_rain"
                     overslost = rng.integers(low=15, high=60)
@@ -248,7 +253,7 @@ class matchsim:
                 break
 
 
-    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype, simulations):
+    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations, inningsorder=None,rain=False):
 
         # Setup match results
         matchsim.matchresultssetup(self,statsmatchtype)
@@ -262,7 +267,8 @@ class matchsim:
 
         matchtypes={"T20": matchsim.limitedovers, "ODI": matchsim.limitedovers,"ODM": matchsim.limitedovers,"Test": matchsim.testmatch}
         for thismatch in range(simulations):
-            matchtypes[statsmatchtype](self,rng,statsmatchtype)
+
+            matchtypes[statsmatchtype](self,rng,statsmatchtype,inningsorder,rain)
 
 
             if statsmatchtype == "T20" or statsmatchtype == "ODI" or statsmatchtype == "ODM":

@@ -226,7 +226,7 @@ class matchsim:
             self.results[f"Innings {nthinnings+1} Team"].append(thisinnings)
             self.results[f"Innings {nthinnings+1} Score"].append(self.inningsscore)
             self.results[f"Innings {nthinnings+1} Wickets"].append(self.inningswickets)
-        print(f"Overs left: {450-matchover}")
+        # print(f"Overs left: {450-matchover}")
 
     def over(self,rng,wicketfallP,scoreP, extrasP,nthinnings,statsmatchtype):
         # ball outcome generator

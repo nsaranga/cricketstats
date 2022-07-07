@@ -132,7 +132,7 @@ class matchsim:
                 if len(wicketfallP)<2 or sum(wicketfallP)!=1:
                     wicketfallP=inningswicketfallP
 
-                matchsim.over(self,rng,wicketfallP,scoreP, extrasP,nthinnings)
+                matchsim.over(self,rng,wicketfallP,scoreP, extrasP,nthinnings,statsmatchtype)
                 
             self.results[f"Innings {nthinnings+1} Team"].append(thisinnings)
             self.results[f"Innings {nthinnings+1} Score"].append(self.inningsscore)

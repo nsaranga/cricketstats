@@ -69,8 +69,11 @@ class matchsim:
         #     simstats[eachteam]["BowlingPs"]["WicketP"] = self.simteamstats.ballresult[["Out/NotOut"]].loc[self.simteamstats.ballresult["Bowling Team"]==eachteam].value_counts(normalize=True,sort=False)
 
     def limitedovers(self,rng,statsmatchtype,inningsorder,rain):
-        # toss rng to decide inningsorder
-        inningsorder = rng.choice(self.simteams, p=[0.5,0.5],size=2, replace=False, shuffle=False).tolist()
+
+        # Randomly set innings order if not given
+        if not inningsorder:
+            # toss rng to decide inningsorder
+            inningsorder = rng.choice(self.simteams, p=[0.5,0.5],size=2, replace=False, shuffle=False).tolist()
 
 
         # innings generator
@@ -139,8 +142,10 @@ class matchsim:
             self.results[f"Innings {nthinnings+1} Wickets"].append(self.inningswickets)
 
     def testmatch(self,rng,statsmatchtype,inningsorder, rain):
-        # toss rng to decide inningsorder
+        
+        # Randomly set innings if not given
         if not inningsorder:
+            # toss rng to decide inningsorder
             toss = rng.choice(self.simteams, p=[0.5,0.5],size=2, replace=False, shuffle=False).tolist()
             inningsorder = toss+toss
         
@@ -254,7 +259,7 @@ class matchsim:
                 break
 
 
-    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations, inningsorder=None,rain=False):
+    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False):
 
         # Setup match results
         matchsim.matchresultssetup(self,statsmatchtype)

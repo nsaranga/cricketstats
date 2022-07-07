@@ -68,7 +68,7 @@ class matchsim:
         #     simstats[eachteam]["BattingPs"]["WicketgivenP"] = self.simteamstats.ballresult[['Out/NotOut']].loc[self.simteamstats.ballresult["Batting Team"]==eachteam].value_counts(normalize=True,sort=False)
         #     simstats[eachteam]["BowlingPs"]["WicketP"] = self.simteamstats.ballresult[["Out/NotOut"]].loc[self.simteamstats.ballresult["Bowling Team"]==eachteam].value_counts(normalize=True,sort=False)
 
-    def limitedovers(self,rng,statsmatchtype,inningsorder):
+    def limitedovers(self,rng,statsmatchtype,inningsorder,rain):
         # toss rng to decide inningsorder
         inningsorder = rng.choice(self.simteams, p=[0.5,0.5],size=2, replace=False, shuffle=False).tolist()
 

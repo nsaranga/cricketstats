@@ -118,14 +118,14 @@ class search:
                                 'Dot Ball Bowled %': 0,'Boundary Given %': 0,'Runsgiven/Wicket': 0, "Runsgiven/Ball":0, "Runsgiven Rate": 0,
                                 "Avg Consecutive Dot Balls": 0, "dotballseries": [],
 
-                                "inningstally":{"batinningscount": False, "bowlinningscount": False, "inningsruns": [], "inningsballstotal": [], "inningsouts": [], "inningsballs": [], "inningsballinover":[], "inningsoutsbyball": [], "inningshowout":[], "inningsstrikers": [],"inningsnonstrikers": [],"inningsbowlers": [],"inningsstrikersbattingpos":[], "inningsextras":[],"inningsextrastype":[], "inningsfielder":[]}
+                                "inningstally":{"batinningscount": False, "bowlinningscount": False, "inningsruns": [], "inningsballstotal": [], "inningsouts": [], "inningsballs": [], "inningsballinover":[], "inningsoutsbyball": [], "inningshowout":[], "inningsstrikers": [],"inningsnonstrikers": [],"inningsbowlers": [],"inningsstrikersbattingpos":[], "inningsextras":[],"inningsextrastype":[], "inningsfielder":[], "inningsdeclared":False}
                                 }
 
     # Team innings results
     def teaminningsresultsetup(self):
         self.inningsresult = {
         "Date":[], "Match Type":[],"Venue":[], "Event":[], "Batting Team":[], "Bowling Team":[], "Innings":[], 
-        "Defended Score": [], "Chased Score": [], "Margin":[], 
+        "Defended Score": [], "Chased Score": [], "Margin":[], "Declared":[],
         "Score": [], "Outs": [], "Overs": [], "Extras": [],
         "Runs/Wicket":[], "Runs/Ball":[], "Run Rate":[], "First Boundary Ball":[],
         "Avg Consecutive Dot Balls":[]
@@ -234,9 +234,9 @@ class search:
         if self.teams or self.allteams==True:
             for eachteam in self.result:
                 for eachstat in self.result[eachteam]["inningstally"]:
-                    if eachstat =="batinningscount" or  eachstat =="bowlinningscount":
+                    if eachstat =="batinningscount" or eachstat =="bowlinningscount" or eachstat =="inningsdeclared":
                         self.result[eachteam]["inningstally"][eachstat] = False
-                    if eachstat !="batinningscount" and eachstat !="bowlinningscount":
+                    if eachstat !="batinningscount" and eachstat !="bowlinningscount" and eachstat !="inningsdeclared":
                         self.result[eachteam]["inningstally"][eachstat] = []
 
 
@@ -948,6 +948,8 @@ class search:
                     self.result[bowlingteam]["Innings Bowled"] += 1
                 self.result[bowlingteam]["dotballseries"].extend(statsprocessor.dotballseries(self.result[inningsteam]["inningstally"]["inningsruns"]))
 
+            self.inningsresult["Declared"].append(self.result[inningsteam]["inningstally"]["inningsdeclared"])
+
             self.inningsresult["Score"].append(
                 sum(self.result[inningsteam]["inningstally"]["inningsruns"]))
             self.inningsresult["Outs"].append(sum(self.result[inningsteam]["inningstally"]["inningsouts"]))
@@ -1030,6 +1032,7 @@ class search:
             if self.result[bowlingteam]["inningstally"]["bowlinningscount"] == True:
                 self.result[bowlingteam]["Innings Bowled"] += 1
                 self.result[bowlingteam]["dotballseries"].extend(statsprocessor.dotballseries(self.result[bowlingteam]["inningstally"]["inningsruns"]))
+            self.inningsresult["Declared"].append(self.result[bowlingteam]["inningstally"]["inningsdeclared"])
             self.inningsresult["Score"].append(
                 sum(self.result[bowlingteam]["inningstally"]["inningsruns"]))
             self.inningsresult["Outs"].append(sum(self.result[bowlingteam]["inningstally"]["inningsouts"]))
@@ -1667,7 +1670,7 @@ class search:
                         if superover and "super_over" not in eachinnings:
                             continue
                         
-                        # PROBLEM this is getting created before the first match where allplayers scoers is create.
+                        # PROBLEM this is getting created before the first match where allplayers scores is create.
                         # Setup running tally of innings scores
                         search.setupinningscores(self)
 
@@ -1745,11 +1748,15 @@ class search:
                                     # Team Batting stats
                                     if eachinnings["team"] in self.result:
                                         search.teambattingstats(self, eachball, eachinnings["team"], nthball, eachover, battingorder)
+                                        if "declared" in eachinnings:
+                                            self.result[eachinnings["team"]]["inningstally"]["inningsdeclared"] = True
 
                                     # Team Bowling stats
                                     for eachteam in match["info"]["teams"]:
                                         if eachteam in self.result and eachteam not in eachinnings["team"]:
                                             search.teambowlingstats(self, eachball, eachteam, nthball, eachover, battingorder)
+                                            if "declared" in eachinnings:
+                                                self.result[eachteam]["inningstally"]["inningsdeclared"] = True
 
                                 # search.ballstats(self, matchtimetuple, match["info"], nthinnings, eachinnings, eachball, nthball, eachover, battingorder, bowlingorder)
 

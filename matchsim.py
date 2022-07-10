@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. 
 """
 
+from contextlib import redirect_stderr
 import os
 import sys
 import pandas as pd
@@ -38,6 +39,16 @@ from cricketstats import cricketstats
 # TODO Test simulation: just do a while loop. get declared innings by eachinnings["declared"]. rewrite cricketstats to include this in teaminnings stats. then get p-value of declaration based on number of overs and innings score.
 # TODO add wide/noball and byes/legbyes p-values for extras with while loop. This requires rewriting crickets stats to include extras type
 
+# TODO Make this simulation of innings record that then have winning losing. YES
+# In mean time i can include overs bowled, runs/wicket and run rate for each innings
+        # self.inningsresult = {
+        # "Date":[], "Match Type":[],"Venue":[], "Event":[], "Batting Team":[], "Bowling Team":[], "Innings":[], 
+        # "Defended Score": [], "Chased Score": [], "Margin":[], "Declared":[],
+        # "Score": [], "Outs": [], "Overs": [], "Extras": [],
+        # "Runs/Wicket":[], "Runs/Ball":[], "Run Rate":[], "First Boundary Ball":[],
+        # "Avg Consecutive Dot Balls":[]
+        # }
+
 class matchsim:
     def __init__(self,simteams=None) -> None:
         self.simteams = simteams
@@ -45,10 +56,11 @@ class matchsim:
         self.simteamstats = None
         self.inningsscore = 0
         self.inningswickets = 0
+        self.inningsovers = 0
 
     def matchresultssetup(self, statsmatchtype):
-        limitedovers = {"Innings 1 Team":[], "Innings 1 Wickets":[],"Innings 1 Score":[], "Innings 2 Team":[],"Innings 2 Wickets":[], "Innings 2 Score":[],"Winner":[]}
-        testmatch={"Innings 1 Team":[],"Innings 1 Wickets":[], "Innings 1 Score":[],"Innings 2 Team":[],"Innings 2 Wickets":[], "Innings 2 Score":[],"Innings 3 Team":[],"Innings 3 Wickets":[], "Innings 3 Score":[],"Innings 4 Team":[], "Innings 4 Wickets":[],"Innings 4 Score":[],"Winner":[]}
+        limitedovers = {"Innings 1 Team":[], "Innings 1 Wickets":[],"Innings 1 Score":[], "Innings 1 Overs":[], "Innings 2 Team":[],"Innings 2 Wickets":[], "Innings 2 Score":[], "Innings 2 Overs":[],"Winner":[]}
+        testmatch={"Innings 1 Team":[],"Innings 1 Wickets":[], "Innings 1 Score":[], "Innings 1 Overs":[],"Innings 2 Team":[],"Innings 2 Wickets":[], "Innings 2 Score":[],"Innings 2 Overs":[],"Innings 3 Team":[],"Innings 3 Wickets":[], "Innings 3 Score":[],"Innings 3 Overs":[],"Innings 4 Team":[], "Innings 4 Wickets":[],"Innings 4 Score":[],"Innings 4 Overs":[],"Winner":[]}
         matchtypes={"T20": limitedovers, "ODI": limitedovers,"ODM": limitedovers,"Test": testmatch}
         self.results = matchtypes[statsmatchtype] 
 
@@ -78,8 +90,7 @@ class matchsim:
 
         # innings generator
         for thisinnings in inningsorder:  
-            self.inningsscore = 0
-            self.inningswickets = 0
+            matchsim.resetinningstally(self)
             bowlingteam = None
             nthinnings = inningsorder.index(thisinnings)
 
@@ -97,9 +108,7 @@ class matchsim:
 
             # over generator
             for thisover in range(overs):
-                if self.inningswickets == 10:
-                    break
-                if nthinnings == 1 and self.inningsscore > self.results["Innings 1 Score"][-1]:
+                if self.inningswickets == 10 or (nthinnings == 1 and self.inningsscore > self.results["Innings 1 Score"][-1]):
                     break
 
                 # To use current outs, add following condition: &(self.simteamstats.ballresult["Current Outs"]==inningswickets)
@@ -118,28 +127,23 @@ class matchsim:
 
                 # Fix if p-values don't have all possibilites
                 if len(scoreP)<7:
-                    # print(f"Before Modification: {scoreP}")
-                    lowestP = min(scoreP)
-                    scoreP=scoreP.apply(lambda x: x/(1+lowestP))
-                    newPs= (1-sum(scoreP))/(7-len(scoreP))
-                    # print(scoreP)
-                    scoreP=scoreP.reindex([(0,),(1,),(2,),(3,),(4,),(5,),(6,)])
-                    # print(scoreP)
-                    for eachvalue in scoreP.index:
-                        if pd.isna(scoreP[eachvalue]):
-                            scoreP[eachvalue]=newPs
-                    # print(scoreP)
-                    # print(f"ScoreP Sum: {sum(scoreP)}")
+                    scoreP = matchsim.redistributepvalues(self,scoreP)
 
                 # print(wicketfallP)
                 if len(wicketfallP)<2 or sum(wicketfallP)!=1:
                     wicketfallP=inningswicketfallP
 
-                matchsim.over(self,rng,wicketfallP,scoreP, extrasP,nthinnings,statsmatchtype)
-                
+                matchsim.over(self,rng,wicketfallP,scoreP, extrasP,nthinnings,statsmatchtype,thisover)
+                if self.inningswickets == 10 or (nthinnings == 1 and self.inningsscore > self.results["Innings 1 Score"][-1]):
+                    break
+
+            if self.inningsovers==0:
+                self.inningsovers=overs
+                print(self.inningsovers)
             self.results[f"Innings {nthinnings+1} Team"].append(thisinnings)
-            self.results[f"Innings {nthinnings+1} Score"].append(self.inningsscore)
             self.results[f"Innings {nthinnings+1} Wickets"].append(self.inningswickets)
+            self.results[f"Innings {nthinnings+1} Score"].append(self.inningsscore)
+            self.results[f"Innings {nthinnings+1} Overs"].append(self.inningsovers)
 
     def testmatch(self,rng,statsmatchtype,inningsorder, rain):
         
@@ -159,8 +163,7 @@ class matchsim:
             if matchover >= 450:
                 break
             inningsnumber+=1
-            self.inningsscore = 0
-            self.inningswickets = 0
+            matchsim.resetinningstally(self)
             bowlingteam = None
             nthinnings = inningsnumber-1
 
@@ -178,9 +181,7 @@ class matchsim:
             thisover=0
             # over generator
             while self.inningswickets<10 and matchover<450:
-                if nthinnings == 3 and self.inningsscore > (self.results["Innings 1 Score"][-1]+self.results["Innings 3 Score"][-1]-self.results["Innings 2 Score"][-1]):
-                    break
-                if nthinnings==2 and (((self.inningsscore+self.results["Innings 1 Score"][-1]-self.results["Innings 2 Score"][-1])/(450-matchover))>4):
+                if (nthinnings == 3 and self.inningsscore > (self.results["Innings 1 Score"][-1]+self.results["Innings 3 Score"][-1]-self.results["Innings 2 Score"][-1])) or (nthinnings==2 and (((self.inningsscore+self.results["Innings 1 Score"][-1]-self.results["Innings 2 Score"][-1])/(450-matchover))>4)):
                     break
 
                 # Over based p-values
@@ -203,20 +204,14 @@ class matchsim:
 
                 # Fix if p-values don't have all possibilites
                 if len(scoreP)<7:
-                    # print(f"Before Modification: {scoreP}")
-                    lowestP = min(scoreP)
-                    scoreP=scoreP.apply(lambda x: x/(1+lowestP))
-                    newPs= (1-sum(scoreP))/(7-len(scoreP))
-                    # print(scoreP)
-                    scoreP=scoreP.reindex([(0,),(1,),(2,),(3,),(4,),(5,),(6,)])
-                    # print(scoreP)
-                    for eachvalue in scoreP.index:
-                        if pd.isna(scoreP[eachvalue]):
-                            scoreP[eachvalue]=newPs
-                    # print(scoreP)
-                    # print(f"ScoreP Sum: {sum(scoreP)}")
+                    scoreP = matchsim.redistributepvalues(self,scoreP)
 
-                matchsim.over(self,rng,wicketfallP,scoreP, extrasP,nthinnings,statsmatchtype)
+                matchsim.over(self,rng,wicketfallP,scoreP, extrasP,nthinnings,statsmatchtype,thisover)
+                if self.inningswickets==10:
+                    break
+
+                if (nthinnings == 3 and self.inningsscore > (self.results["Innings 1 Score"][-1]+self.results["Innings 3 Score"][-1]-self.results["Innings 2 Score"][-1])) or (nthinnings==2 and (((self.inningsscore+self.results["Innings 1 Score"][-1]-self.results["Innings 2 Score"][-1])/(450-matchover))>4)):
+                    break
                 thisover +=1
                 matchover +=1
 
@@ -229,14 +224,16 @@ class matchsim:
             
             #print(thisover)
             self.results[f"Innings {nthinnings+1} Team"].append(thisinnings)
-            self.results[f"Innings {nthinnings+1} Score"].append(self.inningsscore)
             self.results[f"Innings {nthinnings+1} Wickets"].append(self.inningswickets)
+            self.results[f"Innings {nthinnings+1} Score"].append(self.inningsscore)
+            self.results[f"Innings {nthinnings+1} Overs"].append(self.inningsovers)
         # print(f"Overs left: {450-matchover}")
 
-    def over(self,rng,wicketfallP,scoreP, extrasP,nthinnings,statsmatchtype):
+    def over(self,rng,wicketfallP,scoreP, extrasP,nthinnings,statsmatchtype,thisover):
         # ball outcome generator
         legaldeliveries = 0
         while legaldeliveries < 6:
+
             # Over based wicket rng
             wicket = rng.choice(wicketfallP.index, p=wicketfallP.tolist(), shuffle=False)
 
@@ -244,6 +241,7 @@ class matchsim:
                 legaldeliveries += 1
                 self.inningswickets += 1
             if self.inningswickets == 10:
+                self.inningsovers=float(f"{thisover}.{legaldeliveries}")
                 break
             
             # Over based scoring rng
@@ -253,10 +251,31 @@ class matchsim:
                 extras = rng.choice(extrasP.index, p=extrasP.tolist(), shuffle=False)
                 self.inningsscore += (batterscore[0]+extras[0])
 
-            if (statsmatchtype == "T20" or statsmatchtype == "ODI" or statsmatchtype == "ODM") and (nthinnings == 1 and self.inningsscore > self.results["Innings 1 Score"][-1]):
+            # Check if score has been chased
+            if ((statsmatchtype == "T20" or statsmatchtype == "ODI" or statsmatchtype == "ODM") and (nthinnings == 1 and self.inningsscore > self.results["Innings 1 Score"][-1])) or (statsmatchtype == "Test" and (self.inningswickets==10 or (nthinnings == 3 and self.inningsscore > (self.results["Innings 1 Score"][-1]+self.results["Innings 3 Score"][-1]-self.results["Innings 2 Score"][-1])))):
+                self.inningsovers=float(f"{thisover}.{legaldeliveries}")
                 break
-            if statsmatchtype == "Test" and (self.inningswickets==10 or (nthinnings == 3 and self.inningsscore > (self.results["Innings 1 Score"][-1]+self.results["Innings 3 Score"][-1]-self.results["Innings 2 Score"][-1]))):
-                break
+
+    def redistributepvalues(self,scoreP):
+        # print(f"Before Modification: {scoreP}")
+        lowestP = min(scoreP)
+        scoreP=scoreP.apply(lambda x: x/(1+lowestP))
+        newPs= (1-sum(scoreP))/(7-len(scoreP))
+        # print(scoreP)
+        scoreP=scoreP.reindex([(0,),(1,),(2,),(3,),(4,),(5,),(6,)])
+        # print(scoreP)
+        for eachvalue in scoreP.index:
+            if pd.isna(scoreP[eachvalue]):
+                scoreP[eachvalue]=newPs
+        # print(scoreP)
+        # print(f"ScoreP Sum: {sum(scoreP)}")
+        return scoreP
+
+    def resetinningstally(self):
+        self.inningsscore = 0
+        self.inningswickets = 0
+        self.inningsovers = 0
+
 
 
     def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False):
@@ -298,3 +317,6 @@ class matchsim:
         # print(self.results)
 
         self.results=pd.DataFrame(self.results)
+
+
+        

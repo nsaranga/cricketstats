@@ -139,7 +139,6 @@ class matchsim:
 
             if self.inningsovers==0:
                 self.inningsovers=overs
-                print(self.inningsovers)
             self.results[f"Innings {nthinnings+1} Team"].append(thisinnings)
             self.results[f"Innings {nthinnings+1} Wickets"].append(self.inningswickets)
             self.results[f"Innings {nthinnings+1} Score"].append(self.inningsscore)
@@ -160,27 +159,27 @@ class matchsim:
         inningsnumber=0
         # innings generator
         for thisinnings in inningsorder:
-            if matchover >= 450:
-                break
+            # if matchover >= 450:
+            #     break
             inningsnumber+=1
             matchsim.resetinningstally(self)
             bowlingteam = None
             nthinnings = inningsnumber-1
 
-            for eachteam in inningsorder:
-                if eachteam!=thisinnings:
-                    bowlingteam = eachteam
+            if matchover<450:
+                for eachteam in inningsorder:
+                    if eachteam!=thisinnings:
+                        bowlingteam = eachteam
+                # Innings based fallback probabilites
+                inningswicketfallP = self.simteamstats.ballresult[['Out/NotOut']].loc[(self.simteamstats.ballresult["Batting Team"]==thisinnings)&(self.simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False).add(self.simteamstats.ballresult[["Out/NotOut"]].loc[(self.simteamstats.ballresult["Bowling Team"]==bowlingteam)&(self.simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
 
-            # Innings based fallback probabilites
-            inningswicketfallP = self.simteamstats.ballresult[['Out/NotOut']].loc[(self.simteamstats.ballresult["Batting Team"]==thisinnings)&(self.simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False).add(self.simteamstats.ballresult[["Out/NotOut"]].loc[(self.simteamstats.ballresult["Bowling Team"]==bowlingteam)&(self.simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
+                inningsscorefallP= self.simteamstats.ballresult[["Batter Score"]].loc[(self.simteamstats.ballresult["Batting Team"]==thisinnings)&(self.simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False).add(self.simteamstats.ballresult[["Batter Score"]].loc[(self.simteamstats.ballresult["Bowling Team"]==bowlingteam)&(self.simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
 
-            inningsscorefallP= self.simteamstats.ballresult[["Batter Score"]].loc[(self.simteamstats.ballresult["Batting Team"]==thisinnings)&(self.simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False).add(self.simteamstats.ballresult[["Batter Score"]].loc[(self.simteamstats.ballresult["Bowling Team"]==bowlingteam)&(self.simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
-
-            inningsextrasfallP=self.simteamstats.ballresult[["Extras"]].loc[(self.simteamstats.ballresult["Bowling Team"]==bowlingteam)&(self.simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)
+                inningsextrasfallP=self.simteamstats.ballresult[["Extras"]].loc[(self.simteamstats.ballresult["Bowling Team"]==bowlingteam)&(self.simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)
 
             thisover=0
             # over generator
-            while self.inningswickets<10 and matchover<450:
+            while matchover<450:
                 if (nthinnings == 3 and self.inningsscore > (self.results["Innings 1 Score"][-1]+self.results["Innings 3 Score"][-1]-self.results["Innings 2 Score"][-1])) or (nthinnings==2 and (((self.inningsscore+self.results["Innings 1 Score"][-1]-self.results["Innings 2 Score"][-1])/(450-matchover))>4)):
                     break
 
@@ -207,26 +206,27 @@ class matchsim:
                     scoreP = matchsim.redistributepvalues(self,scoreP)
 
                 matchsim.over(self,rng,wicketfallP,scoreP, extrasP,nthinnings,statsmatchtype,thisover)
-                if self.inningswickets==10:
+                if self.inningswickets==10 or (nthinnings == 3 and self.inningsscore > (self.results["Innings 1 Score"][-1]+self.results["Innings 3 Score"][-1]-self.results["Innings 2 Score"][-1])) or (nthinnings==2 and (((self.inningsscore+self.results["Innings 1 Score"][-1]-self.results["Innings 2 Score"][-1])/(450-matchover))>4)):
                     break
 
-                if (nthinnings == 3 and self.inningsscore > (self.results["Innings 1 Score"][-1]+self.results["Innings 3 Score"][-1]-self.results["Innings 2 Score"][-1])) or (nthinnings==2 and (((self.inningsscore+self.results["Innings 1 Score"][-1]-self.results["Innings 2 Score"][-1])/(450-matchover))>4)):
-                    break
                 thisover +=1
                 matchover +=1
 
                 # rain rng
-                if rain:
-                    if rainaffected=="rain":
-                        rainaffected="no_rain"
-                        overslost = rng.integers(low=15, high=60)
-                        matchover+=overslost
+                if rainaffected=="rain":
+                    rain=False
+                    rainaffected="no_rain"
+                    overslost = rng.integers(low=15, high=60)
+                    matchover+=overslost
             
             #print(thisover)
+            if self.inningsovers==0:
+                self.inningsovers= thisover
             self.results[f"Innings {nthinnings+1} Team"].append(thisinnings)
             self.results[f"Innings {nthinnings+1} Wickets"].append(self.inningswickets)
             self.results[f"Innings {nthinnings+1} Score"].append(self.inningsscore)
             self.results[f"Innings {nthinnings+1} Overs"].append(self.inningsovers)
+            
         # print(f"Overs left: {450-matchover}")
 
     def over(self,rng,wicketfallP,scoreP, extrasP,nthinnings,statsmatchtype,thisover):
@@ -305,14 +305,17 @@ class matchsim:
                     self.results["Winner"].append("Tie")
 
             if statsmatchtype == "Test":
+                # print(self.results)
+                if (self.results["Innings 1 Score"][-1]+self.results["Innings 3 Score"][-1])>(self.results["Innings 2 Score"][-1]+self.results["Innings 4 Score"][-1]) and (self.results["Innings 4 Wickets"][-1]<10):
+                    self.results["Winner"].append("Draw")
+
                 if (self.results["Innings 1 Score"][-1]+self.results["Innings 3 Score"][-1])>(self.results["Innings 2 Score"][-1]+self.results["Innings 4 Score"][-1]) and (self.results["Innings 4 Wickets"][-1]==10):
                     self.results["Winner"].append(self.results["Innings 1 Team"][-1])
                 if (self.results["Innings 1 Score"][-1]+self.results["Innings 3 Score"][-1])<(self.results["Innings 2 Score"][-1]+self.results["Innings 4 Score"][-1]):
                     self.results["Winner"].append(self.results["Innings 2 Team"][-1])
                 if (self.results["Innings 1 Score"][-1]+self.results["Innings 3 Score"][-1])==(self.results["Innings 2 Score"][-1]+self.results["Innings 4 Score"][-1]):
                     self.results["Winner"].append("Tie")
-                if (self.results["Innings 1 Score"][-1]+self.results["Innings 3 Score"][-1])>(self.results["Innings 2 Score"][-1]+self.results["Innings 4 Score"][-1]) and (self.results["Innings 4 Wickets"][-1]<10):
-                    self.results["Winner"].append("Draw")
+                
 
         # print(self.results)
 

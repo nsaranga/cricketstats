@@ -129,9 +129,9 @@ class matchsim:
         self.inningswickets = 0
         self.inningsovers = 0
 
-    def mcsimulations(self,rng, statsmatchtype,simulations,inningsorder,rain):
+    def mcsimulations(self, statsmatchtype,simulations,inningsorder,rain):
         # setup random generator object
-        #crng = np.random.default_rng()
+        rng = np.random.default_rng()
         # Set function dictionary
         matchtypes={"T20": ld.limitedovers, "ODI": ld.limitedovers,"ODM": ld.limitedovers,"Test": tm.testmatch}
         classtypes={"T20": ld, "ODI": ld,"ODM": ld,"Test": tm}
@@ -150,24 +150,21 @@ class matchsim:
 
         return sim.results
             
-    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,processors=0,inningsorder=None,rain=False):
+    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False):
         # Setup match results
         matchsim.simresultssetup(self,statsmatchtype)
 
         # Search for pvalues
         matchsim.pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype)
 
-        # setup random generator object
-        rng = np.random.default_rng()
 
-        
         cores = os.cpu_count()
-        procpool=mp.Pool(cores-processors)
+        procpool=mp.Pool(cores)
 
-        simulations=int(simulations/(cores-processors))
+        simulations=int(simulations/cores)
         inputs=[]
-        for x in range(cores-processors):
-            inputs.append((self,rng, statsmatchtype,simulations,inningsorder,rain))
+        for x in range(cores):
+            inputs.append((self,statsmatchtype,simulations,inningsorder,rain))
         simprocs = procpool.starmap(matchsim.mcsimulations,inputs)
 
         # for eachlist in self.simresults:

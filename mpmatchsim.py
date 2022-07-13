@@ -130,6 +130,7 @@ class matchsim:
         self.inningsovers = 0
 
     def mcsimulations(self, statsmatchtype,simulations,inningsorder,rain):
+        print("Sims started")
         # setup random generator object
         rng = np.random.default_rng()
         # Set function dictionary
@@ -162,7 +163,9 @@ class matchsim:
         procpool=mp.Pool(cores)
 
         simulations=int(simulations/cores)
+        inputs=None
         inputs=[]
+        print(f"Sims/cpu: {simulations}")
         for x in range(cores):
             inputs.append((self,statsmatchtype,simulations,inningsorder,rain))
         simprocs = procpool.starmap(matchsim.mcsimulations,inputs)
@@ -173,6 +176,7 @@ class matchsim:
         for eachdict in simprocs:
             for eachlist in eachdict:
                 self.simresults[eachlist].extend(eachdict[eachlist])
+        print("Sims finished")
 
         
 

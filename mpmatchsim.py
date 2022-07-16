@@ -180,7 +180,7 @@ class matchsim:
 
 
 
-class ld:
+class ld(matchsim):
     def __init__(self) -> None:
         self.inningsscore = 0
         self.inningswickets = 0

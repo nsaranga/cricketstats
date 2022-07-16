@@ -21,6 +21,7 @@ import sys
 import pandas as pd
 import numpy as np
 import multiprocessing as mp
+import time
 
 module_path = os.path.abspath(os.path.join("./cricketstats/"))
 if module_path not in sys.path:
@@ -30,15 +31,12 @@ from cricketstats import cricketstats
 
 # Monte Carlo simulation of each ball in match
 
-# TODO mutliprocessing to speed up simulations. I need to move inningsscore etc out of global and into local to have separate acces USE DATACLASS
 # TODO work out how to combine probabilities for OUt/not out, when one team has empty probs.
-# TODO simulate toss and chossing based on previous toss win decisions. This requires rewriting 
+# TODO add option to simulate toss 60/40 in favour of batting first.
 # TODO Innings simulator, that can simulate innings from any given point.
 # TODO Indexing to venue/country?
-# TODO Get p-values for toss choice.
 # TODO Add player statistics into teams?
 # TODO Add superover tiebreaker
-# TODO Test simulation: just do a while loop. get declared innings by eachinnings["declared"]. rewrite cricketstats to include this in teaminnings stats. then get p-value of declaration based on number of overs and innings score.
 # TODO add wide/noball and byes/legbyes p-values for extras with while loop. This requires rewriting crickets stats to include extras type
 
 # TODO Make this simulation of innings record that then have winning losing. YES
@@ -167,8 +165,11 @@ class matchsim:
         print(f"Sims/cpu: {simulations}")
         for x in range(cores):
             inputs.append((self,statsmatchtype,simulations,inningsorder,rain))
+
+        #start = time.time()
         simprocs = procpool.starmap(matchsim.mcsimulations,inputs)
         procpool.close()
+        #print(f'Time after mcsimulations(): {time.time() - start}')
 
         for eachdict in simprocs:
             for eachlist in eachdict:

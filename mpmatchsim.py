@@ -160,7 +160,7 @@ class matchsim:
         self.inningsovers = 0
 
     def mcsimulations(self, statsmatchtype,simulations,inningsorder,rain,matchscore):
-        print("Sims started")
+        # print("Sims started")
         # setup random generator object
         rng = np.random.default_rng()
         # Set function dictionary

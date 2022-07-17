@@ -76,6 +76,7 @@ playerteams=[] # Search matches where players have played in certain teams. Opti
 teammates=[] # Search matches where certain teammates play. For this to work playerteams must be populated.
 oppositionteams=[] # Search matches where opposition is only certain teams. Options: team names eg. oppositionteams=["India", "England"]
 venue=[] # Search matches played only at these venues Options: Cricket Grounds eg. venue=["Sydney Cricket Ground", "Melbourne Cricket Ground", ""Brisbane Cricket Ground, Woolloongabba""]
+teamtype=[] # Search only for particualr type of teams. eg. "international", "club".
 event=[] # Search matches played as part of these Leagues or Tournaments Options: Name of League or Tournament eg. event=["Sheffield Shield", "ICC World Cup", "Big Bash League"] 
 matchresult=None # Search matches where players or teams have these results. When looking at players, this option **must** be used with at one team in playersteams variable. Options either "won" or "loss" or "draw" or "tie" eg. matchresult="won"
 sumstats=False # When switched to True, it adds an "all players" or "all teams" row at end of result that sums all players or teams stats that are searched for.

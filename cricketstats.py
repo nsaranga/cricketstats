@@ -27,7 +27,7 @@ import math
 
 import statsprocessor
 
-
+# TODO easy filter for international teams.
 # TODO make option to sum players/teams stats better. Insert "all players earlier in result"?
 # TODO fix period updating of player index?
 # TODO fix the way innings outs are counted. eg. make it more efficient, there's currently 3 lists for it...
@@ -1486,7 +1486,7 @@ class search:
 
     # This is the main function to be applied to search object.
     # I should make picking oppositon bowlers strongs in a list. yes and then just assign json object tfrom that list.
-    def stats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playersteams=None, teammates=None, oppositionbatters=None, oppositionbowlers = None, oppositionteams=None, venue=None, event=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None, fielders=None, sumstats=False,battingmatchups=None,bowlingmatchups=None):
+    def stats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playersteams=None, teammates=None, oppositionbatters=None, oppositionbowlers = None, oppositionteams=None, venue=None, event=None, teamtype=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None, fielders=None, sumstats=False,battingmatchups=None,bowlingmatchups=None):
         if betweenovers == None:
             betweenovers = []
         if innings == None:
@@ -1532,6 +1532,8 @@ class search:
             venue = []
         if event ==None:
             event =[]
+        if teamtype ==None:
+            teamtype =[]
         if matchresult == None:
             matchresult = None
         if superover == None:
@@ -1623,6 +1625,10 @@ class search:
                         continue
                     # Venue Check
                     if venue and match["info"]["venue"] not in venue:
+                        continue
+
+                    # Team type check
+                    if teamtype and ("team_type" not in match["info"] or match["info"]["team_type"] not in teamtype):
                         continue
 
                     # Team mate check

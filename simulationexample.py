@@ -23,7 +23,7 @@ import pandas as pd
 import cricketstats
 import mpmatchsim
 
-# This is an example script of how you can use cricketstats
+# This is an example script of how you can use the match simulator in cricketstats
 # If you want to import cricketstats into your own python file or jupyter notebook that sits outside, use the lines below instead of "import cricketstats". Replace "./cricketstats/" with the path of repo in your system.
 """
 import os
@@ -32,7 +32,7 @@ module_path = os.path.abspath(os.path.join("./cricketstats/"))
 if module_path not in sys.path:
     sys.path.append(module_path)
 from cricketstats import cricketstats
-from cricketstats import matchsim
+from cricketstats import mpmatchsim
 """
 
 

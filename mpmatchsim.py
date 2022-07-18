@@ -253,8 +253,7 @@ class ld(matchsim):
             inningsorder = rng.choice(simteams, p=[0.5,0.5],size=2, replace=False, shuffle=False).tolist()
 
         # innings generator
-        for thisinnings in inningsorder:
-            nthinnings = inningsorder.index(thisinnings)
+        for nthinnings, thisinnings in enumerate(inningsorder):
 
             if matchscore and (len(matchscore)==2 and thisinnings == matchscore["Innings 1"][0]):
                 continue

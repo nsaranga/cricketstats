@@ -56,7 +56,7 @@ simulations=10 # Number of matches to simulate. Make sure this is divisble by th
 inningsorder = None # This sets the order in which teams bat. Eg. ["Sri Lanka", "Australia","Sri Lanka", "Australia"] for a test match # This overrides the toss rng and sets a specific innings order.
 rain=False # This sets whether there might be rain affected matches in the simulated games. This is set at constant 90/10% in favour of no rain.
 
-matchscore = None # This sets a score or match situation from which a matches will simulated eg. matchscore = {"Innings 1":["Sri Lanka",10, 300, 90],"Innings 2":["Australia"",10, 300, 90],"Innings 3":["Sri Lanka",10, 300, 90],"Innings 4":["Australia"",0, 1, 1]}. when using this argument,s inningsorder must be given to ensure the correct inningsorder is preserved
+matchscore = None # This sets a score or match situation from which a matches will simulated eg. matchscore = {"Innings 1":["Sri Lanka",10, 300, 90],"Innings 2":["Australia"",10, 300, 90],"Innings 3":["Sri Lanka",10, 300, 90],"Innings 4":["Australia"",0, 1, 1]}. when using this argument, inningsorder must be given to ensure the correct inningsorder is preserved
 
 # Apply sim() method on the simulation object.
 sim.sim(statsdatabase=statsdatabase, statsfrom_date=statsfrom_date,statsto_date=statsto_date, statssex=statssex,statsmatchtype=statsmatchtype,simulations=simulations, inningsorder=inningsorder, rain=rain)

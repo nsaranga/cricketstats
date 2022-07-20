@@ -1811,13 +1811,13 @@ class search:
         # print(self.ballresult)
 
         if self.players or self.allplayers==True:
-            self.ballresult = pd.DataFrame(self.playersballresult)
+            self.ballresult = pd.DataFrame(self.playersballresult, dtype=object)
 
         if self.teams or self.allteams==True:
-            self.ballresult = pd.DataFrame(self.teamsballresult)
+            self.ballresult = pd.DataFrame(self.teamsballresult, dtype=object)
 
         # print(f'Time after self.ballresult creation: {time.time() - start}')
-        self.inningsresult = pd.DataFrame(self.inningsresult)
+        self.inningsresult = pd.DataFrame(self.inningsresult, dtype=object)
 
         # This is commented out because it auto-includes time which doesn't look good for plotting.
         # self.ballresult["Date"] = pd.to_datetime(self.ballresult["Date"])

@@ -18,13 +18,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
 import sys
-from tkinter import E
+# from tkinter import E
 import pandas as pd
 import numpy as np
 import multiprocessing as mp
 import time
 
-import traceback
+# import traceback
 
 module_path = os.path.abspath(os.path.join("./cricketstats/"))
 if module_path not in sys.path:
@@ -171,16 +171,16 @@ class matchsim:
 
         sim.resultssetup()
         for thismatch in range(simulations):
-            try:
-                sim.matchresultssetup()
-                # Function to simulate a match
-                if statsmatchtype=="T20" or statsmatchtype=="ODI" or statsmatchtype=="ODM":
-                    sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore)
+            # try:
+            sim.matchresultssetup()
+            # Function to simulate a match
+            if statsmatchtype=="T20" or statsmatchtype=="ODI" or statsmatchtype=="ODM":
+                sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore)
 
-                if statsmatchtype=="Test":
-                    sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore)
-            except:
-                raise Exception("".join(traceback.format_exception(*sys.exc_info())))
+            if statsmatchtype=="Test":
+                sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore)
+            # except:
+            #     raise Exception("".join(traceback.format_exception(*sys.exc_info())))
         return sim.results
             
     def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False,matchscore=None):

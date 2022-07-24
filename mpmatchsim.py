@@ -98,8 +98,9 @@ class matchsim:
 
         scoreCOutsP = simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Batting Team"]==thisinnings)&(simteamstats.ballresult["Current Outs"]==self.inningswickets)].value_counts(normalize=True,sort=False).add(simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Bowling Team"]==bowlingteam)&(simteamstats.ballresult["Current Outs"]==self.inningswickets)].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
 
-        # scoreP = scoreOutsP
-        scoreP = scoreOversP.add(scoreCOutsP, fill_value=0).divide(2)
+        #scoreP = scoreCOutsP
+        scoreP = scoreOversP
+        #scoreP = scoreOversP.add(scoreCOutsP, fill_value=0).divide(2)
 
         # Extras Score p-values
         extrasP = simteamstats.ballresult[["Extras"]].loc[(simteamstats.ballresult["Bowling Team"]==bowlingteam)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)
@@ -107,8 +108,13 @@ class matchsim:
         return scoreP, extrasP
 
     def overswicketsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover):
-        wicketfallP= simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batting Team"]==thisinnings)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False).add(simteamstats.ballresult[["Out/NotOut"]].loc[(simteamstats.ballresult["Bowling Team"]==bowlingteam)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
+        wicketfallOversP= simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batting Team"]==thisinnings)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False).add(simteamstats.ballresult[["Out/NotOut"]].loc[(simteamstats.ballresult["Bowling Team"]==bowlingteam)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
 
+        wicketfallCOutsP = simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batting Team"]==thisinnings)&(simteamstats.ballresult["Current Outs"]==self.inningswickets)].value_counts(normalize=True,sort=False).add(simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Bowling Team"]==bowlingteam)&(simteamstats.ballresult["Current Outs"]==self.inningswickets)].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
+
+        wicketfallP = wicketfallOversP.add(wicketfallCOutsP, fill_value=0).divide(2)
+        # wicketfallP =wicketfallOversP
+        #wicketfallP =wicketfallCOutsP
         return wicketfallP
 
     def over(self,rng,wicketfallP,scoreP, extrasP,nthinnings,statsmatchtype,thisover):

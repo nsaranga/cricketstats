@@ -91,10 +91,22 @@ class matchsim:
 
         return inningswicketfallP,inningsscorefallP,inningsextrasfallP
 
-    def oversrunsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover):
+    def oversrunsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover,hometeam):
         # scoreP = simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Batting Team"]==thisinnings)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False).add(simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Bowling Team"]==bowlingteam)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
 
-        scoreOversP = simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Batting Team"]==thisinnings)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False).add(simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Bowling Team"]==bowlingteam)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
+        if hometeam==thisinnings:
+            batadv=0.55
+            bowladv=1-batadv
+        if hometeam==bowlingteam:
+            bowladv=0.55
+            batadv=1-bowladv
+        if hometeam==None:
+            batadv=0.5
+            bowladv=0.5
+
+        scoreOversP = (simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Batting Team"]==thisinnings)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)*batadv).add((simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Bowling Team"]==bowlingteam)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)*bowladv),fill_value=0)    
+
+        #scoreOversP = simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Batting Team"]==thisinnings)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False).add(simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Bowling Team"]==bowlingteam)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
 
         scoreCOutsP = simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Batting Team"]==thisinnings)&(simteamstats.ballresult["Current Outs"]==self.inningswickets)].value_counts(normalize=True,sort=False).add(simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Bowling Team"]==bowlingteam)&(simteamstats.ballresult["Current Outs"]==self.inningswickets)].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
 
@@ -107,8 +119,20 @@ class matchsim:
 
         return scoreP, extrasP
 
-    def overswicketsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover):
-        wicketfallOversP= simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batting Team"]==thisinnings)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False).add(simteamstats.ballresult[["Out/NotOut"]].loc[(simteamstats.ballresult["Bowling Team"]==bowlingteam)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
+    def overswicketsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover,hometeam):
+        if hometeam==thisinnings:
+            batadv=0.925
+            bowladv=1-batadv
+        if hometeam==bowlingteam:
+            bowladv=0.925
+            batadv=1-bowladv
+        if hometeam==None:
+            batadv=0.5
+            bowladv=0.5
+
+        wicketfallOversP= (simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batting Team"]==thisinnings)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)*batadv).add((simteamstats.ballresult[["Out/NotOut"]].loc[(simteamstats.ballresult["Bowling Team"]==bowlingteam)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)*bowladv),fill_value=0)
+        
+        #wicketfallOversP= simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batting Team"]==thisinnings)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False).add(simteamstats.ballresult[["Out/NotOut"]].loc[(simteamstats.ballresult["Bowling Team"]==bowlingteam)&(simteamstats.ballresult["Ball"]>(thisover))&(simteamstats.ballresult["Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
 
         wicketfallCOutsP = simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batting Team"]==thisinnings)&(simteamstats.ballresult["Current Outs"]==self.inningswickets)].value_counts(normalize=True,sort=False).add(simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Bowling Team"]==bowlingteam)&(simteamstats.ballresult["Current Outs"]==self.inningswickets)].value_counts(normalize=True,sort=False),fill_value=0).divide(2)
 
@@ -165,7 +189,7 @@ class matchsim:
         self.inningswickets = 0
         self.inningsovers = 0
 
-    def mcsimulations(self, statsmatchtype,simulations,inningsorder,rain,matchscore):
+    def mcsimulations(self, statsmatchtype,simulations,inningsorder,rain,matchscore,hometeam):
         # print("Sims started")
         # setup random generator object
         rng = np.random.default_rng()
@@ -181,15 +205,15 @@ class matchsim:
             sim.matchresultssetup()
             # Function to simulate a match
             if statsmatchtype=="T20" or statsmatchtype=="ODI" or statsmatchtype=="ODM":
-                sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore)
+                sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam)
 
             if statsmatchtype=="Test":
-                sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore)
+                sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam)
             # except:
             #     raise Exception("".join(traceback.format_exception(*sys.exc_info())))
         return sim.results
             
-    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False,matchscore=None):
+    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False,matchscore=None,hometeam=None):
         # Setup match results
         matchsim.simresultssetup(self,statsmatchtype)
 
@@ -203,7 +227,7 @@ class matchsim:
         inputs=[]
         print(f"Sims/cpu: {simulations}")
         for x in range(cores):
-            inputs.append((self,statsmatchtype,simulations,inningsorder,rain,matchscore))
+            inputs.append((self,statsmatchtype,simulations,inningsorder,rain,matchscore,hometeam))
 
         #start = time.time()
         simprocs = procpool.starmap(matchsim.mcsimulations,inputs)
@@ -248,7 +272,7 @@ class ld(matchsim):
             self.inningsovers = matchscore["Innings 2"][3]
 
 
-    def limitedovers(self,rng,statsmatchtype,inningsorder,rain,simteams,simteamstats,matchscore):
+    def limitedovers(self,rng,statsmatchtype,inningsorder,rain,simteams,simteamstats,matchscore,hometeam):
 
         if matchscore:
             ld.midinningssetup(self,matchscore)
@@ -288,10 +312,10 @@ class ld(matchsim):
 
                 # Over based p-values
                 # Batter Score p-values
-                scoreP, extrasP = ld.oversrunsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover)
+                scoreP, extrasP = ld.oversrunsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover,hometeam)
 
                 # Over based wicket p-values
-                wicketfallP = ld.overswicketsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover)
+                wicketfallP = ld.overswicketsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover,hometeam)
 
                 if len(wicketfallP)<2 or sum(wicketfallP)!=1:
                     wicketfallP=inningswicketfallP
@@ -390,7 +414,7 @@ class tm(matchsim):
             self.inningsscore = matchscore["Innings 4"][2]
             self.inningsovers = matchscore["Innings 4"][3]
 
-    def testmatch(self,rng,statsmatchtype,inningsorder, rain,simteams,simteamstats,matchscore):
+    def testmatch(self,rng,statsmatchtype,inningsorder, rain,simteams,simteamstats,matchscore,hometeam):
 
         if matchscore:
             tm.midinningssetup(self,matchscore)
@@ -439,10 +463,10 @@ class tm(matchsim):
 
                 # Over based p-values
                 # Batter Score p-values 
-                scoreP, extrasP = tm.oversrunsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover)
+                scoreP, extrasP = tm.oversrunsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover,hometeam)
 
                 # Over based wicket p-values
-                wicketfallP = tm.overswicketsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover)
+                wicketfallP = tm.overswicketsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover,hometeam)
 
                 # print(wicketfallP)
                 if len(wicketfallP)<2 or sum(wicketfallP)!=1:

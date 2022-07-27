@@ -122,10 +122,10 @@ class matchsim:
 
     def overswicketsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover,hometeam):
         if hometeam==thisinnings:
-            batadv=0.925
+            batadv=0.55
             bowladv=1-batadv
         if hometeam==bowlingteam:
-            bowladv=0.925
+            bowladv=0.55
             batadv=1-bowladv
         if hometeam==None:
             batadv=0.5

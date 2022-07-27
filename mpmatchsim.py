@@ -34,6 +34,7 @@ from cricketstats import cricketstats
 
 # Monte Carlo simulation of each ball in match
 
+# TODO add share data manager for simsteamstats
 # TODO work out how to combine probabilities for OUt/not out, when one team has empty probs.
 # TODO add option to simulate toss 60/40 in favour of batting first.
 # TODO Innings simulator, that can simulate innings from any given point.

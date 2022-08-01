@@ -132,7 +132,7 @@ class playersim:
         while legaldeliveries < 6:
             
             wicketfallP,scoreP,extrasP = playersim.inningsfallbacks(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats)
-            # have to changes these to dicts, and "not out"
+            
             # Over based wicket rng
             wicket = rng.choice(wicketfallP[self.batters[0]].index, p=wicketfallP[self.batters[0]].tolist(), shuffle=False)
 
@@ -231,7 +231,7 @@ class playersim:
         #start = time.time()
         simprocs = procpool.starmap(playersim.mcsimulations,inputs)
         
-        procpool.close()
+        procpool.terminate()
         #print(f'Time after mcsimulations(): {time.time() - start}')
 
         for eachdict in simprocs:

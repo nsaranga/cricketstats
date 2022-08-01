@@ -92,7 +92,7 @@ class search:
         self.playersballresult = { 
         "Date":[], "Match Type":[], "Venue":[], "Event":[], "Batting Team":[], "Bowling Team":[], "Innings":[],"Innings Type":[], "Innings Ball":[], "Innings Outs":[], "Fielder":[],
         "Batter":[], "Batting Position":[], "Batter Type":[], "Non_striker": [], "Batter Score": [], "Balls Faced":[],
-        "Runs/Ball": [], "Current Score":[], "Final Score":[], "How Out": [],
+        "Runs/Ball": [], "Current Score":[], "Final Score":[], "How Out": [], "Out/NotOut":[],
 
         "Bowler": [],"Bowler Type":[], "Bowling Position":[], "Balls Bowled":[], "Wicket": [],
         "Extras": [], "Extras Type": [],
@@ -783,10 +783,10 @@ class search:
                         self.playersballresult["How Out"].append("not out")
                     if eachball!=(len(self.result[eachplayer]["inningstally"]["inningshowout"])-1) or (eachball == (len(self.result[eachplayer]["inningstally"]["inningshowout"])-1) and howout!=None):
                         self.playersballresult["How Out"].append(howout)
-                    # if howout==None:
-                    #     self.playersballresult["Out/NotOut"].append("Not Out")
-                    # if howout!=None:
-                    #     self.playersballresult["Out/NotOut"].append("Out")
+                    if howout==None:
+                        self.playersballresult["Out/NotOut"].append("Not Out")
+                    if howout!=None:
+                        self.playersballresult["Out/NotOut"].append("Out")
 
                     self.playersballresult["Runs/Ball"].append(sum(self.result[eachplayer]["inningstally"]["inningsruns"][:(eachball+1)])/(eachball+1))
                     batterfound=False
@@ -896,6 +896,10 @@ class search:
                     self.playersballresult["Final Score"].append(None)
                     self.playersballresult["How Out"].append(None)
                     self.playersballresult["Runs/Ball"].append(None)
+                    if wickettype==None:
+                        self.playersballresult["Out/NotOut"].append("Not Out")
+                    if wickettype!=None:
+                        self.playersballresult["Out/NotOut"].append("Out")
 
                     self.playersballresult["Fielder"].append(fielder)
                     self.playersballresult["Bowler"].append(eachplayer)

@@ -339,11 +339,9 @@ class ld(playersim):
                 
                 ld.over(self,rng,nthinnings,thisinnings, bowlingteam,statsmatchtype,thisover,simteams,simteamstats)
 
-                if self.inningswickets == 10 or (nthinnings == 1 and self.inningsscore > self.matchresults["Innings 1 Score"][-1]):
+                if self.inningswickets == 10 or (nthinnings == 1 and self.inningsscore > self.matchresults["Innings 1 Score"][-1]) or (self.inningswickets+1) == len(simteams[thisinnings]["battingorder"]):
                     break
                 self.inningsovers+=1
-                if (self.inningswickets+1) == len(simteams[thisinnings]["battingorder"]):
-                    break
 
             if self.inningsovers==0:
                 self.inningsovers=overs

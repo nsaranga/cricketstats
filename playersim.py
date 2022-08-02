@@ -149,20 +149,27 @@ class playersim:
             if self.inningswickets == 10:
                 self.inningsovers=float(f"{thisover}.{legaldeliveries}")
                 break
-            # if (self.inningswickets+1) == len(simteams[thisinnings]["battingorder"]):
-            #     break
+
             if wicket[0]=="Out":
                 self.batters[0]= simteams[thisinnings]["battingorder"][(self.inningswickets + 1)]
 
             # Over based scoring rng
             if wicket[0]=="Not Out":
-                legaldeliveries += 1
+
                 batterscore = rng.choice(scoreP[self.batters[0]].index, p=scoreP[self.batters[0]].tolist(), shuffle=False)
-                extras = rng.choice(extrasP.index, p=extrasP.tolist(), shuffle=False)
-                fieldingextras = rng.choice(fieldingextrasP.index, p=fieldingextrasP.tolist(), shuffle=False)
-                self.inningsscore += (batterscore[0]+extras[0]+fieldingextras[0])
-                if (batterscore[0]+fieldingextras[0])%2!=0:
-                    self.batters.reverse()
+                if batterscore[0]!=0:
+                    extras = rng.choice(extrasP.index, p=extrasP.tolist(), shuffle=False)
+                    self.inningsscore+=(batterscore[0]+extras[0])
+                    if extras[0]==0:
+                        legaldeliveries += 1
+                    if (batterscore[0])%2!=0:
+                        self.batters.reverse()
+                if batterscore[0]==0:
+                    legaldeliveries += 1
+                    fieldingextras = rng.choice(fieldingextrasP.index, p=fieldingextrasP.tolist(), shuffle=False)
+                    self.inningsscore += (fieldingextras[0])
+                    if (fieldingextras[0])%2!=0:
+                        self.batters.reverse()
 
 
             # Check if score has been chased

@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cricketstats_nsaranga"
+version = "0.0.1"
+authors = [
+  { name="Saranga Sudarshan", email="nsaranga@hotmail.com" },
+]
+description = "A cricket analytics package for cricsheet data"
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/nsaranga/cricketstats/"
+"Bug Tracker" = "https://github.com/nsaranga/cricketstats/issues"

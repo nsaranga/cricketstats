@@ -73,8 +73,9 @@ class search:
                                     
                                     "inningstally":{"batinningscount": False, "bowlinningscount": False, 
                                     "teaminningsscore":[], "teaminningsouts":[], "teaminningsballs":[], "inningsfielder":[],
-                                    "inningsruns": [], "inningsballsfaced": 0, "inningspartners":[], "inningshowout": [], "inningsbowlersfaced":[], "inningsextras": [],
-                                    "inningsrunsgiven": [], "inningsballsbowled": 0, "inningswickets": [], "inningsbattersbowledat":[],"inningswicketstype":[], "inningsextrasgiven": [],"inningsbatterrunsgiven":[], "inningsbatterextrassgiven":[]}
+                                    "inningsruns": [], "inningsballsfaced": 0, "inningspartners":[], "inningshowout": [], "inningsbowlersfaced":[], 
+                                    #"inningsextras": [],
+                                    "inningsrunsgiven": [], "inningsballsbowled": 0, "inningswickets": [], "inningsbattersbowledat":[],"inningswicketstype":[], "inningsextrasgiven": [],"inningsextrastype":[],"inningsfieldingextrastype":[], "inningsbatterrunsgiven":[], "inningsfieldingextrasgiven":[]}
                                     }
     
     # Player innings results
@@ -95,7 +96,7 @@ class search:
         "Runs/Ball": [], "Current Score":[], "Final Score":[], "How Out": [], "Out/NotOut":[],
 
         "Bowler": [],"Bowler Type":[], "Bowling Position":[], "Balls Bowled":[], "Wicket": [],
-        "Extras": [], "Fielding Extras":[], "Extras Type": [],
+        "Extras": [], "Extras Type": [], "Fielding Extras":[], "Fielding Extras Type":[],
         "Current Wickets": [], "Final Wickets":[], 
         "Runsgiven": [], "Runsgiven/Ball": [], "Current Runsgiven": [], "Final Runsgiven":[]
         }
@@ -390,7 +391,9 @@ class search:
             self.result[eachball['bowler']
                         ]["Balls Bowled"] += 1
             self.result[eachball['bowler']]["inningstally"]["inningsextrasgiven"].append(0)
-            self.result[eachball['bowler']]["inningstally"]["inningsbatterextrassgiven"].append(eachball['runs']['extras'])
+            self.result[eachball['bowler']]["inningstally"]["inningsextrastype"].append(None)
+            self.result[eachball['bowler']]["inningstally"]["inningsfieldingextrasgiven"].append(0)
+            self.result[eachball['bowler']]["inningstally"]["inningsfieldingextrastype"].append(None)
         if "extras" in eachball:
             if not ("wides" in eachball['extras'] or "noballs" in eachball['extras']):
                 self.result[eachball['bowler']
@@ -398,7 +401,20 @@ class search:
                 self.result[eachball['bowler']
                             ]["inningstally"]["inningsballsbowled"] += 1
                 self.result[eachball['bowler']]["inningstally"]["inningsextrasgiven"].append(0)
-                self.result[eachball['bowler']]["inningstally"]["inningsbatterextrassgiven"].append(eachball['runs']['extras'])
+                self.result[eachball['bowler']]["inningstally"]["inningsextrastype"].append(None)
+            
+            if not ("byes" in eachball['extras'] or "legbyes" in eachball['extras']):
+                self.result[eachball['bowler']]["inningstally"]["inningsfieldingextrasgiven"].append(0)
+                self.result[eachball['bowler']]["inningstally"]["inningsfieldingextrastype"].append(None)
+            
+            if "byes" in eachball['extras']:
+                self.result[eachball['bowler']]["inningstally"]["inningsfieldingextrasgiven"].append(eachball['extras']["byes"])
+                self.result[eachball['bowler']]["inningstally"]["inningsfieldingextrastype"].append("Byes")
+            
+            if "legbyes" in eachball['extras']:
+                self.result[eachball['bowler']]["inningstally"]["inningsfieldingextrasgiven"].append(eachball['extras']["legbyes"])
+                self.result[eachball['bowler']]["inningstally"]["inningsfieldingextrastype"].append("Leg byes")
+            
             if "wides" in eachball['extras']:
                 self.result[eachball['bowler']
                             ]["Runsgiven"] += eachball['extras']['wides']
@@ -409,6 +425,8 @@ class search:
                 self.result[eachball['bowler']]["inningstally"]["inningsrunsgiven"].append((
             eachball['runs']['batter'] + eachball['extras']['wides']))
                 self.result[eachball['bowler']]["inningstally"]["inningsextrasgiven"].append((eachball['extras']['wides']))
+                self.result[eachball['bowler']]["inningstally"]["inningsextrastype"].append("Wides")
+            
             if "noballs" in eachball['extras']:
                 self.result[eachball['bowler']
                             ]["Runsgiven"] += eachball['extras']['noballs']
@@ -419,6 +437,7 @@ class search:
                 self.result[eachball['bowler']]["inningstally"]["inningsrunsgiven"].append((
             eachball['runs']['batter'] + eachball['extras']['noballs']))
                 self.result[eachball['bowler']]["inningstally"]["inningsextrasgiven"].append((eachball['extras']['noballs']))
+                self.result[eachball['bowler']]["inningstally"]["inningsextrastype"].append("No-balls")
 
         if "wickets" in eachball:
             self.result[eachball['bowler']]["inningstally"]["teaminningsouts"].append((len(battingorder)-1))
@@ -661,48 +680,6 @@ class search:
             self.result[inningsteam]["inningstally"]["inningshowout"].append(None)
             self.result[inningsteam]["inningstally"]["inningsoutsbyball"].append((len(battingorder)-2))
             self.result[inningsteam]["inningstally"]["inningsfielder"].append(None)
-            
-
-    # Record raw ballstats.
-    def ballstats(self, matchtimetuple, matchinfo, nthinnings, eachinnings, eachball, nthball, eachover, battingorder, bowlingorder):
-        for eachteam in matchinfo["teams"]:
-            if eachteam == eachinnings["team"]:
-                battingteam = eachteam
-            if eachteam != eachinnings["team"]:
-                bowlingteam = eachteam
-
-        self.ballresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
-        self.ballresult["Match Type"].append(matchinfo["match_type"])
-        self.ballresult["Venue"].append(matchinfo["venue"])
-        self.ballresult["Batting Team"].append(battingteam)
-        self.ballresult["Bowling Team"].append(bowlingteam)
-        self.ballresult["Innings"].append(nthinnings + 1)
-        over = (eachover["over"])
-        ball = (nthball + 1)
-        self.ballresult["Ball"].append(float(f"{over}.{ball}"))
-        self.ballresult["Ball in Over"].append((nthball + 1))
-        
-        self.ballresult["Batting Position"].append(battingorder.index(eachball["batter"]) + 1)
-        self.ballresult["Batter"].append(eachball["batter"])
-        self.ballresult["Batter Score"].append(eachball["runs"]["batter"])
-        self.ballresult["Non_striker"].append(eachball["non_striker"])
-
-        self.ballresult["Bowling Position"].append(bowlingorder.index(eachball["bowler"]) + 1)
-        self.ballresult["Bowler"].append(eachball["bowler"])
-        if "wickets" in eachball:
-            self.ballresult["Wicket"].append(True)
-            # for eachwicket in eachball["wickets"]:
-            self.ballresult["How Out"].append(eachball["wickets"][0]["kind"])
-        if "wickets" not in eachball:
-            self.ballresult["Wicket"].append(False)
-            self.ballresult["How Out"].append("No Wicket")
-        if "extras" in eachball:
-            self.ballresult["Extras"].append(eachball["runs"]["extras"])
-            self.ballresult["Extras Type"].append( eachball['extras'].keys())
-        if "extras" not in eachball:
-            self.ballresult["Extras"].append(None)
-            self.ballresult["Extras Type"].append(None)
-        self.ballresult["Total Runs"].append(eachball["runs"]["total"])
 
     # Record player's innings stats
     def playerinnings(self, matchtimetuple, matchinfo, nthinnings, eachmatchtype, battingorder, bowlingorder,tempplayerindex):
@@ -821,6 +798,7 @@ class search:
                     self.playersballresult["Extras Type"].append(None)
                     self.playersballresult["Extras"].append(None)
                     self.playersballresult["Fielding Extras"].append(None)
+                    self.playersballresult["Fielding Extras Type"].append(None)
                     self.playersballresult["Final Runsgiven"].append(None)
 
             if self.result[eachplayer]["inningstally"]["bowlinningscount"] == True:
@@ -876,7 +854,19 @@ class search:
                     self.inningsresult["Bowler Type"].append(None)
 
                 # setup bowling playersballresult
-                for eachball, (eachballrun, inningsball, batter,wickettype,inningsouts,fielder,extras,batterscore,batterextras) in enumerate(zip(self.result[eachplayer]["inningstally"]["inningsrunsgiven"],self.result[eachplayer]["inningstally"]["teaminningsballs"], self.result[eachplayer]["inningstally"]["inningsbattersbowledat"], self.result[eachplayer]["inningstally"]["inningswicketstype"],self.result[eachplayer]["inningstally"]["teaminningsouts"],self.result[eachplayer]["inningstally"]["inningsfielder"],self.result[eachplayer]["inningstally"]["inningsextrasgiven"], self.result[eachplayer]["inningstally"]["inningsbatterrunsgiven"], self.result[eachplayer]["inningstally"]["inningsbatterextrassgiven"])):
+                for eachball, (eachballrun, inningsball, batter,wickettype,inningsouts,fielder,batterscore,extras,extrastype,fieldingextras,fieldingextrastype) in enumerate(zip(self.result[eachplayer]["inningstally"]["inningsrunsgiven"],
+                self.result[eachplayer]["inningstally"]["teaminningsballs"],
+                self.result[eachplayer]["inningstally"]["inningsbattersbowledat"],
+                self.result[eachplayer]["inningstally"]["inningswicketstype"],
+                self.result[eachplayer]["inningstally"]["teaminningsouts"],
+                self.result[eachplayer]["inningstally"]["inningsfielder"],
+                self.result[eachplayer]["inningstally"]["inningsbatterrunsgiven"],
+                self.result[eachplayer]["inningstally"]["inningsextrasgiven"],
+                self.result[eachplayer]["inningstally"]["inningsextrastype"],
+                self.result[eachplayer]["inningstally"]["inningsfieldingextrasgiven"],
+                self.result[eachplayer]["inningstally"]["inningsfieldingextrastype"]
+                )
+                ):
                     self.playersballresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
                     self.playersballresult["Match Type"].append(matchinfo["match_type"])
                     self.playersballresult["Venue"].append(matchinfo["venue"])
@@ -915,9 +905,10 @@ class search:
                     self.playersballresult["Current Runsgiven"].append(sum(self.result[eachplayer]["inningstally"]["inningsrunsgiven"][:(eachball+1)]))
                     self.playersballresult["Balls Bowled"].append(eachball)
                     self.playersballresult["Wicket"].append(wickettype)
-                    self.playersballresult["Extras Type"].append(None)
+                    self.playersballresult["Extras Type"].append(extrastype)
                     self.playersballresult["Extras"].append(extras)
-                    self.playersballresult["Fielding Extras"].append(batterextras)
+                    self.playersballresult["Fielding Extras"].append(fieldingextras)
+                    self.playersballresult["Fielding Extras Type"].append(fieldingextrastype)
                     self.playersballresult["Final Runsgiven"].append(sum(self.result[eachplayer]["inningstally"]["inningsrunsgiven"]))
                     batterfound=False
                     for eachtype in tempplayerindex["Batting"]:

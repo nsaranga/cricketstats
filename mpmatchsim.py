@@ -18,30 +18,35 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
 import sys
-# from tkinter import E
 import pandas as pd
 import numpy as np
 import multiprocessing as mp
 import time
 
-# import traceback
 
 module_path = os.path.abspath(os.path.join("./cricketstats/"))
 if module_path not in sys.path:
     sys.path.append(module_path)
-from cricketstats import cricketstats
+import cricketstats
 
 
 # Monte Carlo simulation of each ball in match
 
+# TODO make multiprocessing an option. so merges single process and multi processing into one package.
 # TODO simulate particular phases, over intervals. this would help determine score after particular overs.
+# TODO Add superover tiebreaker for limited overs matches.
+
+# reorganise into PyPi and submit online
+
+
+
 # TODO add share data manager for simsteamstats
 # TODO work out how to combine probabilities for OUt/not out, when one team has empty probs.
 # TODO add option to simulate toss 60/40 in favour of batting first.
 # TODO Innings simulator, that can simulate innings from any given point.
 # TODO Indexing to venue/country?
 # TODO Add player statistics into teams?
-# TODO Add superover tiebreaker
+
 # TODO add wide/noball and byes/legbyes p-values for extras with while loop. This requires rewriting crickets stats to include extras type
 
 # TODO Make this simulation of innings record that then have winning losing. YES
@@ -65,8 +70,6 @@ class matchsim:
         testmatch={"Innings 1 Team":[],"Innings 1 Wickets":[], "Innings 1 Score":[], "Innings 1 Overs":[],"Innings 2 Team":[],"Innings 2 Wickets":[], "Innings 2 Score":[],"Innings 2 Overs":[],"Innings 3 Team":[],"Innings 3 Wickets":[], "Innings 3 Score":[],"Innings 3 Overs":[],"Innings 4 Team":[], "Innings 4 Wickets":[],"Innings 4 Score":[],"Innings 4 Overs":[],"Winner":[]}
         matchtypes={"T20": limitedovers, "ODI": limitedovers,"ODM": limitedovers,"Test": testmatch}
         self.simresults = matchtypes[statsmatchtype]
-        
-
 
     def pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype):
         # search stats for p-values
@@ -203,7 +206,6 @@ class matchsim:
 
         sim.resultssetup()
         for thismatch in range(simulations):
-            # try:
             sim.matchresultssetup()
             # Function to simulate a match
             if statsmatchtype=="T20" or statsmatchtype=="ODI" or statsmatchtype=="ODM":
@@ -211,39 +213,60 @@ class matchsim:
 
             if statsmatchtype=="Test":
                 sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam)
-            # except:
-            #     raise Exception("".join(traceback.format_exception(*sys.exc_info())))
+
         return sim.results
             
-    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False,matchscore=None,hometeam=None):
+    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False,matchscore=None,hometeam=None, multicore=True):
         # Setup match results
         matchsim.simresultssetup(self,statsmatchtype)
 
         # Search for pvalues
         matchsim.pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype)
-        cores = os.cpu_count()
-        procpool=mp.Pool(cores)
 
-        simulations=int(simulations/cores)
-        inputs=None
-        inputs=[]
-        print(f"Sims/cpu: {simulations}")
-        for x in range(cores):
-            inputs.append((self,statsmatchtype,simulations,inningsorder,rain,matchscore,hometeam))
 
-        #start = time.time()
-        simprocs = procpool.starmap(matchsim.mcsimulations,inputs)
+
+        # multiprocessing
+        if multicore==True:
+            cores = os.cpu_count()
+            procpool=mp.Pool(cores)
+
+            simulations=int(simulations/cores)
+            inputs=None
+            inputs=[]
+            print(f"Sims/cpu: {simulations}")
+            for x in range(cores):
+                inputs.append((self,statsmatchtype,simulations,inningsorder,rain,matchscore,hometeam))
+
+            #start = time.time()
+            simprocs = procpool.starmap(matchsim.mcsimulations,inputs)
+            
+            procpool.close()
+
+            for eachdict in simprocs:
+                for eachlist in eachdict:
+                    self.simresults[eachlist].extend(eachdict[eachlist])
+
+            self.simresults=pd.DataFrame(self.simresults)
         
-        procpool.close()
-        #print(f'Time after mcsimulations(): {time.time() - start}')
+        if multicore==False:
+            rng = np.random.default_rng()
 
-        for eachdict in simprocs:
-            for eachlist in eachdict:
-                self.simresults[eachlist].extend(eachdict[eachlist])
-        print("Sims finished")
+            # Set function dictionary
+            classtypes={"T20": ld, "ODI": ld,"ODM": ld,"Test": tm}
 
-        self.simresults=pd.DataFrame(self.simresults)
+            sim=classtypes[statsmatchtype]()
+            # simulation generator
+            sim.resultssetup()
+            for thismatch in range(simulations):
+                sim.matchresultssetup()
+                # Function to simulate a match
+                if statsmatchtype=="T20" or statsmatchtype=="ODI" or statsmatchtype=="ODM":
+                    sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam)
 
+                if statsmatchtype=="Test":
+                    sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam)
+
+            self.simresults=pd.DataFrame(sim.results)
 
 
 class ld(matchsim):

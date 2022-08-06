@@ -32,7 +32,6 @@ import cricketstats
 
 # Monte Carlo simulation of each ball in match
 
-# TODO make multiprocessing an option. so merges single process and multi processing into one package.
 # TODO simulate particular phases, over intervals. this would help determine score after particular overs.
 # TODO Add superover tiebreaker for limited overs matches.
 

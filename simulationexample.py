@@ -28,11 +28,11 @@ import mpmatchsim
 """
 import os
 import sys
-module_path = os.path.abspath(os.path.join("./cricketstats/"))
+module_path = os.path.abspath(os.path.join("./cricketstats/src/cricketstats"))
 if module_path not in sys.path:
     sys.path.append(module_path)
-from cricketstats import cricketstats
-from cricketstats import mpmatchsim
+import cricketstats 
+import mpmatchsim
 """
 
 

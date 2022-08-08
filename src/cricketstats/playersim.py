@@ -144,13 +144,7 @@ class playersim:
 
     def over(self,rng,nthinnings,thisinnings, bowlingteam,statsmatchtype,thisover,simteams,simteamstats,hometeam, wicketfallP,scoreP,extrasP, fieldingextrasP):
 
-        # move this out of over function. and move pvalue thing out as well. make condition 6 balls ahead not 1/2 balls
-        # this will lessen cpu load. This means I have to find for both strikers? Can't do this because someone iwll get out in middle of over. maybe move extras and field extras out then?
-        self.batters.reverse()
-        if not self.batters:
-            self.batters = simteams[thisinnings]["battingorder"][0:2]
-            for eachbatter in self.batters:
-                self.battersstats[eachbatter] = 0
+
         
         # ball outcome generator
         legaldeliveries = 0
@@ -364,6 +358,11 @@ class ld(playersim):
                 if self.inningswickets == 10 or (nthinnings == 1 and self.inningsscore > self.matchresults["Innings 1 Score"][-1]):
                     break
                 
+                self.batters.reverse()
+                if not self.batters:
+                    self.batters = simteams[thisinnings]["battingorder"][0:2]
+                    for eachbatter in self.batters:
+                        self.battersstats[eachbatter] = 0
 
                 wicketfallP,scoreP = playersim.playerP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
 
@@ -502,6 +501,12 @@ class tm(playersim):
 
                 if (nthinnings == 3 and self.inningsscore > (self.matchresults["Innings 1 Score"][-1]+self.matchresults["Innings 3 Score"][-1]-self.matchresults["Innings 2 Score"][-1])) or (nthinnings==2 and (((self.inningsscore+self.matchresults["Innings 1 Score"][-1]-self.matchresults["Innings 2 Score"][-1])/(450-matchover))>4)):
                     break
+
+                self.batters.reverse()
+                if not self.batters:
+                    self.batters = simteams[thisinnings]["battingorder"][0:2]
+                    for eachbatter in self.batters:
+                        self.battersstats[eachbatter] = 0
 
                 wicketfallP,scoreP = playersim.playerP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
                 if len(wicketfallP[self.batters[0]])<2 or sum(wicketfallP[self.batters[0]])!=1:

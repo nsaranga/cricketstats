@@ -341,11 +341,11 @@ class ld(matchsim):
                 # Over based wicket p-values
                 wicketfallP = ld.overswicketsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover,hometeam)
 
-                if len(wicketfallP)<2 or sum(wicketfallP)!=1:
+                if len(wicketfallP)<2 or sum(wicketfallP)<0.99:
                     wicketfallP=inningswicketfallP
-                if len(scoreP)==0 or sum(scoreP)!=1:
+                if len(scoreP)==0 or sum(scoreP)<0.99:
                     scoreP=inningsscorefallP
-                if len(extrasP)==0 or sum(extrasP)!=1:
+                if len(extrasP)==0 or sum(extrasP)<0.99:
                     extrasP=inningsextrasfallP
 
                 # Fix if p-values don't have all possibilites
@@ -493,11 +493,11 @@ class tm(matchsim):
                 wicketfallP = tm.overswicketsPs(self,nthinnings,thisinnings, bowlingteam,simteamstats,thisover,hometeam)
 
                 # print(wicketfallP)
-                if len(wicketfallP)<2 or sum(wicketfallP)!=1:
+                if len(wicketfallP)<2 or sum(wicketfallP)<0.99:
                     wicketfallP=inningswicketfallP
-                if len(scoreP)==0 or sum(scoreP)!=1:
+                if len(scoreP)==0 or sum(scoreP)<0.99:
                     scoreP=inningsscorefallP
-                if len(extrasP)==0 or sum(extrasP)!=1:
+                if len(extrasP)==0 or sum(extrasP)<0.99:
                     extrasP=inningsextrasfallP
 
                 # Fix if p-values don't have all possibilites

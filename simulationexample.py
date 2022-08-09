@@ -20,24 +20,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-import cricketstats
-import mpmatchsim
+# If you installed cricketstats by pip import the module with line below
+import cricketstats as cks
 
-# This is an example script of how you can use the match simulator in cricketstats
-# If you want to import cricketstats into your own python file or jupyter notebook that sits outside, use the lines below instead of "import cricketstats". Replace "./cricketstats/" with the path of repo in your system.
+# If you cloned the github repo uncomment the block below.
 """
 import os
 import sys
-module_path = os.path.abspath(os.path.join("./cricketstats/src/cricketstats"))
+module_path = os.path.abspath(os.path.join("./cricketstats/src/"))
 if module_path not in sys.path:
     sys.path.append(module_path)
-import cricketstats 
-import mpmatchsim
 """
 
 
 """ 1. Create a simulation object """
-sim = mpmatchsim.matchsim(simteams=["Sri Lanka", "Australia"])
+sim = cks.mpmatchsim.matchsim(simteams=["Sri Lanka", "Australia"])
 
 """ 2. Apply the "sim()" method to the simulation object with the necessary arguments. """
 # Arguments are mostly lists, with items separated by commas.

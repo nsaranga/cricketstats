@@ -16,21 +16,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. 
 """
 
+# This is an example script of how you can use cricketstats
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-import cricketstats
+# If you installed cricketstats by pip import the module with line below
+import cricketstats as cks
 
-# This is an example script of how you can use cricketstats
-# If you want to import cricketstats into your own python file or jupyter notebook that sits outside, use the lines below instead of "import cricketstats". Replace "./cricketstats/" with the path of repo in your system.
+# If you cloned the github repo uncomment the block below.
 """
 import os
 import sys
-module_path = os.path.abspath(os.path.join("./cricketstats/src/cricketstats"))
+module_path = os.path.abspath(os.path.join("./cricketstats/src/"))
 if module_path not in sys.path:
     sys.path.append(module_path)
-import cricketstats
 """
 
 
@@ -41,7 +42,7 @@ Ozbatters = ["DA Warner", "SPD Smith",  "M Labuschagne",  "TM Head", "MS Harris"
 bblteams = ["Sydney Thunder", "Melbourne Renegades", "Brisbane Heat", "Sydney Sixers", "Melbourne Stars", "Perth Scorchers", "Adelaide Strikers", "Hobart Hurricanes"]
 
 # create a search object with "cricketstats.search" based on the inputs above. Input arguments: players=[] or teams=[] You can create multiple objects at the same time.
-search1 = cricketstats.search(players=Ozbatters)
+search1 = cks.cricketstats.search(players=Ozbatters)
 
 # If you want to find stats for all players ot teams use the "allplayers=True" or "allteams=True" option in the class.
 # search2 = cricketstats.search(allplayers=True)

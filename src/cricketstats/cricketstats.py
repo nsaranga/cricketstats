@@ -24,7 +24,6 @@ import os
 import zipfile
 import numpy as np
 import math
-
 from cricketstats import statsprocessor
 
 # TODO easy filter for international teams.

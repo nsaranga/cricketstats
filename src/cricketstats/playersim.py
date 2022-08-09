@@ -16,17 +16,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. 
 """
 
-
 import os
 import sys
 import pandas as pd
 import numpy as np
 import multiprocessing as mp
 import time
-
-# module_path = os.path.abspath(os.path.join("./cricketstats/"))
-# if module_path not in sys.path:
-#     sys.path.append(module_path)
 from cricketstats import cricketstats
 
 

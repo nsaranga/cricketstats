@@ -25,7 +25,7 @@ import zipfile
 import numpy as np
 import math
 
-import statsprocessor
+from cricketstats import statsprocessor
 
 # TODO easy filter for international teams.
 # TODO make option to sum players/teams stats better. Insert "all players earlier in result"?

@@ -26,13 +26,10 @@ import numpy as np
 import math
 from cricketstats import statsprocessor
 
-# TODO easy filter for international teams.
 # TODO make option to sum players/teams stats better. Insert "all players earlier in result"?
-# TODO fix period updating of player index?
 # TODO fix the way innings outs are counted. eg. make it more efficient, there's currently 3 lists for it...
 # TODO when do allteams/allplayers I should add all players/teams at beginning of match not check at each ball. this counts less for palyers for some reason
 # TODO add check for batting first or second for match selection
-# TODO Add a "team_type" check so that different types of teams can be isolated when searchign for T20s
 # TODO show stats by season in IPL, battign avg by year
 
 class search:

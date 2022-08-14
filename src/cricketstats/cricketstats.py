@@ -1492,7 +1492,7 @@ class search:
 
     # This is the main function to be applied to search object.
     # I should make picking oppositon bowlers strongs in a list. yes and then just assign json object tfrom that list.
-    def stats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playersteams=None, teammates=None, oppositionbatters=None, oppositionbowlers = None, oppositionteams=None, venue=None, event=None, teamtype=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None, fielders=None, sumstats=False,battingmatchups=None,bowlingmatchups=None):
+    def stats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playersteams=None, teammates=None, oppositionbatters=None, oppositionbowlers = None, oppositionteams=None, venue=None, event=None, teamtype=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None, fielders=None, sumstats=False,playerindexfile=None,battingmatchups=None,bowlingmatchups=None):
         if betweenovers == None:
             betweenovers = []
         if innings == None:
@@ -1506,31 +1506,32 @@ class search:
         if fielders == None:
             fielders = []
 
-        currentdir = os.path.dirname(os.path.abspath(__file__))
-        playerindexfile = open(f"{currentdir}/playerindex.json")
-        players = json.load(playerindexfile)
+        if playerindexfile==None:
+            playerindex= pd.read_csv(f"{currentdir}/playerindex.csv")
+        if playerindexfile!=None:
+            playerindex= pd.read_csv(playerindexfile)
+
         if oppositionbatters == None:
             oppositionbatters = []
             battingmatchups = []
+
         if oppositionbatters:
             battingmatchups = []
             for eachname in oppositionbatters:
-                for eachgroup in players["Batting"]:
-                    if eachname == eachgroup:
-                        battingmatchups.extend(players["Batting"][eachgroup])
-                    if eachname != eachgroup:
-                        battingmatchups.append(eachname)
+                if eachname in playerindex["Batting"]:
+                    battingmatchups.extend(playerindex["Player"].loc[playerindex["Batting"]==eachname])
+                if eachname in playerindex["Player"]:
+                    battingmatchups.append(eachname)
         if oppositionbowlers == None:
             oppositionbowlers = []
             bowlingmatchups = []
         if oppositionbowlers:
             bowlingmatchups = []
             for eachname in oppositionbowlers:
-                for eachgroup in players["Bowling"]:
-                    if eachname == eachgroup:
-                        bowlingmatchups.extend(players["Bowling"][eachgroup])
-                    if eachname != eachgroup:
-                        bowlingmatchups.append(eachname)
+                if eachname in playerindex["Bowling"]:
+                    bowlingmatchups.extend(playerindex["Player"].loc[playerindex["Bowling"]==eachname])
+                if eachname in playerindex["Player"]:
+                    bowlingmatchups.append(eachname)
 
         if oppositionteams == None:
             oppositionteams = []
@@ -1594,18 +1595,14 @@ class search:
                     match = json.load(matchdata)
 
                     
-                    tempplayerindex={"Batting":{"Right hand":[],"Left hand":[]},"Bowling":{"Right arm pace":[],"Left arm pace":[],"Right arm Off break":[],"Right arm Leg break":[],"Left arm orthodox":[],"Left arm wrist spin":[]},"Unknown":[]}
+                    tempplayerindex={"Batting":{"Right hand":[],"Left hand":[]},"Bowling":{"Right arm pace":[],"Left arm pace":[],"Right arm off break":[],"Right arm leg break":[],"Left arm orthodox":[],"Left arm wrist spin":[]}}
                     for eachplayer in match['info']['registry']['people'].keys():
-                        bowlerfound=False
-                        for eachtype in players["Batting"]:
-                            if eachplayer in players["Batting"][eachtype]:
+                        for eachtype in tempplayerindex["Batting"]:
+                            if eachplayer in playerindex["Player"].loc[playerindex["Batting"]==eachtype]:
                                 tempplayerindex["Batting"][eachtype].append(eachplayer)
-                        for eachtype in players["Bowling"]:
-                            if eachplayer in players["Bowling"][eachtype]:
-                                bowlerfound=True
+                        for eachtype in tempplayerindex["Bowling"]:
+                            if eachplayer in playerindex["Player"].loc[playerindex["Bowling"]==eachtype]:
                                 tempplayerindex["Bowling"][eachtype].append(eachplayer)
-                        if eachplayer in players["Unknown"] or bowlerfound==False:
-                            tempplayerindex["Unknown"].append(eachplayer)
 
                     # Dates check
                     year = str(match["info"]["dates"][0][:4])
@@ -1808,7 +1805,7 @@ class search:
                     matchdata.close()
         matches.close()
         matchindexfile.close()
-        playerindexfile.close()
+        # playerindexfile.close()
         # print(f'Time after stats(): {time.time() - start}')
         
 

@@ -1506,6 +1506,7 @@ class search:
         if fielders == None:
             fielders = []
 
+        currentdir = os.path.dirname(os.path.abspath(__file__))
         if playerindexfile==None:
             playerindex= pd.read_csv(f"{currentdir}/playerindex.csv")
         if playerindexfile!=None:
@@ -1518,19 +1519,20 @@ class search:
         if oppositionbatters:
             battingmatchups = []
             for eachname in oppositionbatters:
-                if eachname in playerindex["Batting"]:
+                if eachname in playerindex["Batting"].values:
                     battingmatchups.extend(playerindex["Player"].loc[playerindex["Batting"]==eachname])
-                if eachname in playerindex["Player"]:
+                if eachname in playerindex["Player"].values:
                     battingmatchups.append(eachname)
+
         if oppositionbowlers == None:
             oppositionbowlers = []
             bowlingmatchups = []
         if oppositionbowlers:
             bowlingmatchups = []
             for eachname in oppositionbowlers:
-                if eachname in playerindex["Bowling"]:
+                if eachname in playerindex["Bowling"].values:
                     bowlingmatchups.extend(playerindex["Player"].loc[playerindex["Bowling"]==eachname])
-                if eachname in playerindex["Player"]:
+                if eachname in playerindex["Player"].values:
                     bowlingmatchups.append(eachname)
 
         if oppositionteams == None:
@@ -1598,10 +1600,10 @@ class search:
                     tempplayerindex={"Batting":{"Right hand":[],"Left hand":[]},"Bowling":{"Right arm pace":[],"Left arm pace":[],"Right arm off break":[],"Right arm leg break":[],"Left arm orthodox":[],"Left arm wrist spin":[]}}
                     for eachplayer in match['info']['registry']['people'].keys():
                         for eachtype in tempplayerindex["Batting"]:
-                            if eachplayer in playerindex["Player"].loc[playerindex["Batting"]==eachtype]:
+                            if eachplayer in playerindex["Player"].loc[playerindex["Batting"]==eachtype].values:
                                 tempplayerindex["Batting"][eachtype].append(eachplayer)
                         for eachtype in tempplayerindex["Bowling"]:
-                            if eachplayer in playerindex["Player"].loc[playerindex["Bowling"]==eachtype]:
+                            if eachplayer in playerindex["Player"].loc[playerindex["Bowling"]==eachtype].values:
                                 tempplayerindex["Bowling"][eachtype].append(eachplayer)
 
                     # Dates check

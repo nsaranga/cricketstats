@@ -25,8 +25,9 @@ import time
 from cricketstats import cricketstats
 
 
+# TODO record player's scores and balls faced
 # TODO fix bowler's runs
-# make batterstats that tracks ballsf aced then pick up stats accordign to that.
+# TODO make batterstats that tracks ballsf aced then pick up stats accordign to that.
 
 
 

@@ -49,17 +49,20 @@ from bs4 import BeautifulSoup
 def index(playerdatabase,playerindexfile=None):
     if playerindexfile==None:
         currentdir = os.path.dirname(os.path.abspath(__file__))
-        #indexfile = open(f"{currentdir}/playerindex.csv")
-        playerindex= pd.read_csv(f"{currentdir}/playerindex.csv")
+        indexfile = open(f"{currentdir}/playerindex.json")
+        playerindex = json.load(indexfile)
         playerlist = pd.read_csv(playerdatabase)
-        newplayers = {"Player":[],"Batting":[],"Bowling":[],"Umpire":[]}
+        newplayers = {}
+        #{"Batting":None,"Bowling":None,"Umpire":"No"}
     else:
         playerlist = pd.read_csv(playerdatabase)
-        playerindex= pd.read_csv(playerindexfile)
-        newplayers = {"Player":[],"Batting":[],"Bowling":[],"Umpire":[]}
+        indexfile = open(playerindexfile)
+        playerindex = json.load(indexfile)
+        newplayers = {}
+        #"Player":[],"Batting":[],"Bowling":[],"Umpire":"No"}
     try:
         for eachplayer in playerlist["name"]:
-            if eachplayer in playerindex["Player"].values and pd.notna(playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Batting"]) and pd.notna(playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Bowling"]):
+            if eachplayer in playerindex.keys() and playerindex[eachplayer]["Batting"]!=None and playerindex[eachplayer]["Bowling"]!=None:
                 continue
 
             #playerdata = playerlist.loc[playerlist["name"]==f"{eachplayer}", ["key_cricinfo"]]
@@ -74,77 +77,44 @@ def index(playerdatabase,playerindexfile=None):
                 continue
             playerinfo = main.find_all("h5", class_="player-card-description gray-900")
             for element in playerinfo:
-                if eachplayer not in playerindex["Player"].values and ("Right hand bat" in element.text or "Left hand bat" in element.text or "Umpire" in element.text):
-                    newplayers["Player"].append(eachplayer)
-                    newplayers["Batting"].append(None)
-                    newplayers["Bowling"].append(None)
-                    newplayers["Umpire"].append("No")
-                    
+                if eachplayer not in playerindex.keys() and ("Right hand bat" in element.text or "Left hand bat" in element.text or "Umpire" in element.text):
+                    playerindex[eachplayer]={"Batting":None,"Bowling":None,"Umpire":None}
 
                 # Batting
-                if "Right hand bat" in element.text:
-                    if eachplayer in playerindex["Player"].values and pd.isna(playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Batting"]):
-                        playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Batting"]="Right hand"
-                    if eachplayer not in playerindex["Player"].values:
-                        newplayers["Batting"][newplayers["Player"].index(eachplayer)]="Right hand"
+                if "Right hand bat" in element.text and playerindex[eachplayer]["Batting"]==None:
+                    playerindex[eachplayer]["Batting"]="Right hand bat"
 
-                if "Left hand bat" in element.text:
-                    if eachplayer in playerindex["Player"].values and pd.isna(playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Batting"]):
-                        playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Batting"]="Left hand"
-                    if eachplayer not in playerindex["Player"].values:
-                        newplayers["Batting"][newplayers["Player"].index(eachplayer)]="Left hand"
+                if "Left hand bat" in element.text and playerindex[eachplayer]["Batting"]==None:
+                    playerindex[eachplayer]["Batting"]="Left hand bat"
                 
                 # Bowling
-                if "Right arm fast" in element.text or "Right arm fast medium" in element.text  or "Right arm medium" in element.text:
-                    if eachplayer in playerindex["Player"].values and pd.isna(playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Bowling"]):
-                        playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Bowling"]="Right arm pace"
+                if ("Right arm fast" in element.text or "Right arm fast medium" in element.text  or "Right arm medium" in element.text) and playerindex[eachplayer]["Bowling"]==None:
+                    playerindex[eachplayer]["Bowling"]="Right arm pace"
 
-                    if eachplayer not in playerindex["Player"].values:
-                        newplayers["Bowling"][newplayers["Player"].index(eachplayer)]="Right arm pace"
-                if "Left arm fast" in element.text or "Left arm fast medium" in element.text  or "Left arm medium" in element.text:
-                    if eachplayer in playerindex["Player"].values and pd.isna(playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Bowling"]):
-                        playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Bowling"]="Left arm pace"
-                    if eachplayer not in playerindex["Player"].values:
-                        newplayers["Bowling"][newplayers["Player"].index(eachplayer)]="Left arm pace"
+                if ("Left arm fast" in element.text or "Left arm fast medium" in element.text  or "Left arm medium" in element.text) and playerindex[eachplayer]["Bowling"]==None:
+                    playerindex[eachplayer]["Bowling"]="Left arm pace"
 
-                if "offbreak" in element.text:
+                if "offbreak" in element.text and playerindex[eachplayer]["Bowling"]==None:
+                    playerindex[eachplayer]["Bowling"]="Right arm off break"
+                if "Legbreak" in element.text and playerindex[eachplayer]["Bowling"]==None:
+                    playerindex[eachplayer]["Bowling"]="Right arm leg break"
                     
-                    if eachplayer in playerindex["Player"].values and pd.isna(playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Bowling"]):
-                        playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Bowling"]="Right arm off break"
-                    if eachplayer not in playerindex["Player"].values:
-                        newplayers["Bowling"][newplayers["Player"].index(eachplayer)]="Right arm off break"
-                if "Legbreak" in element.text:
-                    if eachplayer in playerindex["Player"].values and pd.isna(playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Bowling"]):
-                        playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Bowling"]="Right arm leg break"
-                    if eachplayer not in playerindex["Player"].values:
-                        newplayers["Bowling"][newplayers["Player"].index(eachplayer)]="Right arm leg break"
-                    
-                if "Slow left arm orthodox" in element.text:
-                    if eachplayer in playerindex["Player"].values and pd.isna(playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Bowling"]):
-                        playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Bowling"]="Left arm orthodox"
-                    if eachplayer not in playerindex["Player"].values:
-                        newplayers["Bowling"][newplayers["Player"].index(eachplayer)]="Left arm orthodox"
-                    #newplayers["Bowling"]["Left arm orthodox"].append(eachplayer)
+                if "Slow left arm orthodox" in element.text and playerindex[eachplayer]["Bowling"]==None:
+                    playerindex[eachplayer]["Bowling"]="Left arm orthodox"
 
-                if "Left arm wrist spin" in element.text or "Left-arm googly" in element.text:
-                    #newplayers["Bowling"]["Left arm wrist spin"].append(eachplayer)
-                    if eachplayer in playerindex["Player"].values and pd.isna(playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Bowling"]):
-                        playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Bowling"]="Left arm wrist spin"
-                    if eachplayer not in playerindex["Player"].values:
-                        newplayers["Bowling"][newplayers["Player"].index(eachplayer)]="Left arm wrist spin"
+                if ("Left arm wrist spin" in element.text or "Left-arm googly" in element.text) and playerindex[eachplayer]["Bowling"]==None:
+                    playerindex[eachplayer]["Bowling"]="Left arm wrist spin"
                 # Umpire
-                if "Umpire" in element.text:
-                    #newplayers["Umpire"].append(eachplayer)
-                    if eachplayer in playerindex["Player"].values and playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Umpire"]==False:
-                        playerindex.at[playerindex.loc[playerindex["Player"]==eachplayer].index[0],"Umpire"]="Yes"
-                    if eachplayer not in playerindex["Player"].values:
-                        newplayers["Umpire"][newplayers["Player"].index(eachplayer)]="Yes"
-
+                if "Umpire" in element.text and (playerindex[eachplayer]["Umpire"]==None or playerindex[eachplayer]["Umpire"]=="No"):
+                    playerindex[eachplayer]["Umpire"]="Yes"
     finally:
-        newplayersdf = pd.DataFrame(newplayers)
-        df=pd.concat([playerindex,newplayersdf],ignore_index=True)
+        indexfile.close()
         if playerindexfile==None:
-            df.to_csv(f"{currentdir}/playerindex.csv",index=False)
+            file = open(f"{currentdir}/playerindex.json", "w")
+            file.write(json.dumps(playerindex))
+            file.close()
         if playerindexfile!=None:
-            df.to_csv(playerindexfile,index=False)
-
+            file = open(playerindexfile, "w")
+            file.write(json.dumps(playerindex))
+            file.close()
+    

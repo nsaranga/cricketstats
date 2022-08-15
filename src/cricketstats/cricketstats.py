@@ -28,8 +28,7 @@ from cricketstats import statsprocessor
 
 # TODO make option to sum players/teams stats better. Insert "all players earlier in result"?
 # TODO fix the way innings outs are counted. eg. make it more efficient, there's currently 3 lists for it...
-# TODO when do allteams/allplayers I should add all players/teams at beginning of match not check at each ball. this counts less for palyers for some reason
-# TODO add check for batting first or second for match selection
+# TODO when do allteams/allplayers I should add all players/teams at beginning of match not check at each ball. this counts less for palyers for some reasons
 # TODO show stats by season in IPL, battign avg by year
 
 class search:
@@ -70,7 +69,7 @@ class search:
                                     "inningstally":{"batinningscount": False, "bowlinningscount": False, 
                                     "teaminningsscore":[], "teaminningsouts":[], "teaminningsballs":[], "inningsfielder":[],
                                     "inningsruns": [], "inningsballsfaced": 0, "inningspartners":[], "inningshowout": [], "inningsbowlersfaced":[], 
-                                    #"inningsextras": [],
+                                    
                                     "inningsrunsgiven": [], "inningsballsbowled": 0, "inningswickets": [], "inningsbattersbowledat":[],"inningswicketstype":[], "inningsextrasgiven": [],"inningsextrastype":[],"inningsfieldingextrastype":[], "inningsbatterrunsgiven":[], "inningsfieldingextrasgiven":[]}
                                     }
     
@@ -136,16 +135,6 @@ class search:
         "Batter":[], "Batting Position":[],"Batter Type":[], "Non_striker": [], "Runs Scored": [], "Batter Score":[], "Runs/Ball": [], "How Out": [], "Fielder":[],
         "Bowler": [], "Bowler Type":[], "Extras":[], "Extras Type": [], "Out/NotOut":[],
         }
-
-    # Setup results for ball by ball stats.
-    # DELETE THIS
-    # def ballresultsetup(self):
-    #     self.ballresult = { 
-    #     "Date":[], "Match Type":[], "Venue":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Ball":[], "Ball in Over":[], 
-    #     "Batting Position":[], "Batter":[], "Batter Score": [], "Non_striker": [],
-    #     "Bowling Position":[], "Bowler": [], "Wicket": [], "How Out": [], 
-    #     "Extras": [], "Extras Type": [], "Total Runs": []
-    #     }
 
     # Indexes matches by match type for quick search.
     def fileindexing(self, database, matches):
@@ -1001,8 +990,8 @@ class search:
                 self.teamsballresult["Ball in Over"].append(ballinover)
                 self.teamsballresult["Ball"].append(inningsball)
                 self.teamsballresult["Current Score"].append(sum(self.result[inningsteam]["inningstally"]["inningsruns"][:(eachball+1)]))
-                # self.teamsballresult["Current Outs"].append(sum(self.result[inningsteam]["inningstally"]["inningsouts"][:(eachball+1)]))
-                self.teamsballresult["Current Outs"].append(currentouts)
+                self.teamsballresult["Current Outs"].append(sum(self.result[inningsteam]["inningstally"]["inningsouts"][:(eachball+1)]))
+                #self.teamsballresult["Current Outs"].append(currentouts)
                 self.teamsballresult["Batter"].append(striker)
                 self.teamsballresult["Batting Position"].append(strikerbattingpos)
                 self.teamsballresult["Non_striker"].append(nonstriker)
@@ -1090,8 +1079,8 @@ class search:
                 self.teamsballresult["Ball in Over"].append(ballinover)
                 self.teamsballresult["Ball"].append(inningsball)
                 self.teamsballresult["Current Score"].append(sum(self.result[bowlingteam]["inningstally"]["inningsruns"][:(eachball+1)]))
-                #self.teamsballresult["Current Outs"].append(sum(self.result[bowlingteam]["inningstally"]["inningsouts"][:(eachball+1)]))
-                self.teamsballresult["Current Outs"].append(currentouts)
+                self.teamsballresult["Current Outs"].append(sum(self.result[bowlingteam]["inningstally"]["inningsouts"][:(eachball+1)]))
+                # self.teamsballresult["Current Outs"].append(currentouts)
                 self.teamsballresult["Batter"].append(striker)
                 self.teamsballresult["Batting Position"].append(strikerbattingpos)
                 self.teamsballresult["Non_striker"].append(nonstriker)
@@ -1488,8 +1477,7 @@ class search:
                     self.result[eachdict].pop(eachstat)
 
     # This is the main function to be applied to search object.
-    # I should make picking oppositon bowlers strongs in a list. yes and then just assign json object tfrom that list.
-    def stats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playersteams=None, teammates=None, oppositionbatters=None, oppositionbowlers = None, oppositionteams=None, venue=None, event=None, teamtype=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None, fielders=None, sumstats=False,playerindexfile=None,battingmatchups=None,bowlingmatchups=None):
+    def stats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playersteams=None, teammates=None, oppositionbatters=None, oppositionbowlers = None, oppositionteams=None, venue=None, event=None, teamtype=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None, fielders=None, toss=None, tossdecision=None, sumstats=False, playerindexfile=None):
         if betweenovers == None:
             betweenovers = []
         if innings == None:
@@ -1548,6 +1536,7 @@ class search:
             battingposition = []
         if bowlingposition == None:
             bowlingposition = []
+        
 
 
         # Setup search results according to whether search involves teams or players.
@@ -1579,6 +1568,10 @@ class search:
         allgamesplayed = 0
         allgameswinloss = 0
         allgamesdrawn = 0
+
+        # load playerindex
+        playerindexfile = open(f"{currentdir}/playerindex.json")
+        players = json.load(playerindexfile)
         
         currentdir = os.path.dirname(os.path.abspath(__file__))
         matchindexfile = open(f"{currentdir}/matchindex.json")
@@ -1593,15 +1586,16 @@ class search:
                     matchdata = matches.open(eachfile)
                     match = json.load(matchdata)
 
-                    
+                    # creat temporary player index
                     tempplayerindex={"Batting":{"Right hand":[],"Left hand":[]},"Bowling":{"Right arm pace":[],"Left arm pace":[],"Right arm off break":[],"Right arm leg break":[],"Left arm orthodox":[],"Left arm wrist spin":[]}}
                     for eachplayer in match['info']['registry']['people'].keys():
-                        for eachtype in tempplayerindex["Batting"]:
-                            if eachplayer in playerindex["Player"].loc[playerindex["Batting"]==eachtype].values:
-                                tempplayerindex["Batting"][eachtype].append(eachplayer)
-                        for eachtype in tempplayerindex["Bowling"]:
-                            if eachplayer in playerindex["Player"].loc[playerindex["Bowling"]==eachtype].values:
-                                tempplayerindex["Bowling"][eachtype].append(eachplayer)
+                        if eachplayer in players.keys():
+                            if  players[eachplayer]["Batting"] in tempplayerindex["Batting"]:
+                                tempplayerindex["Batting"][players[eachplayer]["Batting"]].append(eachplayer)
+                            if  players[eachplayer]["Bowling"] in tempplayerindex["Bowling"]:
+                                tempplayerindex["Bowling"][players[eachplayer]["Bowling"]].append(eachplayer)
+
+
 
                     # Dates check
                     year = str(match["info"]["dates"][0][:4])
@@ -1644,6 +1638,15 @@ class search:
                     # Players Check
                     if self.players and not any(eachplayer in self.players for eachplayer in match['info']['registry']['people'].keys()):
                         continue
+
+                    # Toss check
+                    if toss and "winner" in match["info"]["toss"] and ((toss=="won" and match["info"]["toss"]["winner"] not in self.teams) or (toss=="lost" and match["info"]["toss"]["winner"] in self.teams)):
+                        continue
+
+                    # Toss decision check
+                    if tossdecision and "decision" in  match["info"]["toss"] and match["info"]["toss"]["decision"]!=tossdecision:
+                        continue
+
 
                     # Match Result check
                     if matchresult and self.teams and (
@@ -1804,7 +1807,7 @@ class search:
                     matchdata.close()
         matches.close()
         matchindexfile.close()
-        # playerindexfile.close()
+        playerindexfile.close()
         # print(f'Time after stats(): {time.time() - start}')
         
 

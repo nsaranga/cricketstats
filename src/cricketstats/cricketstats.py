@@ -710,13 +710,19 @@ class search:
                 self.inningsresult["Runs/Ball"].append(statsprocessor.ratio(sum(self.result[eachplayer]["inningstally"]["inningsruns"]), self.result[eachplayer]["inningstally"]["inningsballsfaced"]))
                 self.inningsresult["First Boundary Ball"].append(statsprocessor.firstboundary(
                     self.result[eachplayer]["inningstally"]["inningsruns"]))
-                batterfound=False
-                for eachtype in tempplayerindex["Batting"]:
-                    if eachplayer in tempplayerindex["Batting"][eachtype]:
-                        batterfound=True
-                        self.inningsresult["Batter Type"].append(eachtype)
-                if batterfound==False:
+                if eachplayer in tempplayerindex.keys():
+                    self.inningsresult["Batter Type"].append(tempplayerindex[eachplayer]["Batting"])
+                if eachplayer not in tempplayerindex.keys():
                     self.inningsresult["Batter Type"].append(None)
+
+
+                # batterfound=False
+                # for eachtype in tempplayerindex["Batting"]:
+                #     if eachplayer in tempplayerindex["Batting"][eachtype]:
+                #         batterfound=True
+                #         self.inningsresult["Batter Type"].append(eachtype)
+                # if batterfound==False:
+                #     self.inningsresult["Batter Type"].append(None)
 
                 for eachstat in ["Bowler Type", "Bowling Position","Runsgiven","Wickets","Overs Bowled","Economy Rate","Bowling Avg","Bowling S/R","Runsgiven/Ball","Avg Consecutive Dot Balls"]:
                     self.inningsresult[eachstat].append(None)
@@ -754,21 +760,31 @@ class search:
                         self.playersballresult["Out/NotOut"].append("Out")
 
                     self.playersballresult["Runs/Ball"].append(sum(self.result[eachplayer]["inningstally"]["inningsruns"][:(eachball+1)])/(eachball+1))
-                    batterfound=False
-                    for eachtype in tempplayerindex["Batting"]:
-                        if eachplayer in tempplayerindex["Batting"][eachtype]:
-                            batterfound=True
-                            self.playersballresult["Batter Type"].append(eachtype)
-                    bowlerfound=False
-                    for eachtype in tempplayerindex["Bowling"]:
-                        if bowler in tempplayerindex["Bowling"][eachtype]:
-                            bowlerfound=True
-                            self.playersballresult["Bowler Type"].append(eachtype)
-                            break
-                    if batterfound==False:
+                    if eachplayer in tempplayerindex.keys():
+                        self.playersballresult["Batter Type"].append(tempplayerindex[eachplayer]["Batting"])
+                    if eachplayer not in tempplayerindex.keys():
                         self.playersballresult["Batter Type"].append(None)
-                    if bowlerfound==False:
+                    if bowler in tempplayerindex.keys():
+                        self.playersballresult["Bowler Type"].append(tempplayerindex[bowler]["Bowling"])
+                    if bowler not in tempplayerindex.keys():
                         self.playersballresult["Bowler Type"].append(None)
+
+
+                    # batterfound=False
+                    # for eachtype in tempplayerindex["Batting"]:
+                    #     if eachplayer in tempplayerindex["Batting"][eachtype]:
+                    #         batterfound=True
+                    #         self.playersballresult["Batter Type"].append(eachtype)
+                    # bowlerfound=False
+                    # for eachtype in tempplayerindex["Bowling"]:
+                    #     if bowler in tempplayerindex["Bowling"][eachtype]:
+                    #         bowlerfound=True
+                    #         self.playersballresult["Bowler Type"].append(eachtype)
+                    #         break
+                    # if batterfound==False:
+                    #     self.playersballresult["Batter Type"].append(None)
+                    # if bowlerfound==False:
+                    #     self.playersballresult["Bowler Type"].append(None)
 
                     self.playersballresult["Fielder"].append(fielder)
                     self.playersballresult["Bowler"].append(bowler)
@@ -829,14 +845,20 @@ class search:
                     self.inningsresult["Avg Consecutive Dot Balls"].append(round(np.mean(statsprocessor.dotballseries(self.result[eachplayer]["inningstally"]["inningsrunsgiven"]))))
                 if 0 not in self.result[eachplayer]["inningstally"]["inningsrunsgiven"]:
                     self.inningsresult["Avg Consecutive Dot Balls"].append(0)
-                bowlerfound=False
-                for eachtype in tempplayerindex["Bowling"]:
-                    if eachplayer in tempplayerindex["Bowling"][eachtype]:
-                        bowlerfound=True
-                        self.inningsresult["Bowler Type"].append(eachtype)
-                        break
-                if bowlerfound==False:
+
+                if eachplayer in tempplayerindex.keys():
+                    self.inningsresult["Bowler Type"].append(tempplayerindex[eachplayer]["Bowling"])
+                if eachplayer not in tempplayerindex.keys():
                     self.inningsresult["Bowler Type"].append(None)
+                
+                # bowlerfound=False
+                # for eachtype in tempplayerindex["Bowling"]:
+                #     if eachplayer in tempplayerindex["Bowling"][eachtype]:
+                #         bowlerfound=True
+                #         self.inningsresult["Bowler Type"].append(eachtype)
+                #         break
+                # if bowlerfound==False:
+                #     self.inningsresult["Bowler Type"].append(None)
 
                 # setup bowling playersballresult
                 for eachball, (eachballrun, inningsball, batter,wickettype,inningsouts,fielder,batterscore,extras,extrastype,fieldingextras,fieldingextrastype) in enumerate(zip(self.result[eachplayer]["inningstally"]["inningsrunsgiven"],
@@ -895,21 +917,31 @@ class search:
                     self.playersballresult["Fielding Extras"].append(fieldingextras)
                     self.playersballresult["Fielding Extras Type"].append(fieldingextrastype)
                     self.playersballresult["Final Runsgiven"].append(sum(self.result[eachplayer]["inningstally"]["inningsrunsgiven"]))
-                    batterfound=False
-                    for eachtype in tempplayerindex["Batting"]:
-                        if batter in tempplayerindex["Batting"][eachtype]:
-                            batterfound=True
-                            self.playersballresult["Batter Type"].append(eachtype)
-                    bowlerfound=False
-                    for eachtype in tempplayerindex["Bowling"]:
-                        if eachplayer in tempplayerindex["Bowling"][eachtype]:
-                            bowlerfound=True
-                            self.playersballresult["Bowler Type"].append(eachtype)
-                            break
-                    if batterfound==False:
+                    
+                    if batter in tempplayerindex.keys():
+                        self.playersballresult["Batter Type"].append(tempplayerindex[batter]["Batting"])
+                    if batter not in tempplayerindex.keys():
                         self.playersballresult["Batter Type"].append(None)
-                    if bowlerfound==False:
+                    if eachplayer in tempplayerindex.keys():
+                        self.playersballresult["Bowler Type"].append(tempplayerindex[eachplayer]["Bowling"])
+                    if eachplayer not in tempplayerindex.keys():
                         self.playersballresult["Bowler Type"].append(None)
+
+                    # batterfound=False
+                    # for eachtype in tempplayerindex["Batting"]:
+                    #     if batter in tempplayerindex["Batting"][eachtype]:
+                    #         batterfound=True
+                    #         self.playersballresult["Batter Type"].append(eachtype)
+                    # bowlerfound=False
+                    # for eachtype in tempplayerindex["Bowling"]:
+                    #     if eachplayer in tempplayerindex["Bowling"][eachtype]:
+                    #         bowlerfound=True
+                    #         self.playersballresult["Bowler Type"].append(eachtype)
+                    #         break
+                    # if batterfound==False:
+                    #     self.playersballresult["Batter Type"].append(None)
+                    # if bowlerfound==False:
+                    #     self.playersballresult["Bowler Type"].append(None)
                 
     # Record team inningsresult
     # TODO have to fix overs faced. it should be "17.5" format. not divided by 6
@@ -1016,21 +1048,31 @@ class search:
                 self.teamsballresult["Bowler"].append(bowler)
                 # self.teamsballresult["Batter Type"].append(strikertype)
                 # self.teamsballresult["Bowler Type"].append(bowlertype)
-                batterfound=False
-                for eachtype in tempplayerindex["Batting"]:
-                    if striker in tempplayerindex["Batting"][eachtype]:
-                        batterfound=True
-                        self.teamsballresult["Batter Type"].append(eachtype)
-                bowlerfound=False
-                for eachtype in tempplayerindex["Bowling"]:
-                    if bowler in tempplayerindex["Bowling"][eachtype]:
-                        bowlerfound=True
-                        self.teamsballresult["Bowler Type"].append(eachtype)
-                        break
-                if batterfound==False:
+
+                if striker in tempplayerindex.keys():
+                    self.teamsballresult["Batter Type"].append(tempplayerindex[striker]["Batting"])
+                if striker not in tempplayerindex.keys():
                     self.teamsballresult["Batter Type"].append(None)
-                if bowlerfound==False:
+                if bowler in tempplayerindex.keys():
+                    self.teamsballresult["Bowler Type"].append(tempplayerindex[bowler]["Bowling"])
+                if bowler not in tempplayerindex.keys():
                     self.teamsballresult["Bowler Type"].append(None)
+
+                # batterfound=False
+                # for eachtype in tempplayerindex["Batting"]:
+                #     if striker in tempplayerindex["Batting"][eachtype]:
+                #         batterfound=True
+                #         self.teamsballresult["Batter Type"].append(eachtype)
+                # bowlerfound=False
+                # for eachtype in tempplayerindex["Bowling"]:
+                #     if bowler in tempplayerindex["Bowling"][eachtype]:
+                #         bowlerfound=True
+                #         self.teamsballresult["Bowler Type"].append(eachtype)
+                #         break
+                # if batterfound==False:
+                #     self.teamsballresult["Batter Type"].append(None)
+                # if bowlerfound==False:
+                #     self.teamsballresult["Bowler Type"].append(None)
 
         if (inningsteam not in self.result and bowlingteam in self.result):
             if self.result[bowlingteam]["inningstally"]["bowlinningscount"] == True:
@@ -1104,21 +1146,31 @@ class search:
                 self.teamsballresult["Bowler"].append(bowler)
                 # self.teamsballresult["Batter Type"].append(strikertype)
                 # self.teamsballresult["Bowler Type"].append(bowlertype)
-                batterfound=False
-                for eachtype in tempplayerindex["Batting"]:
-                    if striker in tempplayerindex["Batting"][eachtype]:
-                        batterfound=True
-                        self.teamsballresult["Batter Type"].append(eachtype)
-                bowlerfound=False
-                for eachtype in tempplayerindex["Bowling"]:
-                    if bowler in tempplayerindex["Bowling"][eachtype]:
-                        bowlerfound=True
-                        self.teamsballresult["Bowler Type"].append(eachtype)
-                        break
-                if batterfound==False:
+                if striker in tempplayerindex.keys():
+                    self.teamsballresult["Batter Type"].append(tempplayerindex[striker]["Batting"])
+                if striker not in tempplayerindex.keys():
                     self.teamsballresult["Batter Type"].append(None)
-                if bowlerfound==False:
+                if bowler in tempplayerindex.keys():
+                    self.teamsballresult["Bowler Type"].append(tempplayerindex[bowler]["Bowling"])
+                if bowler not in tempplayerindex.keys():
                     self.teamsballresult["Bowler Type"].append(None)
+
+
+                # batterfound=False
+                # for eachtype in tempplayerindex["Batting"]:
+                #     if striker in tempplayerindex["Batting"][eachtype]:
+                #         batterfound=True
+                #         self.teamsballresult["Batter Type"].append(eachtype)
+                # bowlerfound=False
+                # for eachtype in tempplayerindex["Bowling"]:
+                #     if bowler in tempplayerindex["Bowling"][eachtype]:
+                #         bowlerfound=True
+                #         self.teamsballresult["Bowler Type"].append(eachtype)
+                #         break
+                # if batterfound==False:
+                #     self.teamsballresult["Batter Type"].append(None)
+                # if bowlerfound==False:
+                #     self.teamsballresult["Bowler Type"].append(None)
 
 
         # Recording Succesfully Chased Score
@@ -1493,9 +1545,11 @@ class search:
 
         currentdir = os.path.dirname(os.path.abspath(__file__))
         if playerindexfile==None:
-            playerindex= pd.read_csv(f"{currentdir}/playerindex.csv")
+            pindexfile = open(f"{currentdir}/playerindex.json")
+            playerindex = json.load(pindexfile)
         if playerindexfile!=None:
-            playerindex= pd.read_csv(playerindexfile)
+            pindexfile = open(playerindexfile)
+            playerindex = json.load(pindexfile)
 
         if oppositionbatters == None:
             oppositionbatters = []
@@ -1504,10 +1558,11 @@ class search:
         if oppositionbatters:
             battingmatchups = []
             for eachname in oppositionbatters:
-                if eachname in playerindex["Batting"].values:
-                    battingmatchups.extend(playerindex["Player"].loc[playerindex["Batting"]==eachname])
-                if eachname in playerindex["Player"].values:
+                if eachname in playerindex.keys():
                     battingmatchups.append(eachname)
+                if eachname in ["Right hand","Left hand"]:
+                    for eachplayer in playerindex:
+                        battingmatchups.extend([eachplayer for (k,v) in playerindex[eachplayer].items() if v==eachname])
 
         if oppositionbowlers == None:
             oppositionbowlers = []
@@ -1515,10 +1570,11 @@ class search:
         if oppositionbowlers:
             bowlingmatchups = []
             for eachname in oppositionbowlers:
-                if eachname in playerindex["Bowling"].values:
-                    bowlingmatchups.extend(playerindex["Player"].loc[playerindex["Bowling"]==eachname])
-                if eachname in playerindex["Player"].values:
+                if eachname in playerindex.keys():
                     bowlingmatchups.append(eachname)
+                if eachname in ["Right arm pace","Left arm pace","Right arm off break","Right arm leg break","Left arm orthodox","Left arm wrist spin"]:
+                    for eachplayer in playerindex:
+                        bowlingmatchups.extend([eachplayer for (k,v) in playerindex[eachplayer].items() if v==eachname])
 
         if oppositionteams == None:
             oppositionteams = []
@@ -1570,8 +1626,8 @@ class search:
         allgamesdrawn = 0
 
         # load playerindex
-        playerindexfile = open(f"{currentdir}/playerindex.json")
-        players = json.load(playerindexfile)
+        # playerindexfile = open(f"{currentdir}/playerindex.json")
+        # players = json.load(playerindexfile)
         
         currentdir = os.path.dirname(os.path.abspath(__file__))
         matchindexfile = open(f"{currentdir}/matchindex.json")
@@ -1587,13 +1643,14 @@ class search:
                     match = json.load(matchdata)
 
                     # creat temporary player index
-                    tempplayerindex={"Batting":{"Right hand":[],"Left hand":[]},"Bowling":{"Right arm pace":[],"Left arm pace":[],"Right arm off break":[],"Right arm leg break":[],"Left arm orthodox":[],"Left arm wrist spin":[]}}
-                    for eachplayer in match['info']['registry']['people'].keys():
-                        if eachplayer in players.keys():
-                            if  players[eachplayer]["Batting"] in tempplayerindex["Batting"]:
-                                tempplayerindex["Batting"][players[eachplayer]["Batting"]].append(eachplayer)
-                            if  players[eachplayer]["Bowling"] in tempplayerindex["Bowling"]:
-                                tempplayerindex["Bowling"][players[eachplayer]["Bowling"]].append(eachplayer)
+                    # tempplayerindex={"Batting":{"Right hand":[],"Left hand":[]},"Bowling":{"Right arm pace":[],"Left arm pace":[],"Right arm off break":[],"Right arm leg break":[],"Left arm orthodox":[],"Left arm wrist spin":[]}}
+                    # for eachplayer in match['info']['registry']['people'].keys():
+                    #     if eachplayer in playerindex.keys():
+                    #         if  playerindex[eachplayer]["Batting"] in tempplayerindex["Batting"]:
+                    #             tempplayerindex["Batting"][playerindex[eachplayer]["Batting"]].append(eachplayer)
+                    #         if  playerindex[eachplayer]["Bowling"] in tempplayerindex["Bowling"]:
+                    #             tempplayerindex["Bowling"][playerindex[eachplayer]["Bowling"]].append(eachplayer)
+                    tempplayerindex = playerindex
 
 
 
@@ -1807,7 +1864,7 @@ class search:
                     matchdata.close()
         matches.close()
         matchindexfile.close()
-        playerindexfile.close()
+        pindexfile.close()
         # print(f'Time after stats(): {time.time() - start}')
         
 

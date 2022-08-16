@@ -27,7 +27,6 @@ from cricketstats import cricketstats
 
 # TODO record player's scores and balls faced
 # TODO fix bowler's runs
-# TODO make batterstats that tracks ballsf aced then pick up stats accordign to that.
 
 
 

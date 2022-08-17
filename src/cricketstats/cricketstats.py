@@ -1551,10 +1551,12 @@ class search:
             pindexfile = open(playerindexfile)
             playerindex = json.load(pindexfile)
 
+        battingmatchups=None
         if oppositionbatters == None:
             oppositionbatters = []
             battingmatchups = []
 
+        
         if oppositionbatters:
             battingmatchups = []
             for eachname in oppositionbatters:
@@ -1564,6 +1566,7 @@ class search:
                     for eachplayer in playerindex:
                         battingmatchups.extend([eachplayer for (k,v) in playerindex[eachplayer].items() if v==eachname])
 
+        bowlingmatchups=None
         if oppositionbowlers == None:
             oppositionbowlers = []
             bowlingmatchups = []

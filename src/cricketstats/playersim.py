@@ -17,7 +17,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import os
-import sys
 import pandas as pd
 import numpy as np
 import multiprocessing as mp
@@ -107,8 +106,8 @@ class playersim:
             self.batters[1]: (simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
             }
 
-        if len(inningswicketfallP[self.batters[0]])<2 or sum(inningswicketfallP[self.batters[0]])!=1:
-            inningswicketfallP=inningswicketfallP = {
+        if len(inningswicketfallP[self.batters[0]])<2 or sum(inningswicketfallP[self.batters[0]])<0.99:
+            inningswicketfallP={
                 self.batters[0]: (simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batter"].isin(simteams[thisinnings]["battingorder"]))&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
                 ,
                 self.batters[1]: (simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batter"].isin(simteams[thisinnings]["battingorder"]))&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
@@ -158,12 +157,11 @@ class playersim:
         legaldeliveries = 0
         while legaldeliveries < 6:
             
-            # Fix if p-values don't have all possibilites
-            # if len(scoreP)<7:
-            #     scoreP = tm.redistributepvalues(self,scoreP)
-            
+            if len(wicketfallP[self.batters[0]])<2 or sum(wicketfallP[self.batters[0]])<0.99:
+                    wicketfallP=playersim.wicketfallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
             # Over based wicket rng
             wicket = rng.choice(wicketfallP[self.batters[0]].index, p=wicketfallP[self.batters[0]].tolist(), shuffle=False)
+            
 
             if wicket[0]=="Out":
                 legaldeliveries += 1
@@ -181,16 +179,30 @@ class playersim:
 
                 wicketfallP,scoreP = playersim.playerP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
 
-                if len(wicketfallP[self.batters[0]])<2 or sum(wicketfallP[self.batters[0]])!=1:
+                if len(wicketfallP[self.batters[0]])<2 or sum(wicketfallP[self.batters[0]])<0.99:
                     wicketfallP=playersim.wicketfallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
 
-                if len(scoreP[self.batters[0]])==0 or sum(scoreP[self.batters[0]])!=1:
+                if len(scoreP[self.batters[0]])==0 or sum(scoreP[self.batters[0]])<0.99:
                     scoreP=playersim.scorefallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
+
+                # Fix if p-values don't have all possibilites
+                if len(scoreP[self.batters[0]])>0 and len(scoreP[self.batters[0]])<7:
+                    scoreP = playersim.redistributepvalues(self,scoreP)
 
             # Over based scoring rng
             if wicket[0]=="Not Out":
 
+                if len(scoreP[self.batters[0]])==0 or sum(scoreP[self.batters[0]])<0.99:
+                    scoreP=playersim.scorefallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
+
+                # Fix if p-values don't have all possibilites
+                if len(scoreP[self.batters[0]])>0 and len(scoreP[self.batters[0]])<7:
+                    scoreP = playersim.redistributepvalues(self,scoreP)
+
+                #try:
                 batterscore = rng.choice(scoreP[self.batters[0]].index, p=scoreP[self.batters[0]].tolist(), shuffle=False)
+                # except:
+                #     print(self.batters[0])
 
                 if batterscore[0]!=0:
                     extras = rng.choice(extrasP.index, p=extrasP.tolist(), shuffle=False)
@@ -219,15 +231,15 @@ class playersim:
 
     def redistributepvalues(self,scoreP):
         # print(f"Before Modification: {scoreP}")
-        lowestP = min(scoreP)
-        scoreP=scoreP.apply(lambda x: x/(1+lowestP))
-        newPs= (1-sum(scoreP))/(7-len(scoreP))
+        lowestP = min(scoreP[self.batters[0]])
+        scoreP[self.batters[0]]=scoreP[self.batters[0]].apply(lambda x: x/(1+lowestP))
+        newPs= (1-sum(scoreP[self.batters[0]]))/(7-len(scoreP[self.batters[0]]))
         # print(scoreP)
-        scoreP=scoreP.reindex([(0,),(1,),(2,),(3,),(4,),(5,),(6,)])
+        scoreP[self.batters[0]]=scoreP[self.batters[0]].reindex([(0,),(1,),(2,),(3,),(4,),(5,),(6,)])
         # print(scoreP)
-        for eachvalue in scoreP.index:
-            if pd.isna(scoreP[eachvalue]):
-                scoreP[eachvalue]=newPs
+        for eachvalue in scoreP[self.batters[0]].index:
+            if pd.isna(scoreP[self.batters[0]][eachvalue]):
+                scoreP[self.batters[0]][eachvalue]=newPs
         # print(scoreP)
         # print(f"ScoreP Sum: {sum(scoreP)}")
         return scoreP
@@ -252,7 +264,7 @@ class playersim:
 
         sim.resultssetup()
         for thismatch in range(simulations):
-            # try:
+            
             sim.matchresultssetup()
             # Function to simulate a match
             if statsmatchtype=="T20" or statsmatchtype=="ODI" or statsmatchtype=="ODM":
@@ -260,8 +272,7 @@ class playersim:
 
             if statsmatchtype=="Test":
                 sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam)
-            # except:
-            #     raise Exception("".join(traceback.format_exception(*sys.exc_info())))
+
         return sim.results
             
     def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False,matchscore=None,hometeam=None):
@@ -368,6 +379,10 @@ class ld(playersim):
                         self.battersstats[eachbatter] = 0
 
                 wicketfallP,scoreP = playersim.playerP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
+                
+                # Fix if p-values don't have all possibilites
+                if len(scoreP[self.batters[0]])>0 and len(scoreP[self.batters[0]])<7:
+                    scoreP = playersim.redistributepvalues(self,scoreP)
 
                 if len(wicketfallP[self.batters[0]])<2 or sum(wicketfallP[self.batters[0]])<0.99:
                     wicketfallP=playersim.wicketfallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
@@ -512,6 +527,10 @@ class tm(playersim):
                         self.battersstats[eachbatter] = 0
 
                 wicketfallP,scoreP = playersim.playerP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
+                # Fix if p-values don't have all possibilites
+                if len(scoreP[self.batters[0]])>0 and len(scoreP[self.batters[0]])<7:
+                    scoreP = playersim.redistributepvalues(self,scoreP)
+
                 if len(wicketfallP[self.batters[0]])<2 or sum(wicketfallP[self.batters[0]])<0.99:
                     wicketfallP=playersim.wicketfallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
 
@@ -554,7 +573,7 @@ class tm(playersim):
 
         # Record match winners
         if (self.matchresults["Innings 1 Score"][-1]+self.matchresults["Innings 3 Score"][-1])>(self.matchresults["Innings 2 Score"][-1]+self.matchresults["Innings 4 Score"][-1]) and (self.matchresults["Innings 4 Wickets"][-1]<10):
-                    self.matchresults["Winner"].append("Draw")
+            self.matchresults["Winner"].append("Draw")
         if (self.matchresults["Innings 1 Score"][-1]+self.matchresults["Innings 3 Score"][-1])>(self.matchresults["Innings 2 Score"][-1]+self.matchresults["Innings 4 Score"][-1]) and (self.matchresults["Innings 4 Wickets"][-1]==10):
             self.matchresults["Winner"].append(self.matchresults["Innings 1 Team"][-1])
         if (self.matchresults["Innings 1 Score"][-1]+self.matchresults["Innings 3 Score"][-1])<(self.matchresults["Innings 2 Score"][-1]+self.matchresults["Innings 4 Score"][-1]):

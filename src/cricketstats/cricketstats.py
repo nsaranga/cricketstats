@@ -46,8 +46,8 @@ class search:
     # Setup Player statistics to be recorded.
 
     # Player aggregate results
-    def addplayerstoresult(self, eachplayer):
-        self.result[eachplayer] = {"Players": eachplayer, "Games": 0, "Won": 0, "Drawn": 0, 'Win %': 0,
+    def addplayerstoresult(self, eachplayer,playerindex):
+        self.result[eachplayer] = {"Players": eachplayer, "Batting":None,"Bowling":None, "Games": 0, "Won": 0, "Drawn": 0, 'Win %': 0,
 
                                     "Innings Batted": 0,
                                     "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Balls Faced": 0, "Outs": 0, 
@@ -72,6 +72,10 @@ class search:
                                     
                                     "inningsrunsgiven": [], "inningsballsbowled": 0, "inningswickets": [], "inningsbattersbowledat":[],"inningswicketstype":[], "inningsextrasgiven": [],"inningsextrastype":[],"inningsfieldingextrastype":[], "inningsbatterrunsgiven":[], "inningsfieldingextrasgiven":[]}
                                     }
+        if eachplayer in playerindex.keys():
+            self.result[eachplayer]["Batting"]=playerindex[eachplayer]["Batting"]
+            self.result[eachplayer]["Bowling"]=playerindex[eachplayer]["Bowling"]
+
     
     # Player innings results
     def playerinningsresultsetup(self):
@@ -1523,7 +1527,7 @@ class search:
 
     def cleanup(self):
         for eachdict in self.result:
-            removestats = ["batinningscount", "inningsruns", "inningsballsfaced", "inningsouts", "firstboundary", "totalstos", "totalstosopp", "totalstosgiven", "totalstosgivenopp", "bowlinningscount", "inningsrunsgiven", "inningsballsbowled", "inningswickets","dotballseries", "inningshowout", "inningsbowlersfaced", "inningspartners", "teaminningsscore", "teaminningsballs", "inningsbattersbowledat", "inningswicketstype", "teaminningsrunsgiven", "teaminningswickets","teaminningsballsbowled", "inningsbowlersfacedtype", "inningstally"]
+            removestats = ["firstboundary", "totalstos", "totalstosopp", "totalstosgiven", "totalstosgivenopp","dotballseries","inningstally"]
             for eachstat in removestats:
                 if eachstat in self.result[eachdict]: 
                     self.result[eachdict].pop(eachstat)
@@ -1607,7 +1611,7 @@ class search:
         if self.players:
             search.playerinningsresultsetup(self)
             for eachplayer in self.players:
-                search.addplayerstoresult(self, eachplayer)
+                search.addplayerstoresult(self, eachplayer,playerindex)
         if self.allteams==True:
             search.teaminningsresultsetup(self)
         if self.teams:
@@ -1802,7 +1806,7 @@ class search:
                                 if self.allplayers==True:
                                     for eachplayer in [eachball["batter"],eachball["non_striker"], eachball["bowler"]]:
                                         if eachplayer not in self.result:
-                                            search.addplayerstoresult(self, eachplayer)
+                                            search.addplayerstoresult(self, eachplayer,playerindex)
                                     if "wickets" in eachball:
                                         for eachwicket in eachball["wickets"]:
                                             if "fielders" in eachwicket:
@@ -1810,7 +1814,7 @@ class search:
                                                     if "name" not in eachfielder:
                                                         continue
                                                     if eachfielder["name"] not in self.result:
-                                                        search.addplayerstoresult(self, eachfielder["name"])
+                                                        search.addplayerstoresult(self, eachfielder["name"],playerindex)
 
                                 # Record Player stats
                                 if self.players or self.allplayers==True:

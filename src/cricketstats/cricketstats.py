@@ -124,8 +124,8 @@ class search:
     # Team innings results
     def teaminningsresultsetup(self):
         self.inningsresult = {
-        "Date":[], "Match Type":[],"Venue":[], "Event":[], "Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[], 
-        "Defended Score": [], "Chased Score": [], "Margin":[], "Declared":[],
+        "Date":[], "Match Type":[],"Venue":[], "Event":[], "Match Winner":[], "Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[], 
+        "Defence":[], "Defended Score": [],"Chase":[], "Chased Score": [], "Margin":[], "Declared":[],
         "Score": [], "Outs": [], "Overs": [], "Extras": [],
         "Runs/Wicket":[], "Runs/Ball":[], "Run Rate":[], "First Boundary Ball":[],
         "Avg Consecutive Dot Balls":[]
@@ -135,7 +135,7 @@ class search:
     def teamsballresultsetup(self):
         self.teamsballresult = { 
         "Date":[], "Match Type":[], "Venue":[], "Event":[], "Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Ball":[], "Ball in Over":[],
-        "Current Score":[], "Current Outs":[], "Final Score":[],
+        "Current Score":[], "Current Outs":[], "Final Score":[], "Final Outs":[],"Final Overs":[],
         "Batter":[], "Batting Position":[],"Batter Type":[], "Non_striker": [], "Runs Scored": [], "Batter Score":[], "Runs/Ball": [], "How Out": [], "Fielder":[],
         "Bowler": [], "Bowler Type":[], "Extras":[], "Extras Type": [], "Out/NotOut":[],
         }
@@ -232,13 +232,13 @@ class search:
 
 
     # Record striker's stats for each ball.
-    def strikerstats(self, eachball, nthball, eachover,battingorder):
+    def strikerstats(self, eachball, nthball, eachover,battingorder,legdel):
         self.result[eachball['batter']]["inningstally"]["batinningscount"] = True
         self.result[eachball['batter']]["inningstally"]["inningsruns"].append(eachball['runs']['batter'])
         self.result[eachball['batter']]["inningstally"]["inningsbowlersfaced"].append(eachball['bowler'])
         over=eachover["over"]
         ball=nthball+1
-        self.result[eachball['batter']]["inningstally"]["teaminningsballs"].append(float(f"{over}.{ball}"))
+        self.result[eachball['batter']]["inningstally"]["teaminningsballs"].append(float(f"{over}.{legdel}"))
         self.result[eachball['batter']]["inningstally"]["inningspartners"].append(eachball["non_striker"])
         
 
@@ -353,11 +353,11 @@ class search:
                         ]["totalstosgiven"] += 1
     
     # Record bowler's stats
-    def bowlerstats(self, eachball, fielders, nthball, eachover,battingorder):
+    def bowlerstats(self, eachball, fielders, nthball, eachover,battingorder,legdel):
         self.result[eachball['bowler']]["inningstally"]["bowlinningscount"] = True
         over=eachover["over"]
         ball=nthball+1
-        self.result[eachball['bowler']]["inningstally"]["teaminningsballs"].append(float(f"{over}.{ball}"))
+        self.result[eachball['bowler']]["inningstally"]["teaminningsballs"].append(float(f"{over}.{legdel}"))
         self.result[eachball['bowler']]["inningstally"]["inningsbattersbowledat"].append(eachball["batter"])
 
         self.result[eachball['bowler']]["inningstally"]["inningsbatterrunsgiven"].append(eachball['runs']['batter'])    
@@ -504,7 +504,7 @@ class search:
                                         ]["Runouts"] += 1
 
     # Record team's batting stats
-    def teambattingstats(self, eachball, inningsteam, nthball, eachover, battingorder):
+    def teambattingstats(self, eachball, inningsteam, nthball, eachover, battingorder,legdel):
         self.result[inningsteam]["inningstally"]["batinningscount"] = True
         self.result[inningsteam]["inningstally"]["inningsstrikers"].append(eachball["batter"])
         self.result[inningsteam]["inningstally"]["inningsnonstrikers"].append(eachball["non_striker"])
@@ -514,7 +514,7 @@ class search:
         self.result[inningsteam]["inningstally"]["inningsextras"].append(eachball['runs']['extras'])
         over=eachover["over"]
         ball=nthball+1
-        self.result[inningsteam]["inningstally"]["inningsballs"].append(float(f"{over}.{ball}"))
+        self.result[inningsteam]["inningstally"]["inningsballs"].append(float(f"{over}.{legdel}"))
         self.result[inningsteam]["inningstally"]["inningsballinover"].append(ball)
 
         self.result[inningsteam]["Runs"] += eachball['runs']['total']
@@ -585,7 +585,7 @@ class search:
 
 
     # Record team's bowling stats
-    def teambowlingstats(self, eachball, inningsteam, nthball, eachover, battingorder):
+    def teambowlingstats(self, eachball, inningsteam, nthball, eachover, battingorder,legdel):
         self.result[inningsteam]["inningstally"]["bowlinningscount"] = True
         self.result[inningsteam]["inningstally"]["inningsstrikers"].append(eachball["batter"])
         self.result[inningsteam]["inningstally"]["inningsnonstrikers"].append(eachball["non_striker"])
@@ -595,7 +595,7 @@ class search:
         self.result[inningsteam]["inningstally"]["inningsextras"].append(eachball['runs']['extras'])
         over=eachover["over"]
         ball=nthball+1
-        self.result[inningsteam]["inningstally"]["inningsballs"].append(float(f"{over}.{ball}"))
+        self.result[inningsteam]["inningstally"]["inningsballs"].append(float(f"{over}.{legdel}"))
         self.result[inningsteam]["inningstally"]["inningsballinover"].append(ball)
 
         self.result[inningsteam]["Runsgiven"] += eachball['runs']['total']
@@ -967,6 +967,11 @@ class search:
         if "toss" not in matchinfo:
             self.inningsresult["Toss Winner"].append(None)
             self.inningsresult["Toss Decision"].append(None)
+        if "result" not in matchinfo["outcome"]:
+            self.inningsresult["Match Winner"].append(matchinfo["outcome"]["winner"])
+        if "result" in matchinfo["outcome"]:
+            self.inningsresult["Match Winner"].append(None)
+
         self.inningsresult["Batting Team"].append(inningsteam)
         self.inningsresult["Bowling Team"].append(bowlingteam)
         self.inningsresult["Innings"].append(nthinnings + 1)
@@ -1027,7 +1032,6 @@ class search:
                 self.teamsballresult["Ball"].append(inningsball)
                 self.teamsballresult["Current Score"].append(sum(self.result[inningsteam]["inningstally"]["inningsruns"][:(eachball+1)]))
                 self.teamsballresult["Current Outs"].append(sum(self.result[inningsteam]["inningstally"]["inningsouts"][:(eachball+1)]))
-                #self.teamsballresult["Current Outs"].append(currentouts)
                 self.teamsballresult["Batter"].append(striker)
                 self.teamsballresult["Batting Position"].append(strikerbattingpos)
                 self.teamsballresult["Non_striker"].append(nonstriker)
@@ -1038,15 +1042,14 @@ class search:
                 self.teamsballresult["Runs/Ball"].append(
                     round(sum(self.result[inningsteam]["inningstally"]["inningsruns"][:(eachball+1)])/(eachball+1),2))
                 self.teamsballresult["Final Score"].append(sum(self.result[inningsteam]["inningstally"]["inningsruns"]))
-                if eachball == (len(self.result[inningsteam]["inningstally"]["inningsruns"])-1) and howout==None:
-                    self.teamsballresult["How Out"].append("not out")
-                if eachball == (len(self.result[inningsteam]["inningstally"]["inningsruns"])-1) and howout!=None:
-                    self.teamsballresult["How Out"].append(howout)
-                if eachball != (len(self.result[inningsteam]["inningstally"]["inningsruns"])-1):
-                    self.teamsballresult["How Out"].append("No Wicket")
+                self.teamsballresult["Final Outs"].append(sum(self.result[inningsteam]["inningstally"]["inningsouts"]))
+                self.teamsballresult["Final Overs"].append(self.result[inningsteam]["inningstally"]["inningsballs"][-1])
+                    
                 if howout==None:
-                    self.teamsballresult["Out/NotOut"].append("not out")
+                    self.teamsballresult["How Out"].append("Not Out")
+                    self.teamsballresult["Out/NotOut"].append("Not Out")
                 if howout!=None:
+                    self.teamsballresult["How Out"].append(howout)
                     self.teamsballresult["Out/NotOut"].append("Out")
                 self.teamsballresult["Fielder"].append(fielder)   
                 self.teamsballresult["Bowler"].append(bowler)
@@ -1125,8 +1128,7 @@ class search:
                 self.teamsballresult["Ball in Over"].append(ballinover)
                 self.teamsballresult["Ball"].append(inningsball)
                 self.teamsballresult["Current Score"].append(sum(self.result[bowlingteam]["inningstally"]["inningsruns"][:(eachball+1)]))
-                self.teamsballresult["Current Outs"].append(sum(self.result[bowlingteam]["inningstally"]["inningsouts"][:(eachball+1)]))
-                # self.teamsballresult["Current Outs"].append(currentouts)
+                self.teamsballresult["Current Outs"].append(sum(self.result[bowlingteam]["inningstally"]["inningsoutsbyball"][:(eachball+1)]))
                 self.teamsballresult["Batter"].append(striker)
                 self.teamsballresult["Batting Position"].append(strikerbattingpos)
                 self.teamsballresult["Non_striker"].append(nonstriker)
@@ -1136,15 +1138,13 @@ class search:
                 self.teamsballresult["Extras Type"].append(None)
                 self.teamsballresult["Runs/Ball"].append(round(sum(self.result[bowlingteam]["inningstally"]["inningsruns"][:(eachball+1)])/(eachball+1),2))
                 self.teamsballresult["Final Score"].append(sum(self.result[bowlingteam]["inningstally"]["inningsruns"]))
-                if eachball == (len(self.result[bowlingteam]["inningstally"]["inningsruns"])-1) and howout==None:
-                    self.teamsballresult["How Out"].append("not out")
-                if eachball == (len(self.result[bowlingteam]["inningstally"]["inningsruns"])-1) and howout!=None:
-                    self.teamsballresult["How Out"].append(howout)
-                if eachball != (len(self.result[bowlingteam]["inningstally"]["inningsruns"])-1):
-                    self.teamsballresult["How Out"].append("No Wicket")
+                self.teamsballresult["Final Outs"].append(sum(self.result[bowlingteam]["inningstally"]["inningsouts"]))
+                self.teamsballresult["Final Overs"].append(self.result[bowlingteam]["inningstally"]["inningsballs"][-1])
                 if howout==None:
-                    self.teamsballresult["Out/NotOut"].append("not out")
+                    self.teamsballresult["How Out"].append("Not Out")
+                    self.teamsballresult["Out/NotOut"].append("Not Out")
                 if howout!=None:
+                    self.teamsballresult["How Out"].append(howout)
                     self.teamsballresult["Out/NotOut"].append("Out")
                 self.teamsballresult["Fielder"].append(fielder)  
                 self.teamsballresult["Bowler"].append(bowler)
@@ -1177,38 +1177,72 @@ class search:
                 #     self.teamsballresult["Bowler Type"].append(None)
 
 
-        # Recording Succesfully Chased Score
+        # Recording Succesfully Defended/Chased Score
         if nthinnings == (len(matchinnings) - 1):
             if "result" not in matchinfo["outcome"]:
                 if "by" in matchinfo["outcome"] and "wickets" in matchinfo["outcome"]["by"]:
                     if inningsteam in self.result:
                         self.result[inningsteam]["Chased Wins"] += 1
+                        self.inningsresult["Chase"].append("Successful")
                         self.inningsresult["Chased Score"].append(sum(self.result[inningsteam]["inningstally"]["inningsruns"]))
+                        self.inningsresult["Defence"].append("Unsuccessful")
                     if inningsteam not in self.result:
+                        self.inningsresult["Chase"].append("Successful")
                         self.inningsresult["Chased Score"].append(sum(self.result[bowlingteam]["inningstally"]["inningsruns"]))
+                        self.inningsresult["Defence"].append("Unsuccessful")
                     self.inningsresult["Defended Score"].append(None)
                     self.inningsresult["Margin"].append(matchinfo["outcome"]['by']['wickets'])
                 if "by" in matchinfo["outcome"] and "runs" in matchinfo["outcome"]["by"]:
                     if bowlingteam in self.result:
                         self.result[bowlingteam]["Defended Wins"] += 1
+                        self.inningsresult["Defence"].append("Successful")
                         self.inningsresult["Defended Score"].append(sum(self.result[bowlingteam]["inningstally"]["inningsruns"]) + matchinfo["outcome"]['by']['runs'])
+                        self.inningsresult["Chase"].append("Unsuccessful")
                     if bowlingteam not in self.result:
+                        self.inningsresult["Defence"].append("Successful")
                         self.inningsresult["Defended Score"].append(sum(self.result[inningsteam]["inningstally"]["inningsruns"]) + matchinfo["outcome"]['by']['runs'])
+                        self.inningsresult["Chase"].append("Unsuccessful")
                     self.inningsresult["Chased Score"].append(None)
                     self.inningsresult["Margin"].append(matchinfo["outcome"]['by']['runs'])
                 if "by" not in matchinfo["outcome"]:
                     self.inningsresult["Defended Score"].append(None)
                     self.inningsresult["Chased Score"].append(None)
                     self.inningsresult["Margin"].append(None)
+                    self.inningsresult["Chase"].append(None)
+                    self.inningsresult["Defence"].append(None)
             if "result" in matchinfo["outcome"]:
                 self.inningsresult["Defended Score"].append(None)
                 self.inningsresult["Chased Score"].append(None)
                 self.inningsresult["Margin"].append(None)
+                self.inningsresult["Chase"].append(None)
+                self.inningsresult["Defence"].append(None)
 
-        if nthinnings!= (len(matchinnings) - 1):
+        if nthinnings== (len(matchinnings) - 2):
+            if "result" not in matchinfo["outcome"]:
+                if matchinfo["outcome"]["winner"]==inningsteam:
+                    self.inningsresult["Defended Score"].append(None)
+                    self.inningsresult["Chased Score"].append(None)
+                    self.inningsresult["Margin"].append(None)
+                    self.inningsresult["Chase"].append(None)
+                    self.inningsresult["Defence"].append("Successful")
+                if matchinfo["outcome"]["winner"]!=inningsteam:
+                    self.inningsresult["Defended Score"].append(None)
+                    self.inningsresult["Chased Score"].append(None)
+                    self.inningsresult["Margin"].append(None)
+                    self.inningsresult["Chase"].append(None)
+                    self.inningsresult["Defence"].append("Unsuccessful")
+            if "result" in matchinfo["outcome"]:
+                self.inningsresult["Defended Score"].append(None)
+                self.inningsresult["Chased Score"].append(None)
+                self.inningsresult["Margin"].append(None)
+                self.inningsresult["Chase"].append(None)
+                self.inningsresult["Defence"].append(None)
+        if nthinnings!= (len(matchinnings) - 1) and nthinnings!= (len(matchinnings) - 2):
             self.inningsresult["Defended Score"].append(None)
             self.inningsresult["Chased Score"].append(None)
             self.inningsresult["Margin"].append(None)
+            self.inningsresult["Chase"].append(None)
+            self.inningsresult["Defence"].append(None)
 
         # print("Inn", len(self.inningsresult["Innings"]))
         # print(nthinnings +1)
@@ -1790,7 +1824,9 @@ class search:
                                 continue
 
                             # Open each ball
+                            legdel=1
                             for nthball, eachball in enumerate(eachover['deliveries']):
+
 
                                 # Record batting lineup.
                                 if eachball['batter'] not in battingorder:
@@ -1821,7 +1857,7 @@ class search:
                                     
                                     # Striker's stats
                                     if eachball['batter'] in self.result and (not oppositionbowlers or eachball['bowler'] in bowlingmatchups) and (not oppositionteams or eachinnings["team"] not in oppositionteams) and (not battingposition or (battingposition and ((battingorder.index(eachball['batter']) + 1) in battingposition))):
-                                        search.strikerstats(self, eachball, nthball, eachover,battingorder)
+                                        search.strikerstats(self, eachball, nthball, eachover,battingorder,legdel)
     
                                     # Non-striker's outs.
                                     if eachball["non_striker"] in self.result and "wickets" in eachball and (not oppositionteams or eachinnings["team"] not in oppositionteams) and (not battingposition or (battingposition and ((battingorder.index(eachball['non_striker']) + 1) in battingposition))):
@@ -1829,7 +1865,7 @@ class search:
 
                                     # Bowling stats
                                     if eachball['bowler'] in self.result and (not oppositionbatters or eachball['batter'] in battingmatchups) and (not oppositionteams or eachinnings["team"] in oppositionteams) and (not bowlingposition or (bowlingposition and ((bowlingorder.index(eachball['bowler']) + 1) in bowlingposition))):
-                                        search.bowlerstats(self, eachball, fielders, nthball, eachover,battingorder)
+                                        search.bowlerstats(self, eachball, fielders, nthball, eachover,battingorder,legdel)
 
                                     # Fielding stats
                                     if "wickets" in eachball:
@@ -1840,18 +1876,21 @@ class search:
 
                                     # Team Batting stats
                                     if eachinnings["team"] in self.result:
-                                        search.teambattingstats(self, eachball, eachinnings["team"], nthball, eachover, battingorder)
+                                        search.teambattingstats(self, eachball, eachinnings["team"], nthball, eachover, battingorder,legdel)
                                         if "declared" in eachinnings:
                                             self.result[eachinnings["team"]]["inningstally"]["inningsdeclared"] = True
 
                                     # Team Bowling stats
                                     for eachteam in match["info"]["teams"]:
                                         if eachteam in self.result and eachteam not in eachinnings["team"]:
-                                            search.teambowlingstats(self, eachball, eachteam, nthball, eachover, battingorder)
+                                            search.teambowlingstats(self, eachball, eachteam, nthball, eachover, battingorder,legdel)
                                             if "declared" in eachinnings:
                                                 self.result[eachteam]["inningstally"]["inningsdeclared"] = True
-
-                                # search.ballstats(self, matchtimetuple, match["info"], nthinnings, eachinnings, eachball, nthball, eachover, battingorder, bowlingorder)
+                                
+                                if "extras" in eachball and "wides" not in eachball['extras'] and "noballs" not in eachball['extras']:
+                                    legdel+=1
+                                if "extras" not in eachball:
+                                    legdel+=1
 
                         # Record Player innings and ball by ball stats
                         if self.players or self.allplayers==True:

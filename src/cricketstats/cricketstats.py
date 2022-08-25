@@ -134,7 +134,7 @@ class search:
     # Team ball results
     def teamsballresultsetup(self):
         self.teamsballresult = { 
-        "Date":[], "Match Type":[], "Venue":[], "Event":[], "Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Ball":[], "Ball in Over":[],
+        "Date":[], "Match Type":[], "Venue":[], "Event":[], "Match Winner":[],"Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Innings Ball":[], "Ball":[], "Ball in Over":[],
         "Current Score":[], "Current Outs":[], "Final Score":[], "Final Outs":[],"Final Overs":[],
         "Batter":[], "Batting Position":[],"Batter Type":[], "Non_striker": [], "Runs Scored": [], "Batter Score":[], "Runs/Ball": [], "How Out": [], "Fielder":[],
         "Bowler": [], "Bowler Type":[], "Extras":[], "Extras Type": [], "Out/NotOut":[],
@@ -948,7 +948,6 @@ class search:
                     #     self.playersballresult["Bowler Type"].append(None)
                 
     # Record team inningsresult
-    # TODO have to fix overs faced. it should be "17.5" format. not divided by 6
     def teaminnings(self, inningsteam, nthinnings, matchinfo, matchtimetuple, matchinnings,tempplayerindex):
         for eachteam in matchinfo["teams"]:
             if eachteam != inningsteam:
@@ -993,8 +992,7 @@ class search:
                 sum(self.result[inningsteam]["inningstally"]["inningsruns"]))
             self.inningsresult["Outs"].append(sum(self.result[inningsteam]["inningstally"]["inningsouts"]))
             self.inningsresult["Extras"].append(sum(self.result[inningsteam]["inningstally"]["inningsextras"]))
-            self.inningsresult["Overs"].append(
-                math.ceil(sum(self.result[inningsteam]["inningstally"]["inningsballstotal"])/6))
+            self.inningsresult["Overs"].append(self.result[inningsteam]["inningstally"]["inningsballs"][-1])
             if sum(self.result[inningsteam]["inningstally"]["inningsouts"]) > 0:
                 self.inningsresult["Runs/Wicket"].append(statsprocessor.ratio(sum(self.result[inningsteam]["inningstally"]["inningsruns"]), sum(self.result[inningsteam]["inningstally"]["inningsouts"])))
             if sum(self.result[inningsteam]["inningstally"]["inningsouts"])==0:
@@ -1024,12 +1022,17 @@ class search:
                 if "toss" not in matchinfo:
                     self.teamsballresult["Toss Winner"].append(None)
                     self.teamsballresult["Toss Decision"].append(None)
+                if "result" not in matchinfo["outcome"]:
+                    self.teamsballresult["Match Winner"].append(matchinfo["outcome"]["winner"])
+                if "result" in matchinfo["outcome"]:
+                    self.teamsballresult["Match Winner"].append(None)
                 self.teamsballresult["Batting Team"].append(inningsteam)
                 self.teamsballresult["Bowling Team"].append(bowlingteam)
                 self.teamsballresult["Innings"].append(nthinnings + 1)
 
                 self.teamsballresult["Ball in Over"].append(ballinover)
-                self.teamsballresult["Ball"].append(inningsball)
+                self.teamsballresult["Ball"].append(eachball + 1)
+                self.teamsballresult["Innings Ball"].append(inningsball)
                 self.teamsballresult["Current Score"].append(sum(self.result[inningsteam]["inningstally"]["inningsruns"][:(eachball+1)]))
                 self.teamsballresult["Current Outs"].append(sum(self.result[inningsteam]["inningstally"]["inningsouts"][:(eachball+1)]))
                 self.teamsballresult["Batter"].append(striker)
@@ -1090,8 +1093,7 @@ class search:
                 sum(self.result[bowlingteam]["inningstally"]["inningsruns"]))
             self.inningsresult["Outs"].append(sum(self.result[bowlingteam]["inningstally"]["inningsouts"]))
             self.inningsresult["Extras"].append(sum(self.result[bowlingteam]["inningstally"]["inningsextras"]))
-            self.inningsresult["Overs"].append(
-                math.ceil(sum(self.result[bowlingteam]["inningstally"]["inningsballstotal"])/6))
+            self.inningsresult["Overs"].append(self.result[bowlingteam]["inningstally"]["inningsballs"][-1])
             if sum(self.result[bowlingteam]["inningstally"]["inningsouts"]) > 0:
                 self.inningsresult["Runs/Wicket"].append(statsprocessor.ratio(sum(self.result[bowlingteam]["inningstally"]["inningsruns"]), sum(self.result[bowlingteam]["inningstally"]["inningsouts"])))
             if sum(self.result[bowlingteam]["inningstally"]["inningsouts"])==0:
@@ -1121,12 +1123,18 @@ class search:
                 if "toss" not in matchinfo:
                     self.teamsballresult["Toss Winner"].append(None)
                     self.teamsballresult["Toss Decision"].append(None)
+                if "result" not in matchinfo["outcome"]:
+                    self.teamsballresult["Match Winner"].append(matchinfo["outcome"]["winner"])
+                if "result" in matchinfo["outcome"]:
+                    self.teamsballresult["Match Winner"].append(None)
+                
                 self.teamsballresult["Batting Team"].append(inningsteam)
                 self.teamsballresult["Bowling Team"].append(bowlingteam)
                 self.teamsballresult["Innings"].append(nthinnings + 1)
 
                 self.teamsballresult["Ball in Over"].append(ballinover)
-                self.teamsballresult["Ball"].append(inningsball)
+                self.teamsballresult["Innings Ball"].append(inningsball)
+                self.teamsballresult["Ball"].append(eachball + 1)
                 self.teamsballresult["Current Score"].append(sum(self.result[bowlingteam]["inningstally"]["inningsruns"][:(eachball+1)]))
                 self.teamsballresult["Current Outs"].append(sum(self.result[bowlingteam]["inningstally"]["inningsoutsbyball"][:(eachball+1)]))
                 self.teamsballresult["Batter"].append(striker)

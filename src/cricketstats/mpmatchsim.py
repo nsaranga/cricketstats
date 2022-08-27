@@ -162,7 +162,7 @@ class matchsim:
     def redistributepvalues(self,scoreP):
         # print(f"Before Modification: {scoreP}")
         lowestP = min(scoreP)
-        scoreP=scoreP.apply(lambda x: x/(1+lowestP))
+        scoreP=scoreP /(1+lowestP)
         newPs= (1-sum(scoreP))/(7-len(scoreP))
         # print(scoreP)
         scoreP=scoreP.reindex([(0,),(1,),(2,),(3,),(4,),(5,),(6,)])

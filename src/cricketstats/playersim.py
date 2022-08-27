@@ -17,11 +17,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import os
+from timeit import timeit
 import pandas as pd
 import numpy as np
 import multiprocessing as mp
 import time
 from cricketstats import cricketstats
+import numba
 
 
 # TODO record player's scores and balls faced
@@ -232,14 +234,14 @@ class playersim:
     def redistributepvalues(self,scoreP):
         # print(f"Before Modification: {scoreP}")
         lowestP = min(scoreP[self.batters[0]])
-        scoreP[self.batters[0]]=scoreP[self.batters[0]].apply(lambda x: x/(1+lowestP))
+        scoreP[self.batters[0]]=scoreP[self.batters[0]] /(1+lowestP)
         newPs= (1-sum(scoreP[self.batters[0]]))/(7-len(scoreP[self.batters[0]]))
         # print(scoreP)
-        scoreP[self.batters[0]]=scoreP[self.batters[0]].reindex([(0,),(1,),(2,),(3,),(4,),(5,),(6,)])
+        scoreP[self.batters[0]]=scoreP[self.batters[0]].reindex([(0,),(1,),(2,),(3,),(4,),(5,),(6,)],fill_value=newPs)
         # print(scoreP)
-        for eachvalue in scoreP[self.batters[0]].index:
-            if pd.isna(scoreP[self.batters[0]][eachvalue]):
-                scoreP[self.batters[0]][eachvalue]=newPs
+        # for eachvalue in scoreP[self.batters[0]].index:
+        #     if pd.isna(scoreP[self.batters[0]][eachvalue]):
+        #         scoreP[self.batters[0]][eachvalue]=newPs
         # print(scoreP)
         # print(f"ScoreP Sum: {sum(scoreP)}")
         return scoreP
@@ -275,34 +277,59 @@ class playersim:
 
         return sim.results
             
-    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False,matchscore=None,hometeam=None):
+    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False,matchscore=None,hometeam=None, multicore=True):
         # Setup match results
         playersim.simresultssetup(self,statsmatchtype)
 
         # Search for pvalues
         playersim.pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype)
-        cores = os.cpu_count()
-        procpool=mp.Pool(cores)
 
-        simulations=int(simulations/cores)
-        inputs=None
-        inputs=[]
-        print(f"Sims/cpu: {simulations}")
-        for x in range(cores):
-            inputs.append((self,statsmatchtype,simulations,inningsorder,rain,matchscore,hometeam))
+        # multiprocessing
+        if multicore==True:
+            cores = os.cpu_count()
+            procpool=mp.Pool(cores)
 
-        #start = time.time()
-        simprocs = procpool.starmap(playersim.mcsimulations,inputs)
-        
-        procpool.terminate()
-        #print(f'Time after mcsimulations(): {time.time() - start}')
+            simulations=int(simulations/cores)
+            inputs=None
+            inputs=[]
+            print(f"Sims/cpu: {simulations}")
+            for x in range(cores):
+                inputs.append((self,statsmatchtype,simulations,inningsorder,rain,matchscore,hometeam))
 
-        for eachdict in simprocs:
-            for eachlist in eachdict:
-                self.simresults[eachlist].extend(eachdict[eachlist])
-        print("Sims finished")
+            #start = time.time()
+            simprocs = procpool.starmap(playersim.mcsimulations,inputs)
+            
+            procpool.close()
+            #print(f'Time after mcsimulations(): {time.time() - start}')
 
-        self.simresults=pd.DataFrame(self.simresults)
+            for eachdict in simprocs:
+                for eachlist in eachdict:
+                    self.simresults[eachlist].extend(eachdict[eachlist])
+            print("Sims finished")
+
+            self.simresults=pd.DataFrame(self.simresults)
+
+        if multicore==False:
+            start = time.time()
+            rng = np.random.default_rng()
+            print(f'Time after rng: {time.time() - start}')
+
+            # Set function dictionary
+            classtypes={"T20": ld, "ODI": ld,"ODM": ld,"Test": tm}
+
+            sim=classtypes[statsmatchtype]()
+            # simulation generator
+            sim.resultssetup()
+            for thismatch in range(simulations):
+                sim.matchresultssetup()
+                # Function to simulate a match
+                if statsmatchtype=="T20" or statsmatchtype=="ODI" or statsmatchtype=="ODM":
+                    sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam)
+
+                if statsmatchtype=="Test":
+                    sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,start)
+
+            self.simresults=pd.DataFrame(sim.results)
 
 
 
@@ -335,7 +362,6 @@ class ld(playersim):
             self.inningswickets = matchscore["Innings 2"][1]
             self.inningsscore = matchscore["Innings 2"][2]
             self.inningsovers = matchscore["Innings 2"][3]
-
 
     def limitedovers(self,rng,statsmatchtype,inningsorder,rain,simteams,simteamstats,matchscore,hometeam):
 
@@ -481,7 +507,7 @@ class tm(playersim):
             self.inningsscore = matchscore["Innings 4"][2]
             self.inningsovers = matchscore["Innings 4"][3]
 
-    def testmatch(self,rng,statsmatchtype,inningsorder,rain,simteams,simteamstats,matchscore,hometeam):
+    def testmatch(self,rng,statsmatchtype,inningsorder,rain,simteams,simteamstats,matchscore,hometeam,start):
 
         if matchscore:
             tm.midinningssetup(self,matchscore)
@@ -515,9 +541,10 @@ class tm(playersim):
 
             thisover=0
             # Innings overs generator
+            
             while matchover<450:
 
-                if (nthinnings == 3 and self.inningsscore > (self.matchresults["Innings 1 Score"][-1]+self.matchresults["Innings 3 Score"][-1]-self.matchresults["Innings 2 Score"][-1])) or (nthinnings==2 and (((self.inningsscore+self.matchresults["Innings 1 Score"][-1]-self.matchresults["Innings 2 Score"][-1])/(450-matchover))>4)):
+                if (nthinnings == 3 and self.inningsscore > (self.matchresults["Innings 1 Score"][-1]+self.matchresults["Innings 3 Score"][-1]-self.matchresults["Innings 2 Score"][-1])) or (nthinnings==0 and (((self.inningsscore)/(450-matchover))>2)) or (nthinnings==1 and (((self.inningsscore-self.matchresults["Innings 1 Score"][-1])/(450-matchover))>2)) or (nthinnings==2 and (((self.inningsscore+self.matchresults["Innings 1 Score"][-1]-self.matchresults["Innings 2 Score"][-1])/(450-matchover))>4)):
                     break
 
                 self.batters.reverse()
@@ -540,9 +567,11 @@ class tm(playersim):
                 extrasP, fieldingextrasP = ld.extras(self,nthinnings,thisinnings, bowlingteam,simteams,simteamstats,thisover)
                 if len(extrasP)==0 or sum(extrasP)<0.99:
                     extrasP=playersim.extrasfallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam,)
-
+                #print(f'Time after beforeover: {time.time() - start}')
                 # Over generator
                 tm.over(self,rng,nthinnings,thisinnings, bowlingteam,statsmatchtype,thisover,simteams,simteamstats,hometeam,wicketfallP,scoreP,extrasP, fieldingextrasP)
+
+                # print(f'Time after afterover: {time.time() - start}')
 
                 if self.inningswickets==10 or (nthinnings == 3 and self.inningsscore > (self.matchresults["Innings 1 Score"][-1]+self.matchresults["Innings 3 Score"][-1]-self.matchresults["Innings 2 Score"][-1])) or (nthinnings==2 and (((self.inningsscore+self.matchresults["Innings 1 Score"][-1]-self.matchresults["Innings 2 Score"][-1])/(450-matchover))>4)):
                     break

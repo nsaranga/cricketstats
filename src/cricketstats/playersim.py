@@ -68,14 +68,16 @@ class playersim:
             bowladv=0.5
 
         # Condition with balls faced
-        wicketfallP = {self.batters[0]: (simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Innings Type"]=="Batting")&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
+        wicketfallP = {self.batters[0]: (
+            simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Innings Type"]=="Batting")&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))].value_counts(normalize=True,sort=False)*batadv).add(
+            simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
         ,
-        self.batters[1]: (simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Innings Type"]=="Batting")&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
+        self.batters[1]: (simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Innings Type"]=="Batting")&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
         }
 
-        scoreP= {self.batters[0]: (simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[['Batter Score']].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
+        scoreP= {self.batters[0]: (simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult['Batter Score'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
         ,
-        self.batters[1]: (simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[['Batter Score']].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
+        self.batters[1]: (simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult['Batter Score'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
         }
 
         
@@ -84,9 +86,9 @@ class playersim:
 
     def extras(self,nthinnings,thisinnings, bowlingteam,simteams,simteamstats,thisover):
 
-        extrasP= simteamstats.ballresult[["Extras"]].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)
+        extrasP= simteamstats.ballresult["Extras"].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)
         
-        fieldingextrasP= simteamstats.ballresult[["Fielding Extras"]].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))].value_counts(normalize=True,sort=False)
+        fieldingextrasP= simteamstats.ballresult["Fielding Extras"].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))].value_counts(normalize=True,sort=False)
 
         return extrasP,fieldingextrasP
 
@@ -103,16 +105,16 @@ class playersim:
             bowladv=0.5
 
         inningswicketfallP = {
-            self.batters[0]: (simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
+            self.batters[0]: (simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
             ,
-            self.batters[1]: (simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
+            self.batters[1]: (simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
             }
 
         if len(inningswicketfallP[self.batters[0]])<2 or sum(inningswicketfallP[self.batters[0]])<0.99:
             inningswicketfallP={
-                self.batters[0]: (simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batter"].isin(simteams[thisinnings]["battingorder"]))&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
+                self.batters[0]: (simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"].isin(simteams[thisinnings]["battingorder"]))&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
                 ,
-                self.batters[1]: (simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Batter"].isin(simteams[thisinnings]["battingorder"]))&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[['Out/NotOut']].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
+                self.batters[1]: (simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"].isin(simteams[thisinnings]["battingorder"]))&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
                 }
 
         return inningswicketfallP
@@ -131,23 +133,23 @@ class playersim:
             bowladv=0.5
 
         inningsscorefallP = {
-            self.batters[0]: (simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
+            self.batters[0]: (simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
             ,
-            self.batters[1]: (simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
+            self.batters[1]: (simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
             }
 
-        if len(inningsscorefallP [self.batters[0]])==0 or sum(inningsscorefallP [self.batters[0]])!=1:
+        if len(inningsscorefallP[self.batters[0]])==0 or sum(inningsscorefallP[self.batters[0]])!=1:
             inningsscorefallP = {
-                self.batters[0]: (simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Batter"].isin(simteams[thisinnings]["battingorder"]))&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
+                self.batters[0]: (simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"].isin(simteams[thisinnings]["battingorder"]))&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
                 ,
-                self.batters[1]: (simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Batter"].isin(simteams[thisinnings]["battingorder"]))&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult[["Batter Score"]].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
+                self.batters[1]: (simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"].isin(simteams[thisinnings]["battingorder"]))&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)*batadv).add(simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
                 }
         
         return inningsscorefallP
 
     def extrasfallbackplayersP(self,nthinnings,thisinnings, bowlingteam,simteams,simteamstats,thisover,hometeam):
 
-        extrasP= simteamstats.ballresult[["Extras"]].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))].value_counts(normalize=True,sort=False)
+        extrasP= simteamstats.ballresult["Extras"].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))].value_counts(normalize=True,sort=False)
 
         return extrasP
 
@@ -165,7 +167,7 @@ class playersim:
             wicket = rng.choice(wicketfallP[self.batters[0]].index, p=wicketfallP[self.batters[0]].tolist(), shuffle=False)
             
 
-            if wicket[0]=="Out":
+            if wicket=="Out":
                 legaldeliveries += 1
                 self.battersstats[self.batters[0]] += 1
                 self.inningswickets += 1
@@ -175,7 +177,7 @@ class playersim:
                 self.inningsovers=float(f"{thisover}.{legaldeliveries}")
                 break
 
-            if wicket[0]=="Out":
+            if wicket=="Out":
                 self.batters[0]= simteams[thisinnings]["battingorder"][(self.inningswickets + 1)]
                 self.battersstats[simteams[thisinnings]["battingorder"][(self.inningswickets + 1)]] = 0
 
@@ -192,7 +194,7 @@ class playersim:
                     scoreP = playersim.redistributepvalues(self,scoreP)
 
             # Over based scoring rng
-            if wicket[0]=="Not Out":
+            if wicket=="Not Out":
 
                 if len(scoreP[self.batters[0]])==0 or sum(scoreP[self.batters[0]])<0.99:
                     scoreP=playersim.scorefallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
@@ -206,22 +208,22 @@ class playersim:
                 # except:
                 #     print(self.batters[0])
 
-                if batterscore[0]!=0:
+                if batterscore!=0:
                     extras = rng.choice(extrasP.index, p=extrasP.tolist(), shuffle=False)
-                    self.inningsscore+=(batterscore[0]+extras[0])
-                    if extras[0]==0:
+                    self.inningsscore+=(batterscore+extras)
+                    if extras==0:
                         legaldeliveries += 1
                         self.battersstats[self.batters[0]] += 1
-                    if (batterscore[0])%2!=0:
+                    if (batterscore)%2!=0:
                         self.batters.reverse()
-                    if extras[0]!=0:
+                    if extras!=0:
                         self.battersstats[self.batters[0]] += 1
-                if batterscore[0]==0:
+                if batterscore==0:
                     legaldeliveries += 1
                     self.battersstats[self.batters[0]] += 1
                     fieldingextras = rng.choice(fieldingextrasP.index, p=fieldingextrasP.tolist(), shuffle=False)
-                    self.inningsscore += (fieldingextras[0])
-                    if (fieldingextras[0])%2!=0:
+                    self.inningsscore += (fieldingextras)
+                    if (fieldingextras)%2!=0:
                         self.batters.reverse()
 
 
@@ -237,7 +239,7 @@ class playersim:
         scoreP[self.batters[0]]=scoreP[self.batters[0]] /(1+lowestP)
         newPs= (1-sum(scoreP[self.batters[0]]))/(7-len(scoreP[self.batters[0]]))
         # print(scoreP)
-        scoreP[self.batters[0]]=scoreP[self.batters[0]].reindex([(0,),(1,),(2,),(3,),(4,),(5,),(6,)],fill_value=newPs)
+        scoreP[self.batters[0]]=scoreP[self.batters[0]].reindex([0,1,2,3,4,5,6],fill_value=newPs)
         # print(scoreP)
         # for eachvalue in scoreP[self.batters[0]].index:
         #     if pd.isna(scoreP[self.batters[0]][eachvalue]):
@@ -256,6 +258,7 @@ class playersim:
 
     def mcsimulations(self,statsmatchtype,simulations,inningsorder,rain,matchscore,hometeam):
         # print("Sims started")
+        start = time.time()
         # setup random generator object
         rng = np.random.default_rng()
         # Set function dictionary
@@ -270,10 +273,10 @@ class playersim:
             sim.matchresultssetup()
             # Function to simulate a match
             if statsmatchtype=="T20" or statsmatchtype=="ODI" or statsmatchtype=="ODM":
-                sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam)
+                sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,start)
 
             if statsmatchtype=="Test":
-                sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam)
+                sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,start)
 
         return sim.results
             
@@ -312,7 +315,7 @@ class playersim:
         if multicore==False:
             start = time.time()
             rng = np.random.default_rng()
-            print(f'Time after rng: {time.time() - start}')
+            # print(f'Time after rng: {time.time() - start}')
 
             # Set function dictionary
             classtypes={"T20": ld, "ODI": ld,"ODM": ld,"Test": tm}
@@ -324,7 +327,7 @@ class playersim:
                 sim.matchresultssetup()
                 # Function to simulate a match
                 if statsmatchtype=="T20" or statsmatchtype=="ODI" or statsmatchtype=="ODM":
-                    sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam)
+                    sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,start)
 
                 if statsmatchtype=="Test":
                     sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,start)
@@ -363,7 +366,7 @@ class ld(playersim):
             self.inningsscore = matchscore["Innings 2"][2]
             self.inningsovers = matchscore["Innings 2"][3]
 
-    def limitedovers(self,rng,statsmatchtype,inningsorder,rain,simteams,simteamstats,matchscore,hometeam):
+    def limitedovers(self,rng,statsmatchtype,inningsorder,rain,simteams,simteamstats,matchscore,hometeam,start):
 
         if matchscore:
             ld.midinningssetup(self,matchscore)

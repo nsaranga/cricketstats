@@ -55,7 +55,7 @@ class search:
                                     "totalstos": 0, "totalstosopp": 0, 
                                     'Dot Ball %': 0, 'Strike Turnover %': 0, 'Batting S/R': 0, 'Batting S/R MeanAD': 0, 'Batting Avg': 0, "Mean Score":0, 'Score MeanAD': 0, "Scoring Consistency":0, 'Boundary %': 0, "Runs/Ball":0,
                                     "Mean Balls Faced":0, "Balls Faced MeanAD":0, "Survival Consistency":0,
-                                    "firstboundary": [], 'Avg First Boundary Ball': 0,
+                                    "firstboundary": [], 'Avg First Boundary Ball': 0, "Dismissal Rate":0,
                                     
                                     "Innings Bowled":0,
                                     "Runsgiven": 0, "Foursgiven": 0, "Sixesgiven": 0, 
@@ -1273,7 +1273,7 @@ class search:
                         self.result[eachplayer]["Balls Faced"], multiplier=100)
                     self.result[eachplayer]["Dot Ball %"] = statsprocessor.ratio(self.result[eachplayer]["Dot Balls"],self.result[eachplayer]["Balls Faced"], multiplier=100)
                 if self.result[eachplayer]["firstboundary"]:
-                    self.result[eachplayer]["Avg First Boundary Ball"] = round(statsprocessor.ratio(sum(self.result[eachplayer]["firstboundary"]), len(self.result[eachplayer]["firstboundary"])))
+                    self.result[eachplayer]["Avg First Boundary Ball"] = round(statsprocessor.ratio(sum(self.result[eachplayer]["firstboundary"]), len(self.result[eachplayer]["firstboundary"])),2)
 
                 if self.result[eachplayer]["totalstosopp"] > 0:
                     self.result[eachplayer]["Strike Turnover %"] = statsprocessor.ratio(self.result[eachplayer]["totalstos"], self.result[eachplayer]["totalstosopp"], multiplier=100)
@@ -1291,6 +1291,7 @@ class search:
 
                 if self.result[eachplayer]["Outs"] > 0:
                     self.result[eachplayer]["Batting Avg"] = statsprocessor.ratio(self.result[eachplayer]["Runs"],self.result[eachplayer]["Outs"], multiplier=0)
+                    self.result[eachplayer]["Dismissal Rate"] = statsprocessor.ratio(self.result[eachplayer]["Balls Faced"],self.result[eachplayer]["Outs"], multiplier=0)
 
                 if self.result[eachplayer]["Balls Bowled"] > 0:
                     self.result[eachplayer]["Runsgiven/Ball"] = statsprocessor.ratio(self.result[eachplayer]["Runsgiven"], self.result[eachplayer]["Balls Bowled"])
@@ -1305,7 +1306,7 @@ class search:
                         + self.result[eachplayer]["Sixesgiven"]),
                         self.result[eachplayer]["Balls Bowled"], multiplier=100)
                 if self.result[eachplayer]["dotballseries"]:
-                    self.result[eachplayer]["Avg Consecutive Dot Balls"] = round(np.mean(self.result[eachplayer]["dotballseries"]))
+                    self.result[eachplayer]["Avg Consecutive Dot Balls"] = round(np.mean(self.result[eachplayer]["dotballseries"]),2)
 
                 if len(self.inningsresult["Overs Bowled"].loc[self.inningsresult["Players"]==eachplayer].dropna().index) > 0:
                     self.result[eachplayer]["Economy Rate MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Economy Rate"] - self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Economy Rate"].mean()).abs().mean(),2)

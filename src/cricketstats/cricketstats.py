@@ -55,7 +55,7 @@ class search:
                                     "totalstos": 0, "totalstosopp": 0, 
                                     'Dot Ball %': 0, 'Strike Turnover %': 0, 'Batting S/R': 0, 'Batting S/R MeanAD': 0, 'Batting Avg': 0, "Mean Score":0, 'Score MeanAD': 0, "Scoring Consistency":0, 'Boundary %': 0, "Runs/Ball":0,
                                     "Mean Balls Faced":0, "Balls Faced MeanAD":0, "Survival Consistency":0,
-                                    "firstboundary": [], 'Avg First Boundary Ball': 0, "Dismissal Rate":0,
+                                    "firstboundary": [], 'Avg First Boundary Ball': 0, "Dismissal Rate":0, "Boundary Rate":0,
                                     
                                     "Innings Bowled":0,
                                     "Runsgiven": 0, "Foursgiven": 0, "Sixesgiven": 0, 
@@ -1322,6 +1322,9 @@ class search:
                         self.result[eachplayer]["Runsgiven"], self.result[eachplayer]["Wickets"], multiplier=0)
                     self.result[eachplayer]["Bowling S/R"] = statsprocessor.ratio(
                         self.result[eachplayer]["Balls Bowled"], self.result[eachplayer]["Wickets"], multiplier=0)
+
+                if (self.result[eachplayer]["Fours"]+self.result[eachplayer]["Sixes"])>0:
+                    self.result[eachplayer]["Boundary Rate"] = statsprocessor.ratio(self.result[eachplayer]["Balls Faced"],(self.result[eachplayer]["Fours"]+self.result[eachplayer]["Sixes"]), multiplier=0) 
 
             
         if self.teams or self.allteams==True:

@@ -1272,26 +1272,27 @@ class search:
                         + self.result[eachplayer]["Sixes"]),
                         self.result[eachplayer]["Balls Faced"], multiplier=100)
                     self.result[eachplayer]["Dot Ball %"] = statsprocessor.ratio(self.result[eachplayer]["Dot Balls"],self.result[eachplayer]["Balls Faced"], multiplier=100)
+
+                if self.result[eachplayer]["Outs"] > 0:
+                    self.result[eachplayer]["Batting Avg"] = statsprocessor.ratio(self.result[eachplayer]["Runs"],self.result[eachplayer]["Outs"], multiplier=0)
+                    self.result[eachplayer]["Dismissal Rate"] = statsprocessor.ratio(self.result[eachplayer]["Balls Faced"],self.result[eachplayer]["Outs"], multiplier=0)
+
                 if self.result[eachplayer]["firstboundary"]:
                     self.result[eachplayer]["Avg First Boundary Ball"] = round(statsprocessor.ratio(sum(self.result[eachplayer]["firstboundary"]), len(self.result[eachplayer]["firstboundary"])),2)
 
                 if self.result[eachplayer]["totalstosopp"] > 0:
                     self.result[eachplayer]["Strike Turnover %"] = statsprocessor.ratio(self.result[eachplayer]["totalstos"], self.result[eachplayer]["totalstosopp"], multiplier=100)
 
-                if len(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Balls Faced"].dropna().index) > 0:
+                if self.result[eachplayer]["Balls Faced"] > 0 and self.result[eachplayer]["Innings Batted"] > 0:
                     self.result[eachplayer]["Batting S/R MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Batting S/R"] - self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Batting S/R"].mean()).abs().mean(), 2)
-                    self.result[eachplayer]["Mean Balls Faced"] = round(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Balls Faced"].mean(), 2)
+                    self.result[eachplayer]["Mean Balls Faced"] = round(statsprocessor.ratio(self.result[eachplayer]["Balls Faced"],self.result[eachplayer]["Innings Batted"], multiplier=0), 2)
                     self.result[eachplayer]["Balls Faced MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Balls Faced"] - self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Balls Faced"].mean()).abs().mean(), 2)
                     self.result[eachplayer]["Survival Consistency"] = statsprocessor.ratio(self.result[eachplayer]["Balls Faced MeanAD"], self.result[eachplayer]["Mean Balls Faced"], multiplier=100)
 
-                if len(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Score"].dropna().index) > 0:
-                    self.result[eachplayer]["Mean Score"] = round(self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Score"].mean(),2)
+                if self.result[eachplayer]["Balls Faced"] > 0 and self.result[eachplayer]["Runs"] > 0:
+                    self.result[eachplayer]["Mean Score"] = round(statsprocessor.ratio(self.result[eachplayer]["Runs"],self.result[eachplayer]["Innings Batted"], multiplier=0), 2)
                     self.result[eachplayer]["Score MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Score"] - self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Score"].mean()).abs().mean(),2)
                     self.result[eachplayer]["Scoring Consistency"] = statsprocessor.ratio(self.result[eachplayer]["Score MeanAD"], self.result[eachplayer]["Mean Score"], multiplier=100)
-
-                if self.result[eachplayer]["Outs"] > 0:
-                    self.result[eachplayer]["Batting Avg"] = statsprocessor.ratio(self.result[eachplayer]["Runs"],self.result[eachplayer]["Outs"], multiplier=0)
-                    self.result[eachplayer]["Dismissal Rate"] = statsprocessor.ratio(self.result[eachplayer]["Balls Faced"],self.result[eachplayer]["Outs"], multiplier=0)
 
                 if self.result[eachplayer]["Balls Bowled"] > 0:
                     self.result[eachplayer]["Runsgiven/Ball"] = statsprocessor.ratio(self.result[eachplayer]["Runsgiven"], self.result[eachplayer]["Balls Bowled"])
@@ -1308,15 +1309,6 @@ class search:
                 if self.result[eachplayer]["dotballseries"]:
                     self.result[eachplayer]["Avg Consecutive Dot Balls"] = round(np.mean(self.result[eachplayer]["dotballseries"]),2)
 
-                if len(self.inningsresult["Overs Bowled"].loc[self.inningsresult["Players"]==eachplayer].dropna().index) > 0:
-                    self.result[eachplayer]["Economy Rate MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Economy Rate"] - self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Economy Rate"].mean()).abs().mean(),2)
-
-                if len(self.inningsresult["Wickets"].loc[self.inningsresult["Players"]==eachplayer].dropna().index) > 0:
-                    self.result[eachplayer]["Bowling Avg MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Bowling Avg"] - self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Bowling Avg"].mean()).abs().mean(),2)
-
-                if len(self.inningsresult["Wickets"].loc[self.inningsresult["Players"]==eachplayer].dropna().index) > 0:
-                    self.result[eachplayer]["Bowling S/R MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Bowling S/R"] - self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Bowling S/R"].mean()).abs().mean(),2)
-
                 if self.result[eachplayer]["Wickets"] > 0:
                     self.result[eachplayer]["Bowling Avg"] = statsprocessor.ratio(
                         self.result[eachplayer]["Runsgiven"], self.result[eachplayer]["Wickets"], multiplier=0)
@@ -1325,6 +1317,15 @@ class search:
 
                 if (self.result[eachplayer]["Fours"]+self.result[eachplayer]["Sixes"])>0:
                     self.result[eachplayer]["Boundary Rate"] = statsprocessor.ratio(self.result[eachplayer]["Balls Faced"],(self.result[eachplayer]["Fours"]+self.result[eachplayer]["Sixes"]), multiplier=0) 
+
+                if self.result[eachplayer]["Balls Bowled"] > 5 and self.result[eachplayer]["Economy Rate"]>0:
+                    self.result[eachplayer]["Economy Rate MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Economy Rate"] - self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Economy Rate"].mean()).abs().mean(),2)
+
+                if self.result[eachplayer]["Wickets"] > 0 and self.result[eachplayer]["Bowling Avg"]>0:
+                    self.result[eachplayer]["Bowling Avg MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Bowling Avg"] - self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Bowling Avg"].mean()).abs().mean(),2)
+
+                if self.result[eachplayer]["Wickets"] > 0 and self.result[eachplayer]["Bowling S/R"]>0:
+                    self.result[eachplayer]["Bowling S/R MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Bowling S/R"] - self.inningsresult.loc[self.inningsresult["Players"]==eachplayer,"Bowling S/R"].mean()).abs().mean(),2)
 
             
         if self.teams or self.allteams==True:
@@ -1345,12 +1346,12 @@ class search:
                 if self.result[eachteam]["Outs"] > 0:
                     self.result[eachteam]["Runs/Ball"] = statsprocessor.ratio(self.result[eachteam]["Runs"],self.result[eachteam]["Outs"])
 
-                if len(self.inningsresult["Overs"].loc[self.inningsresult["Batting Team"]==eachteam].dropna().index) > 0:
+                if self.result[eachteam]["Balls Faced"] > 5 and self.result[eachteam]["Run Rate"]>0:
                     self.result[eachteam]["Run Rate MeanAD"]=round((self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"Run Rate"] - self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"Run Rate"].mean()).abs().mean(), 2)
 
-                if len(self.inningsresult["Score"].loc[self.inningsresult["Batting Team"]==eachteam].dropna().index) > 0:
+                if self.result[eachteam]["Runs"] > 0 and self.result[eachteam]["Innings Batted"] > 0:
                     self.result[eachteam]["Score MeanAD"]=round((self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"Score"] - self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"Score"].mean()).abs().mean(), 2) 
-                    self.result[eachteam]["Mean Score"]=round(self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"Score"].mean(), 2)
+                    self.result[eachteam]["Mean Score"]=round(statsprocessor.ratio(self.result[eachteam]["Runs"], self.result[eachteam]["Innings Batted"], multiplier=0), 2)
                     self.result[eachteam]["Scoring Consistency"] = statsprocessor.ratio(self.result[eachteam]["Score MeanAD"], self.result[eachteam]["Mean Score"], multiplier=100)
 
                 if self.result[eachteam]["Balls Bowled"] > 0:
@@ -1365,7 +1366,7 @@ class search:
                         self.result[eachteam]["Balls Bowled"], multiplier=100)
                     self.result[eachteam]["Runsgiven Rate"] = statsprocessor.ratio(self.result[eachteam]["Runsgiven"], self.result[eachteam]["Balls Bowled"], multiplier=6)
                 
-                if len(self.inningsresult["Overs"].loc[self.inningsresult["Bowling Team"]==eachteam].dropna().index) > 0:
+                if self.result[eachteam]["Balls Bowled"] > 5 and self.result[eachteam]["Runsgiven Rate"]>0:
                     self.result[eachteam]["Runsgiven Rate MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Bowling Team"]==eachteam,"Run Rate"] - self.inningsresult.loc[self.inningsresult["Bowling Team"]==eachteam,"Run Rate"].mean()).abs().mean(), 2)
 
                 if self.result[eachteam]["Wickets"] > 0:
@@ -1931,16 +1932,16 @@ class search:
         # print(self.ballresult)
 
         if self.players or self.allplayers==True:
-            self.ballresult = pd.DataFrame(self.playersballresult, dtype=object)
+            self.ballresult = pd.DataFrame(self.playersballresult).convert_dtypes()
 
         if self.teams or self.allteams==True:
-            self.ballresult = pd.DataFrame(self.teamsballresult, dtype=object)
+            self.ballresult = pd.DataFrame(self.teamsballresult).convert_dtypes()
 
         # print(f'Time after self.ballresult creation: {time.time() - start}')
-        self.inningsresult = pd.DataFrame(self.inningsresult, dtype=object)
+        self.inningsresult = pd.DataFrame(self.inningsresult).convert_dtypes()
 
         # This is commented out because it auto-includes time which doesn't look good for plotting.
-        # self.ballresult["Date"] = pd.to_datetime(self.ballresult["Date"])
+        self.ballresult["Date"] = pd.to_datetime(self.ballresult["Date"])
         self.inningsresult["Date"] = pd.to_datetime(self.inningsresult["Date"])
 
         # print(f'Time after self.inningsresult creation: {time.time() - start}')

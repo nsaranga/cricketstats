@@ -134,7 +134,8 @@ class search:
     # Team ball results
     def teamsballresultsetup(self):
         self.teamsballresult = { 
-        "Date":[], "Match Type":[], "Venue":[], "Event":[], "Match Winner":[],"Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Innings Ball":[], "Ball":[], "Ball in Over":[],
+        "Date":[], "Match Type":[], "Venue":[], "Event":[], "Match Winner":[],"Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Defence":[], "Chase":[],
+        "Innings Ball":[], "Ball":[], "Ball in Over":[],
         "Current Score":[], "Current Outs":[], "Final Score":[], "Final Outs":[],"Final Overs":[],
         "Batter":[], "Batting Position":[],"Batter Type":[], "Non_striker": [], "Runs Scored": [], "Batter Score":[], "Runs/Ball": [], "How Out": [], "Fielder":[],
         "Bowler": [], "Bowler Type":[], "Extras":[], "Extras Type": [], "Out/NotOut":[],
@@ -1034,8 +1035,28 @@ class search:
                     self.teamsballresult["Toss Decision"].append(None)
                 if "result" not in matchinfo["outcome"]:
                     self.teamsballresult["Match Winner"].append(matchinfo["outcome"]["winner"])
+                    if nthinnings == (len(matchinnings) - 2):
+                        if matchinfo["outcome"]["winner"]==inningsteam:
+                            self.teamsballresult["Defence"].append("Successful")
+                            self.teamsballresult["Chase"].append(None)
+                        if matchinfo["outcome"]["winner"]==bowlingteam:
+                            self.teamsballresult["Defence"].append("Unsuccessful")
+                            self.teamsballresult["Chase"].append(None)
+                    if nthinnings == (len(matchinnings) - 1):
+                        if matchinfo["outcome"]["winner"]==inningsteam:
+                            self.teamsballresult["Defence"].append(None)
+                            self.teamsballresult["Chase"].append("Successful")
+                        if matchinfo["outcome"]["winner"]==bowlingteam:
+                            self.teamsballresult["Defence"].append(None)
+                            self.teamsballresult["Chase"].append("Unsuccessful")
+                    if nthinnings!= (len(matchinnings) - 1) and nthinnings!= (len(matchinnings) - 2):
+                        self.teamsballresult["Chase"].append(None)
+                        self.teamsballresult["Defence"].append(None)
                 if "result" in matchinfo["outcome"]:
                     self.teamsballresult["Match Winner"].append(None)
+                    self.teamsballresult["Chase"].append(None)
+                    self.teamsballresult["Defence"].append(None)
+
                 self.teamsballresult["Batting Team"].append(inningsteam)
                 self.teamsballresult["Bowling Team"].append(bowlingteam)
                 self.teamsballresult["Innings"].append(nthinnings + 1)
@@ -1135,8 +1156,27 @@ class search:
                     self.teamsballresult["Toss Decision"].append(None)
                 if "result" not in matchinfo["outcome"]:
                     self.teamsballresult["Match Winner"].append(matchinfo["outcome"]["winner"])
+                    if nthinnings == (len(matchinnings) - 2):
+                        if matchinfo["outcome"]["winner"]==inningsteam:
+                            self.teamsballresult["Defence"].append("Successful")
+                            self.teamsballresult["Chase"].append(None)
+                        if matchinfo["outcome"]["winner"]==bowlingteam:
+                            self.teamsballresult["Defence"].append("Unsuccessful")
+                            self.teamsballresult["Chase"].append(None)
+                    if nthinnings == (len(matchinnings) - 1):
+                        if matchinfo["outcome"]["winner"]==inningsteam:
+                            self.teamsballresult["Defence"].append(None)
+                            self.teamsballresult["Chase"].append("Successful")
+                        if matchinfo["outcome"]["winner"]==bowlingteam:
+                            self.teamsballresult["Defence"].append(None)
+                            self.teamsballresult["Chase"].append("Unsuccessful")
+                    if nthinnings!= (len(matchinnings) - 1) and nthinnings!= (len(matchinnings) - 2):
+                        self.teamsballresult["Chase"].append(None)
+                        self.teamsballresult["Defence"].append(None)
                 if "result" in matchinfo["outcome"]:
                     self.teamsballresult["Match Winner"].append(None)
+                    self.teamsballresult["Chase"].append(None)
+                    self.teamsballresult["Defence"].append(None)
                 
                 self.teamsballresult["Batting Team"].append(inningsteam)
                 self.teamsballresult["Bowling Team"].append(bowlingteam)

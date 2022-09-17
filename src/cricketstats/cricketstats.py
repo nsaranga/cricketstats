@@ -50,7 +50,7 @@ class search:
         self.result[eachplayer] = {"Players": eachplayer, "Batting":None,"Bowling":None, "Games": 0, "Won": 0, "Drawn": 0, 'Win %': 0,
 
                                     "Innings Batted": 0,
-                                    "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Balls Faced": 0, "Outs": 0, 
+                                    "Runs": 0, "Singles":0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Balls Faced": 0, "Outs": 0, 
                                     "Bowled Outs": 0, "LBW Outs": 0, "Hitwicket Outs": 0, "Caught Outs": 0, "Stumped Outs": 0, "Run Outs": 0, "Caught and Bowled Outs": 0, 
                                     "totalstos": 0, "totalstosopp": 0, 
                                     'Dot Ball %': 0, 'Strike Turnover %': 0, 'Batting S/R': 0, 'Batting S/R MeanAD': 0, 'Batting Avg': 0, "Mean Score":0, 'Score MeanAD': 0, "Scoring Consistency":0, 'Boundary %': 0, "Runs/Ball":0,
@@ -58,7 +58,7 @@ class search:
                                     "firstboundary": [], 'Avg First Boundary Ball': 0, "Dismissal Rate":0, "Boundary Rate":0,
                                     
                                     "Innings Bowled":0,
-                                    "Runsgiven": 0, "Foursgiven": 0, "Sixesgiven": 0, 
+                                    "Runsgiven": 0, "Singlesgiven":0, "Foursgiven": 0, "Sixesgiven": 0, 
                                     "Wickets": 0, "Balls Bowled": 0, "Extras": 0, "No Balls": 0, "Wides":0,
                                     "Dot Balls Bowled": 0, 
                                     "Bowleds": 0, "LBWs": 0, "Hitwickets": 0, "Caughts": 0, "Stumpeds": 0, "Caught and Bowleds": 0,
@@ -107,12 +107,12 @@ class search:
                                 "Won": 0, "Drawn": 0, 'Win %': 0, "Defended Wins": 0, "Chased Wins": 0, 
                                 "Net Boundary %":0, "Net Run Rate":0,
                                 "firstboundary": [],
-                                "Runs": 0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Outs": 0, "Balls Faced": 0, 
+                                "Runs": 0, "Singles":0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Outs": 0, "Balls Faced": 0, 
                                 "Bowled Outs": 0, "LBW Outs": 0, "Caught Outs": 0, "Stumped Outs": 0, "Run Outs": 0, "Caught and Bowled Outs": 0,
                                 "Runs/Wicket":0, "Runs/Ball":0, "Run Rate":0, 'Avg First Boundary Ball': 0,
                                 'Dot Ball %': 0, 'Score MeanAD': 0, "Scoring Consistency":0, 'Boundary %': 0, 
 
-                                "Runsgiven":0,"Foursgiven": 0, "Sixesgiven": 0, 
+                                "Runsgiven":0, "Singlesgiven":0,"Foursgiven": 0, "Sixesgiven": 0, 
                                 "Wickets": 0, "Balls Bowled": 0, "Extras": 0, "No Balls": 0, "Wides":0, "Byes": 0, "Leg Byes": 0, "Dot Balls Bowled": 0, 
                                 "Bowleds": 0, "LBWs": 0, "Hitwickets": 0,  "Caughts": 0, "Runouts": 0, "Stumpeds": 0, "Caught and Bowleds": 0,
                                 'Dot Ball Bowled %': 0,'Boundary Given %': 0,'Runsgiven/Wicket': 0, "Runsgiven/Ball":0, "Runsgiven Rate": 0,
@@ -243,6 +243,9 @@ class search:
         
 
         self.result[eachball['batter']]["Runs"] += eachball['runs']['batter']
+        if eachball['runs']['batter'] == 1:
+            self.result[eachball['batter']
+                        ]["Singles"] += 1
         if eachball['runs']['batter'] == 4:
             self.result[eachball['batter']
                         ]["Fours"] += 1
@@ -361,6 +364,9 @@ class search:
         self.result[eachball['bowler']]["inningstally"]["inningsbattersbowledat"].append(eachball["batter"])
 
         self.result[eachball['bowler']]["inningstally"]["inningsbatterrunsgiven"].append(eachball['runs']['batter'])    
+        if eachball['runs']['batter'] == 1:
+            self.result[eachball['bowler']
+                        ]["Singlesgiven"] += 1
         if eachball['runs']['batter'] == 4:
             self.result[eachball['bowler']
                         ]["Foursgiven"] += 1
@@ -518,6 +524,8 @@ class search:
         self.result[inningsteam]["inningstally"]["inningsballinover"].append(ball)
 
         self.result[inningsteam]["Runs"] += eachball['runs']['total']
+        if eachball['runs']['batter'] == 1:
+            self.result[inningsteam]["Singles"] += 1
         if eachball['runs']['batter'] == 4:
             self.result[inningsteam]["Fours"] += 1
         if eachball['runs']['batter'] == 6:
@@ -599,6 +607,8 @@ class search:
         self.result[inningsteam]["inningstally"]["inningsballinover"].append(ball)
 
         self.result[inningsteam]["Runsgiven"] += eachball['runs']['total']
+        if eachball['runs']['batter'] == 1:
+            self.result[inningsteam]["Singlesgiven"] += 1
         if eachball['runs']['batter'] == 4:
             self.result[inningsteam]["Foursgiven"] += 1
         if eachball['runs']['batter'] == 6:
@@ -1935,7 +1945,7 @@ class search:
             self.ballresult = pd.DataFrame(self.playersballresult).convert_dtypes()
 
         if self.teams or self.allteams==True:
-            self.ballresult = pd.DataFrame(self.teamsballresult).convert_dtypes()
+            self.ballresult = pd.DataFrame(self.teamsballresult)
 
         # print(f'Time after self.ballresult creation: {time.time() - start}')
         self.inningsresult = pd.DataFrame(self.inningsresult).convert_dtypes()

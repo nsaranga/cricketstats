@@ -23,7 +23,6 @@ import numpy as np
 import multiprocessing as mp
 import time
 from cricketstats import cricketstats
-import numba
 
 
 # TODO record player's scores and balls faced

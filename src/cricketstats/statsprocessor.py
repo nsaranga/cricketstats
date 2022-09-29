@@ -26,24 +26,6 @@ def ratio(stat1, stat2, multiplier=None):
         stat = round((stat1 / stat2), 2)
     return stat
 
-
-# def madfromratio(statlist1, statlist2, multiplier=None):
-#     data = []
-#     for eachlist in zip(statlist1, statlist2):
-#         statratio = ratio(eachlist[0], eachlist[1], multiplier=multiplier)
-#         data.append(statratio)
-#     df = pd.DataFrame(data)
-#     stat = df[0].mad()
-#     return round(stat, 2)
-
-
-# def mad(statlist):
-#     data = statlist
-#     df = pd.DataFrame(data)
-#     stat = df[0].mad()
-#     return round(stat, 2)
-
-
 def firstboundary(shotlist):
     four = None
     six = None

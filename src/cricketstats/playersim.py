@@ -85,7 +85,7 @@ class playersim:
 
     def extras(self,nthinnings,thisinnings, bowlingteam,simteams,simteamstats,thisover):
 
-        extrasP= simteamstats.ballresult["Extras"].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)
+        extrasP= simteamstats.ballresult["Bowler Extras"].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)
         
         fieldingextrasP= simteamstats.ballresult["Fielding Extras"].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))].value_counts(normalize=True,sort=False)
 
@@ -519,6 +519,9 @@ class tm(playersim):
             # toss rng to decide inningsorder
             toss = rng.choice(list(simteams.keys()), p=[0.5,0.5],size=2, replace=False, shuffle=False).tolist()
             inningsorder = toss+toss
+        if len(inningsorder)==2:
+            inningsorder = [inningsorder[0],inningsorder[1],inningsorder[0],inningsorder[1]]
+
         
         if rain:
             rainaffected = rng.choice(["rain","no_rain"], p=[0.1,0.9],size=1, replace=False, shuffle=False)
@@ -603,6 +606,7 @@ class tm(playersim):
         # print(f"Overs left: {450-matchover}")
 
         # Record match winners
+        #print(self.matchresults)
         if (self.matchresults["Innings 1 Score"][-1]+self.matchresults["Innings 3 Score"][-1])>(self.matchresults["Innings 2 Score"][-1]+self.matchresults["Innings 4 Score"][-1]) and (self.matchresults["Innings 4 Wickets"][-1]<10):
             self.matchresults["Winner"].append("Draw")
         if (self.matchresults["Innings 1 Score"][-1]+self.matchresults["Innings 3 Score"][-1])>(self.matchresults["Innings 2 Score"][-1]+self.matchresults["Innings 4 Score"][-1]) and (self.matchresults["Innings 4 Wickets"][-1]==10):

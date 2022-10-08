@@ -437,6 +437,8 @@ class tm(matchsim):
             # toss rng to decide inningsorder
             toss = rng.choice(simteams, p=[0.5,0.5],size=2, replace=False, shuffle=False).tolist()
             inningsorder = toss+toss
+        if len(inningsorder)==2:
+            inningsorder = [inningsorder[0],inningsorder[1],inningsorder[0],inningsorder[1]]
         
         if rain:
             rainaffected = rng.choice(["rain","no_rain"], p=[0.1,0.9],size=1, replace=False, shuffle=False)

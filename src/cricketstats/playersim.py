@@ -27,6 +27,7 @@ from cricketstats import cricketstats
 
 # TODO record player's scores and balls faced
 # TODO fix bowler's runs
+# TODO add bowling order, or some mechanism to pick specific bowlers, yeah
 
 
 

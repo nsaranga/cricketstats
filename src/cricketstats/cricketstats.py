@@ -1804,8 +1804,11 @@ class search:
             self.inningsresult.loc[self.inningsresult["Innings Type"]=="Batting","Batting S/R AA"] = self.inningsresult["Batting S/R"] - self.inningsresult["Batting S/R"].mean()
 
             self.ballresult["Batter Score AA"] = np.nan
-            for everyball in pd.unique(self.ballresult['Innings Ball']):
-                self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Innings Ball"]==everyball)),"Batter Score AA"] = self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Innings Ball"]==everyball)),"Batter Score"] - self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Innings Ball"]==everyball)),"Batter Score"].mean()
+            self.ballresult["Batting S/R AA"] = np.nan
+            for everyball in pd.unique(self.ballresult['Balls Faced']):
+                self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Batter Score AA"] = self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Batter Score"] - self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Batter Score"].mean()
+                self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Batting S/R AA"] = self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Strike Rate"] - self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Strike Rate"].mean()
+            
             
         if self.teams or self.allteams==True:
             for eachteam in self.result:

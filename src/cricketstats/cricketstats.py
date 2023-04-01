@@ -283,15 +283,24 @@ class search:
             self.matchtally[nthinnings]["inningsnoballs"].append(None)
             self.matchtally[nthinnings]["inningsbyes"].append(None)
             self.matchtally[nthinnings]["inningslegbyes"].append(None)
+            self.matchtally[nthinnings]["inningsextrastype"].append(None)
         if "extras" in eachball:
             if "wides" in eachball["extras"]:
                 self.matchtally[nthinnings]["inningswides"].append(eachball['extras']["wides"])
+                self.matchtally[nthinnings]["inningsextrastype"].append("Wd")
+
             if "noballs" in eachball['extras']:
                 self.matchtally[nthinnings]["inningsnoballs"].append(eachball['extras']["noballs"])
             if "byes" in eachball['extras']:
                 self.matchtally[nthinnings]["inningsbyes"].append(eachball['extras']["byes"])
             if "legbyes" in eachball['extras']:
                 self.matchtally[nthinnings]["inningslegbyes"].append(eachball['extras']["legbyes"])
+            if "noballs" in eachball['extras'] and "legbyes" in eachball['extras']:
+                self.matchtally[nthinnings]["inningsextrastype"].append("NbLb")
+            if "noballs" in eachball['extras'] and "byes" in eachball['extras']:
+                self.matchtally[nthinnings]["inningsextrastype"].append("NbB")
+            if "noballs" in eachball['extras'] and ("byes" not in eachball['extras'] and "legbyes" not in eachball['extras']):
+                self.matchtally[nthinnings]["inningsextrastype"].append("Nb")
 
 
         if "wickets" in eachball:
@@ -1494,7 +1503,8 @@ class search:
             nthballinover,
             ballinover,
             extras,
-            fielder
+            extrastype,
+            fielder,
             ) in enumerate(zip(
                 self.matchtally[nthinnings]["inningsruns"],
                 self.matchtally[nthinnings]["inningsballs"],
@@ -1507,6 +1517,7 @@ class search:
                 self.matchtally[nthinnings]["inningsnthballinover"],
                 self.matchtally[nthinnings]["inningsballinover"],
                 self.matchtally[nthinnings]["inningsextras"],
+                self.matchtally[nthinnings]["inningsextrastype"],
                 self.matchtally[nthinnings]["inningsfielder"])):
             self.teamsballresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
             self.teamsballresult["Year"].append(matchtimetuple[0])
@@ -1627,9 +1638,9 @@ class search:
             self.teamsballresult["Batting Position"].append(strikerbattingpos)
             self.teamsballresult["Non_striker"].append(nonstriker)
             self.teamsballresult["Runs Scored"].append(eachshot)
-            self.teamsballresult["Batter Score"].append(eachshot-extras)
+            self.teamsballresult["Batter Score"].append(eachshot)
             self.teamsballresult["Extras"].append(extras)
-            self.teamsballresult["Extras Type"].append(None)
+            self.teamsballresult["Extras Type"].append(extrastype)
             self.teamsballresult["Runs/Ball"].append(
                 round(sum(self.matchtally[nthinnings]["inningsruns"][:(eachball+1)])/(eachball+1),2))
             self.teamsballresult["Final Score"].append(sum(self.matchtally[nthinnings]["inningsruns"]))

@@ -1670,7 +1670,7 @@ class search:
                         self.inningsresult["Defence"].append("Unsuccessful")
                     self.inningsresult["Defended Score"].append(None)
                     self.inningsresult["Margin"].append(matchinfo["outcome"]['by']['wickets'])
-                if "by" in matchinfo["outcome"] and "runs" in matchinfo["outcome"]["by"]:
+                if "by" in matchinfo["outcome"] and ("runs" in matchinfo["outcome"]["by"] or "run" in matchinfo["outcome"]["by"]):
                     if bowlingteam in self.result:
                         self.result[bowlingteam]["Defended Wins"] += 1
                         self.inningsresult["Defence"].append("Successful")
@@ -1681,7 +1681,10 @@ class search:
                         self.inningsresult["Defended Score"].append(sum(self.matchtally[(nthinnings-1)]["inningsruns"]))
                         self.inningsresult["Chase"].append("Unsuccessful")
                     self.inningsresult["Chased Score"].append(None)
-                    self.inningsresult["Margin"].append(matchinfo["outcome"]['by']['runs'])
+                    if "runs" in matchinfo["outcome"]["by"]:
+                        self.inningsresult["Margin"].append(matchinfo["outcome"]['by']['runs'])
+                    if "run" in matchinfo["outcome"]["by"]:
+                        self.inningsresult["Margin"].append(matchinfo["outcome"]['by']['run'])
                 if "by" not in matchinfo["outcome"]:
                     self.inningsresult["Defended Score"].append(None)
                     self.inningsresult["Chased Score"].append(None)
@@ -2418,6 +2421,8 @@ class search:
                             # Team innings score
                             # if eachinnings["team"] in self.result:
                             search.teaminnings(self, eachinnings["team"], nthinnings, match["info"], matchtimetuple, match['innings'],tempplayerindex)
+                            # if len(self.inningsresult["Defence"])!=len(self.inningsresult["Innings"]):
+                            #     print(eachfile)
                                 
                         # if len(self.playersballresult["Defence"]) != len(self.playersballresult["Target"]):
                         #     print(eachfile)
@@ -2432,9 +2437,9 @@ class search:
         # print(f'Time after stats(): {time.time() - start}')
         
 
-        # for y in self.playersballresult.keys():
-        #     print(y, len(self.playersballresult[y]))
-        # print(self.ballresult)
+        # for y in self.inningsresult.keys():
+        #     print(y, len(self.inningsresult[y]))
+        # print(self.inningsresult)
 
         if self.players or self.allplayers==True:
             self.ballresult = pd.DataFrame(self.playersballresult)#.convert_dtypes(convert_integer=False,convert_floating=False)

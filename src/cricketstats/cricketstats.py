@@ -1669,7 +1669,7 @@ class search:
         # Recording Succesfully Defended/Chased Score
         if nthinnings == (len(matchinnings) - 1):
             if "result" not in matchinfo["outcome"]:
-                if "by" in matchinfo["outcome"] and "wickets" in matchinfo["outcome"]["by"]:
+                if "by" in matchinfo["outcome"] and ("wickets" in matchinfo["outcome"]["by"] or "wicket" in matchinfo["outcome"]["by"]):
                     if inningsteam in self.result:
                         self.result[inningsteam]["Chased Wins"] += 1
                         self.inningsresult["Chase"].append("Successful")
@@ -1680,7 +1680,11 @@ class search:
                         self.inningsresult["Chased Score"].append(sum(self.matchtally[(nthinnings-1)]["inningsruns"])+1)
                         self.inningsresult["Defence"].append("Unsuccessful")
                     self.inningsresult["Defended Score"].append(None)
-                    self.inningsresult["Margin"].append(matchinfo["outcome"]['by']['wickets'])
+                    if "wickets" in matchinfo["outcome"]["by"]:
+                        self.inningsresult["Margin"].append(matchinfo["outcome"]['by']['wickets'])
+                    if "wicket" in matchinfo["outcome"]["by"]:
+                        self.inningsresult["Margin"].append(matchinfo["outcome"]['by']['wicket'])
+
                 if "by" in matchinfo["outcome"] and ("runs" in matchinfo["outcome"]["by"] or "run" in matchinfo["outcome"]["by"]):
                     if bowlingteam in self.result:
                         self.result[bowlingteam]["Defended Wins"] += 1
@@ -1696,6 +1700,7 @@ class search:
                         self.inningsresult["Margin"].append(matchinfo["outcome"]['by']['runs'])
                     if "run" in matchinfo["outcome"]["by"]:
                         self.inningsresult["Margin"].append(matchinfo["outcome"]['by']['run'])
+
                 if "by" not in matchinfo["outcome"]:
                     self.inningsresult["Defended Score"].append(None)
                     self.inningsresult["Chased Score"].append(None)
@@ -2448,8 +2453,8 @@ class search:
         # print(f'Time after stats(): {time.time() - start}')
         
 
-        # for y in self.inningsresult.keys():
-        #     print(y, len(self.inningsresult[y]))
+        for y in self.inningsresult.keys():
+            print(y, len(self.inningsresult[y]))
         # print(self.inningsresult)
 
         if self.players or self.allplayers==True:

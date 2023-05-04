@@ -29,6 +29,8 @@ from cricketstats import cricketstats
 # TODO fix bowler's runs
 # TODO add bowling order, or some mechanism to pick specific bowlers, yeah
 
+# basically this should be a way to simululate players performance in specific overs as well. fir do specific overse for matchsim
+
 
 
 class playersim:
@@ -284,7 +286,7 @@ class playersim:
         self.batters=[]
         self.battersstats={}
 
-    def mcsimulations(self,statsmatchtype,simulations,inningsorder,rain,matchscore,hometeam):
+    def mcsimulations(self,statsmatchtype,simulations,inningsorder,rain,matchscore,hometeam,endover):
         # print("Sims started")
         start = time.time()
         # setup random generator object
@@ -308,7 +310,7 @@ class playersim:
 
         return sim.results
             
-    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False,matchscore=None,hometeam=None, multicore=True):
+    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False,matchscore=None,hometeam=None, multicore=True ,endover=None):
         # Setup match results
         playersim.simresultssetup(self,statsmatchtype)
 
@@ -325,7 +327,7 @@ class playersim:
             inputs=[]
             print(f"Sims/cpu: {simulations}")
             for x in range(cores):
-                inputs.append((self,statsmatchtype,simulations,inningsorder,rain,matchscore,hometeam))
+                inputs.append((self,statsmatchtype,simulations,inningsorder,rain,matchscore,hometeam,endover))
 
             #start = time.time()
             simprocs = procpool.starmap(playersim.mcsimulations,inputs)
@@ -355,7 +357,7 @@ class playersim:
                 sim.matchresultssetup()
                 # Function to simulate a match
                 if statsmatchtype=="T20" or statsmatchtype=="ODI" or statsmatchtype=="ODM":
-                    sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,start)
+                    sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,start,endover)
 
                 if statsmatchtype=="Test":
                     sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,start)
@@ -394,7 +396,7 @@ class ld(playersim):
             self.inningsscore = matchscore["Innings 2"][2]
             self.inningsovers = matchscore["Innings 2"][3]
 
-    def limitedovers(self,rng,statsmatchtype,inningsorder,rain,simteams,simteamstats,matchscore,hometeam,start):
+    def limitedovers(self,rng,statsmatchtype,inningsorder,rain,simteams,simteamstats,matchscore,hometeam,start,endover):
 
         if matchscore:
             ld.midinningssetup(self,matchscore)
@@ -427,6 +429,9 @@ class ld(playersim):
                     continue
 
                 if self.inningswickets == 10 or (nthinnings == 1 and self.inningsscore > self.matchresults["Innings 1 Score"][-1]):
+                    break
+
+                if thisover == endover:
                     break
                 
                 self.batters.reverse()

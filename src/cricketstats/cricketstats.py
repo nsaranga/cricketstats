@@ -26,7 +26,6 @@ import numpy as np
 import math
 from cricketstats import statsprocessor
 
-# TODO make the record collection process using list of dicts, looks to be more accurate.
 # also create a flag thatt will will collect super over data if requested.
 
 # TODO make option to sum players/teams stats better. Insert "all players earlier in result"?
@@ -56,9 +55,9 @@ class search:
         self.teamsballresult = None
         self.matchtally = None
         self.playermatchtally = None
-        self.dictmatchtally = None
-        self.dictballresult = None
-        self.dictteamsballresult = []
+        # self.dictmatchtally = None
+        # self.dictballresult = None
+        # self.dictteamsballresult = []
 
     # Setup Player statistics to be recorded.
 
@@ -91,8 +90,8 @@ class search:
     
     # Player innings results
     def playerinningsresultsetup(self):
-        self.inningsresult = { 
-        "Date":[], "Year":[], "Month":[], "Match Type":[], "Venue":[], "Event":[],"Match Winner":[],  "Player":[], "Team":[], "Opposition":[], "Innings":[], "Innings Type":[],"Target":[],"Chase":[],"Defence":[],'% Target Achieved':[],"Runs Required":[], "Run Rate Required":[],
+        self.inningsresult = {
+        "MatchID":[],"InningsID":[], "Date":[], "Year":[], "Month":[], "Match Type":[], "Venue":[], "Event":[],"Match Winner":[],  "Player":[], "Team":[], "Opposition":[], "Innings":[], "Innings Type":[],"Target":[],"Chase":[],"Defence":[],'% Target Achieved':[],"Runs Required":[], "Run Rate Required":[],
         "Fielder":[],
 
         "Batter Type":[], "Batting Position":[], "Score": [], "Balls Faced": [],  "How Out": [], "First Boundary Ball":[], "Batting S/R":[], "Runs/Ball":[], "Boundary %":[],"Boundary Rate":[],
@@ -104,7 +103,7 @@ class search:
     # Player ball results
     def playersballresultsetup(self):
         self.playersballresult = { 
-        "Date":[], "Year":[], "Month":[], "Match Type":[], "Venue":[], "Event":[], "Match Winner":[], "Batting Team":[], "Bowling Team":[], "Innings":[],"Innings Type":[], #"Phase": [],
+        "MatchID":[],"InningsID":[], "BallID":[], "Date":[], "Year":[], "Month":[], "Match Type":[], "Venue":[], "Event":[], "Match Winner":[], "Batting Team":[], "Bowling Team":[], "Innings":[],"Innings Type":[], #"Phase": [],
         "Ball":[], "Innings Ball":[], "Innings Outs":[], "Innings Runs":[], "Target":[],"Chase":[],"Defence":[],"% Target Achieved":[],"Runs Required":[],"Run Rate Required":[],
         "Runs":[], "Batter Score":[], "Extras":[],"Noballs":[], "Wides":[],"Byes":[], "Legbyes":[], "How Out":[],"Fielder":[], "Out/NotOut":[], "Runs/Ball":[], "Bowler Extras":[], "Fielding Extras":[],
 
@@ -137,7 +136,7 @@ class search:
     # Team innings results
     def teaminningsresultsetup(self):
         self.inningsresult = {
-        "Date":[],"Year":[], "Month":[], "Match Type":[],"Venue":[], "Event":[], "Match Winner":[], "Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[], 
+        "MatchID":[],"InningsID":[],"Date":[],"Year":[], "Month":[], "Match Type":[],"Venue":[], "Event":[], "Match Winner":[], "Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[], 
         "Defence":[], "Defended Score": [],"Chase":[], "Chased Score": [], "Margin":[], "Declared":[],
         "Score": [], "Outs": [], "Overs": [], "Extras": [],
         "Runs/Wicket":[], "Runs/Ball":[], "Run Rate":[], "First Boundary Ball":[], "Boundary %":[], "Net Boundary %":[], "TwosThrees %": [],
@@ -147,11 +146,11 @@ class search:
     # Team ball results
     def teamsballresultsetup(self):
         self.teamsballresult = { 
-        "Date":[],"Year":[], "Month":[], "Match Type":[], "Venue":[], "Event":[], "Match Winner":[],"Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Defence":[], "Chase":[], "Target":[], "% Target Achieved":[], "Runs Required":[], "Run Rate Required":[],
+        "MatchID":[],"InningsID":[], "BallID":[],"Date":[],"Year":[], "Month":[], "Match Type":[], "Venue":[], "Event":[], "Match Winner":[],"Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Defence":[], "Chase":[], "Target":[], "% Target Achieved":[], "Runs Required":[], "Run Rate Required":[],
         "Innings Ball":[], "Innings Over":[], "Ball":[], "Ball in Over":[], "Nth Ball in Over":[], "Phase":[],
         "Current Score":[], "Current Outs":[], "Final Score":[], "Final Outs":[],"Final Overs":[],
         "Batter":[], "Batting Position":[],"Batter Type":[], "Non_striker": [], 
-        "Runs Scored": [], "Batter Score":[], "Runs/Ball": [],
+        "Runs Scored": [], "Batter Score":[], "Runs/Ball": [], "Runs_in_prev_balls":[],
         "Bowler": [], "Bowler Type":[], "Extras":[], "Extras Type": [], "How Out": [], "Fielder":[], "Out/NotOut":[],
         }
 
@@ -167,14 +166,14 @@ class search:
             "inningsouts": [],"inningsballsseries":[], "inningsballs": [], "inningsballinover":[],"inningsnthballinover":[], "inningsoutsbyball": [], "inningshowout":[],"inningswides":[], "inningsnoballs":[], "inningsbyes":[],"inningslegbyes":[], "inningspenalty":[],
             "inningsstrikers": [],"inningsnonstrikers": [],"inningsbowlers": [],"inningsstrikersbattingpos":[], "inningsextras":[],"inningsextrastype":[], "inningsfielder":[], "inningsdeclared":False}
 
-    def teammatchtallysetupdict(self,matchinfo, matchinnings):
-        for nthinnings, eachinnings in enumerate(matchinnings):
-            if "super_over" in eachinnings:
-                continue
-            for eachteam in matchinfo["teams"]:
-                if eachteam != eachinnings["team"]:
-                    bowlingteam = eachteam
-            self.dictmatchtally[nthinnings] = []
+    # def teammatchtallysetupdict(self,matchinfo, matchinnings):
+    #     for nthinnings, eachinnings in enumerate(matchinnings):
+    #         if "super_over" in eachinnings:
+    #             continue
+    #         for eachteam in matchinfo["teams"]:
+    #             if eachteam != eachinnings["team"]:
+    #                 bowlingteam = eachteam
+    #         self.dictmatchtally[nthinnings] = []
 
     def playermatchtallysetup(self,matchinfo, matchinnings):
         for nthinnings, eachinnings in enumerate(matchinnings):
@@ -265,7 +264,7 @@ class search:
 
 
     # Record innings tally
-    def teaminningstally(self,nthball,eachball,legdel,eachover, battingorder, nthinnings):
+    def teaminningstally(self,nthball,eachball,legdel,eachover, battingorder, nthinnings,matchinfo):
         # record innings tally
         over=eachover["over"]
         # self.matchtally[nthinnings]["batinningscount"] = True
@@ -970,7 +969,8 @@ class search:
 
 
                 self.result[eachplayer]["Innings Batted"] += 1
-        
+                self.inningsresult["MatchID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}')
+                self.inningsresult["InningsID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}-{(nthinnings + 1)}')
                 self.inningsresult["Player"].append(eachplayer)
                 self.inningsresult["Venue"].append(matchinfo["venue"])
                 if "event" in matchinfo and "name" in matchinfo["event"]:
@@ -1129,6 +1129,9 @@ class search:
                     self.playermatchtally[nthinnings][eachplayer]["inningsballs"],
                     )):
 
+                    self.playersballresult["MatchID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}')
+                    self.playersballresult["InningsID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}-{(nthinnings + 1)}')
+                    self.playersballresult["BallID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}-{(nthinnings + 1)}-{(eachball + 1)}')
                     self.playersballresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
                     self.playersballresult["Year"].append(matchtimetuple[0])
                     self.playersballresult["Month"].append(matchtimetuple[1])
@@ -1294,6 +1297,8 @@ class search:
 
                 self.result[eachplayer]["Innings Bowled"] += 1
                 self.result[eachplayer]["dotballseries"].extend(statsprocessor.dotballseries(self.playermatchtally[nthinnings][eachplayer]["inningsruns"]))
+                self.inningsresult["MatchID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}')
+                self.inningsresult["InningsID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}-{(nthinnings + 1)}')
                 self.inningsresult["Player"].append(eachplayer)
                 self.inningsresult["Venue"].append(matchinfo["venue"])
                 if "event" in matchinfo and "name" in matchinfo["event"]:
@@ -1448,6 +1453,9 @@ class search:
                     self.playermatchtally[nthinnings][eachplayer]["inningsballs"],
                     )):
 
+                    self.playersballresult["MatchID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}')
+                    self.playersballresult["InningsID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}-{(nthinnings + 1)}')
+                    self.playersballresult["BallID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}-{(nthinnings + 1)}-{(eachball + 1)}')
                     self.playersballresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
                     self.playersballresult["Year"].append(matchtimetuple[0])
                     self.playersballresult["Month"].append(matchtimetuple[1])
@@ -1601,6 +1609,8 @@ class search:
                 bowlingteam = eachteam
 
         # things to put in ball result, required run rate, wickets left,
+        self.inningsresult["MatchID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}')
+        self.inningsresult["InningsID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}-{(nthinnings + 1)}')
         self.inningsresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
         self.inningsresult["Year"].append(matchtimetuple[0])
         self.inningsresult["Month"].append(matchtimetuple[1])
@@ -1714,6 +1724,10 @@ class search:
                 self.matchtally[nthinnings]["inningsextras"],
                 self.matchtally[nthinnings]["inningsextrastype"],
                 self.matchtally[nthinnings]["inningsfielder"])):
+            
+            self.teamsballresult["MatchID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}')
+            self.teamsballresult["InningsID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}-{(nthinnings + 1)}')
+            self.teamsballresult["BallID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}-{(nthinnings + 1)}-{(eachball + 1)}')
             self.teamsballresult["Date"].append(datetime.date(matchtimetuple[0], matchtimetuple[1], matchtimetuple[2]))
             self.teamsballresult["Year"].append(matchtimetuple[0])
             self.teamsballresult["Month"].append(matchtimetuple[1])
@@ -1841,6 +1855,10 @@ class search:
             self.teamsballresult["Final Score"].append(sum(self.matchtally[nthinnings]["inningsruns"]))
             self.teamsballresult["Final Outs"].append(sum(self.matchtally[nthinnings]["inningsouts"]))
             self.teamsballresult["Final Overs"].append(self.matchtally[nthinnings]["inningsballs"][-1])
+            if ballinover == 1:
+                self.teamsballresult["Runs_in_prev_balls"].append(0)
+            if ballinover != 1:
+                self.teamsballresult["Runs_in_prev_balls"].append(sum(self.matchtally[nthinnings]["inningsruns"][self.matchtally[nthinnings]["inningsballs"].index(float(f"{math.floor(inningsball)}.1")):(self.matchtally[nthinnings]["inningsballs"].index(inningsball))]))
                 
             if howout==None:
                 self.teamsballresult["How Out"].append("Not Out")
@@ -1869,11 +1887,11 @@ class search:
                         self.result[inningsteam]["Chased Wins"] += 1
                         self.inningsresult["Chase"].append("Successful")
                         self.inningsresult["Chased Score"].append(sum(self.matchtally[(nthinnings-1)]["inningsruns"])+1)
-                        self.inningsresult["Defence"].append("Unsuccessful")
+                        self.inningsresult["Defence"].append(None)
                     if inningsteam not in self.result:
                         self.inningsresult["Chase"].append("Successful")
                         self.inningsresult["Chased Score"].append(sum(self.matchtally[(nthinnings-1)]["inningsruns"])+1)
-                        self.inningsresult["Defence"].append("Unsuccessful")
+                        self.inningsresult["Defence"].append(None)
                     self.inningsresult["Defended Score"].append(None)
                     if "wickets" in matchinfo["outcome"]["by"]:
                         self.inningsresult["Margin"].append(matchinfo["outcome"]['by']['wickets'])
@@ -1883,11 +1901,11 @@ class search:
                 if "by" in matchinfo["outcome"] and ("runs" in matchinfo["outcome"]["by"] or "run" in matchinfo["outcome"]["by"]):
                     if bowlingteam in self.result:
                         self.result[bowlingteam]["Defended Wins"] += 1
-                        self.inningsresult["Defence"].append("Successful")
+                        self.inningsresult["Defence"].append(None)
                         self.inningsresult["Defended Score"].append(sum(self.matchtally[(nthinnings-1)]["inningsruns"]))
                         self.inningsresult["Chase"].append("Unsuccessful")
                     if bowlingteam not in self.result:
-                        self.inningsresult["Defence"].append("Successful")
+                        self.inningsresult["Defence"].append(None)
                         self.inningsresult["Defended Score"].append(sum(self.matchtally[(nthinnings-1)]["inningsruns"]))
                         self.inningsresult["Chase"].append("Unsuccessful")
                     self.inningsresult["Chased Score"].append(None)
@@ -2696,7 +2714,7 @@ class search:
                     self.matchtally = {}
                     self.dictmatchtally = {}
                     search.teammatchtallysetup(self,match["info"],match['innings'])
-                    search.teammatchtallysetupdict(self,match["info"],match['innings'])
+                    # search.teammatchtallysetupdict(self,match["info"],match['innings'])
 
                     self.playermatchtally = {}
                     search.playermatchtallysetup(self,match["info"],match['innings'])
@@ -2773,8 +2791,8 @@ class search:
                                                         search.addplayerstoresult(self, eachfielder["name"],playerindex)
 
                                 # Record team innings tally
-                                search.teaminningstally(self,nthball,eachball,legdel,eachover, battingorder, nthinnings)
-                                search.teaminningstallydict(self,nthball,eachball,legdel,eachover, battingorder, nthinnings,battingteam,bowlingteam,match['innings'],matchtimetuple,match["info"])
+                                search.teaminningstally(self,nthball,eachball,legdel,eachover, battingorder, nthinnings,match["info"])
+                                # search.teaminningstallydict(self,nthball,eachball,legdel,eachover, battingorder, nthinnings,battingteam,bowlingteam,match['innings'],matchtimetuple,match["info"])
                                 if "declared" in eachinnings:
                                     self.matchtally[nthinnings]["inningsdeclared"] = True
                                 
@@ -2830,7 +2848,7 @@ class search:
                             # Team innings score
                             # if eachinnings["team"] in self.result:
                             search.teaminnings(self, eachinnings["team"], nthinnings, match["info"], matchtimetuple, match['innings'],tempplayerindex, eachfile)
-                            search.dictteaminnings(self, eachinnings["team"], nthinnings, match["info"], matchtimetuple, match['innings'],tempplayerindex,battingteam,bowlingteam)
+                            # search.dictteaminnings(self, eachinnings["team"], nthinnings, match["info"], matchtimetuple, match['innings'],tempplayerindex,battingteam,bowlingteam)
 
 
                             # if len(self.inningsresult["Defence"])!=len(self.inningsresult["Innings"]):
@@ -2840,8 +2858,8 @@ class search:
 
                     # Individual team and players games/wins/draw/ties record
                     search.gamesandwins(self, match["info"],match['innings'],innings)
-                    for eachdict in self.dictmatchtally.keys():
-                        fulldict.extend(self.dictmatchtally[eachdict])
+                    # for eachdict in self.dictmatchtally.keys():
+                    #     fulldict.extend(self.dictmatchtally[eachdict])
                     matchdata.close()
         matches.close()
         matchindexfile.close()
@@ -2849,7 +2867,7 @@ class search:
         # print(f'Time after stats(): {time.time() - start}')
         
         # dict trial
-        self.dictballresult = pd.DataFrame.from_records(fulldict)
+        # self.dictballresult = pd.DataFrame.from_records(fulldict)
 
         # for y in self.inningsresult.keys():
         #     print(y, len(self.inningsresult[y]))

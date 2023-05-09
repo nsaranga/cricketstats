@@ -316,7 +316,7 @@ class ld(matchsim):
             # over generator
             for thisover in range(overs):
                 # skip to last matchscore overs
-                if matchscore and ((len(matchscore)==1 and thisover<(matchscore["Innings 1"][3])) or (len(matchscore)==2 and thisover<(matchscore["Innings 2"][3]))):
+                if matchscore and ((len(matchscore)==1 and thisover<(matchscore["Innings 1"][3]) and thisinnings==matchscore["Innings 1"][0]) or (len(matchscore)==2 and thisover<(matchscore["Innings 2"][3])and thisinnings==matchscore["Innings 2"][0])):
                     continue
 
                 if self.inningswickets == 10 or (nthinnings == 1 and self.inningsscore > self.matchresults["Innings 1 Score"][-1]):

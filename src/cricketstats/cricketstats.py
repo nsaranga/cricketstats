@@ -26,8 +26,8 @@ import numpy as np
 import math
 from cricketstats import statsprocessor
 
-# also create a flag thatt will will collect super over data if requested.
-
+# TODO also create a flag thatt will will collect super over data if requested.
+# TODO write script for scraping haw eye data from bcci widget
 # TODO make option to sum players/teams stats better. Insert "all players earlier in result"?
 # TODO fix the way innings outs are counted. eg. make it more efficient, there's currently 3 lists for it...
 # TODO when do allteams/allplayers I should add all players/teams at beginning of match not check at each ball. this counts less for palyers for some reasons
@@ -2150,65 +2150,67 @@ class search:
     def derivedstats(self):
         if self.players or self.allplayers==True:
             for eachplayer in self.result:
-                if self.result[eachplayer]["Games"] > 0:
-                    self.result[eachplayer]["Win %"] = statsprocessor.ratio(self.result[eachplayer]["Won"],self.result[eachplayer]["Games"],multiplier=100)
+                # if self.result[eachplayer]["Games"] > 0:
+                #     self.result[eachplayer]["Win %"] = statsprocessor.ratio(self.result[eachplayer]["Won"],self.result[eachplayer]["Games"],multiplier=100)
 
-                if self.result[eachplayer]["Balls Faced"] > 0:
-                    self.result[eachplayer]["Runs/Ball"] = statsprocessor.ratio(self.result[eachplayer]["Runs"],self.result[eachplayer]["Balls Faced"])
-                    self.result[eachplayer]["Batting S/R"] = statsprocessor.ratio(self.result[eachplayer]["Runs"], self.result[eachplayer]["Balls Faced"], multiplier=100)
-                    self.result[eachplayer]["Boundary %"] = statsprocessor.ratio(
-                        (self.result[eachplayer]["Fours"]
-                        + self.result[eachplayer]["Sixes"]),
-                        self.result[eachplayer]["Balls Faced"], multiplier=100)
-                    self.result[eachplayer]["Dot Ball %"] = statsprocessor.ratio(self.result[eachplayer]["Dot Balls"],self.result[eachplayer]["Balls Faced"], multiplier=100)
+                # if self.result[eachplayer]["Balls Faced"] > 0:
+                #     self.result[eachplayer]["Runs/Ball"] = statsprocessor.ratio(self.result[eachplayer]["Runs"],self.result[eachplayer]["Balls Faced"])
+                #     self.result[eachplayer]["Batting S/R"] = statsprocessor.ratio(self.result[eachplayer]["Runs"], self.result[eachplayer]["Balls Faced"], multiplier=100)
+                #     self.result[eachplayer]["Boundary %"] = statsprocessor.ratio(
+                #         (self.result[eachplayer]["Fours"]
+                #         + self.result[eachplayer]["Sixes"]),
+                #         self.result[eachplayer]["Balls Faced"], multiplier=100)
+                #     self.result[eachplayer]["Dot Ball %"] = statsprocessor.ratio(self.result[eachplayer]["Dot Balls"],self.result[eachplayer]["Balls Faced"], multiplier=100)
 
-                if self.result[eachplayer]["Outs"] > 0:
-                    self.result[eachplayer]["Batting Avg"] = statsprocessor.ratio(self.result[eachplayer]["Runs"],self.result[eachplayer]["Outs"], multiplier=0)
-                    self.result[eachplayer]["Dismissal Rate"] = statsprocessor.ratio(self.result[eachplayer]["Balls Faced"],self.result[eachplayer]["Outs"], multiplier=0)
+                # if self.result[eachplayer]["Outs"] > 0:
+                #     self.result[eachplayer]["Batting Avg"] = statsprocessor.ratio(self.result[eachplayer]["Runs"],self.result[eachplayer]["Outs"], multiplier=0)
+                #     self.result[eachplayer]["Dismissal Rate"] = statsprocessor.ratio(self.result[eachplayer]["Balls Faced"],self.result[eachplayer]["Outs"], multiplier=0)
 
                 if self.result[eachplayer]["firstboundary"]:
-                    self.result[eachplayer]["Avg First Boundary Ball"] = round(statsprocessor.ratio(sum(self.result[eachplayer]["firstboundary"]), len(self.result[eachplayer]["firstboundary"])),2)
+                    self.result[eachplayer]["Avg First Boundary Ball"] = round(statsprocessor.ratio(sum(self.result[eachplayer]["firstboundary"]), len(self.result[eachplayer]["firstboundary"])),1)
 
-                if self.result[eachplayer]["totalstosopp"] > 0:
-                    self.result[eachplayer]["Strike Turnover %"] = statsprocessor.ratio(self.result[eachplayer]["totalstos"], self.result[eachplayer]["totalstosopp"], multiplier=100)
+                # have to fix cleanup function to move below to derived stats
+                # if self.result[eachplayer]["totalstosopp"] > 0:
+                #     self.result[eachplayer]["Strike Turnover %"] = statsprocessor.ratio(self.result[eachplayer]["totalstos"], self.result[eachplayer]["totalstosopp"], multiplier=100)
 
                 if self.result[eachplayer]["Balls Faced"] > 0 and self.result[eachplayer]["Innings Batted"] > 0:
                     self.result[eachplayer]["Batting S/R MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Player"]==eachplayer,"Batting S/R"] - self.inningsresult.loc[self.inningsresult["Player"]==eachplayer,"Batting S/R"].mean()).abs().mean(), 2)
-                    self.result[eachplayer]["Mean Balls Faced"] = round(statsprocessor.ratio(self.result[eachplayer]["Balls Faced"],self.result[eachplayer]["Innings Batted"], multiplier=0), 2)
+                #     self.result[eachplayer]["Mean Balls Faced"] = round(statsprocessor.ratio(self.result[eachplayer]["Balls Faced"],self.result[eachplayer]["Innings Batted"], multiplier=0), 2)
                     self.result[eachplayer]["Balls Faced MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Player"]==eachplayer,"Balls Faced"] - self.inningsresult.loc[self.inningsresult["Player"]==eachplayer,"Balls Faced"].mean()).abs().mean(), 2)
-                    self.result[eachplayer]["Survival Consistency"] = 100 - statsprocessor.ratio(self.result[eachplayer]["Balls Faced MeanAD"], self.result[eachplayer]["Mean Balls Faced"], multiplier=100)
+                #     self.result[eachplayer]["Survival Consistency"] = 100 - statsprocessor.ratio(self.result[eachplayer]["Balls Faced MeanAD"], self.result[eachplayer]["Mean Balls Faced"], multiplier=100)
 
                 if self.result[eachplayer]["Balls Faced"] > 0 and self.result[eachplayer]["Runs"] > 0:
-                    self.result[eachplayer]["Mean Score"] = round(statsprocessor.ratio(self.result[eachplayer]["Runs"],self.result[eachplayer]["Innings Batted"], multiplier=0), 2)
+                    # self.result[eachplayer]["Mean Score"] = round(statsprocessor.ratio(self.result[eachplayer]["Runs"],self.result[eachplayer]["Innings Batted"], multiplier=0), 2)
                     self.result[eachplayer]["Score MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Player"]==eachplayer,"Score"] - self.inningsresult.loc[self.inningsresult["Player"]==eachplayer,"Score"].mean()).abs().mean(),2)
-                    self.result[eachplayer]["Scoring Consistency"] = 100 - statsprocessor.ratio(self.result[eachplayer]["Score MeanAD"], self.result[eachplayer]["Mean Score"], multiplier=100)
+                    # self.result[eachplayer]["Scoring Consistency"] = 100 - statsprocessor.ratio(self.result[eachplayer]["Score MeanAD"], self.result[eachplayer]["Mean Score"], multiplier=100)
 
-                if self.result[eachplayer]["Balls Bowled"] > 0:
-                    self.result[eachplayer]["Runsgiven/Ball"] = statsprocessor.ratio(self.result[eachplayer]["Runsgiven"], self.result[eachplayer]["Balls Bowled"])
-                    self.result[eachplayer]["Economy Rate"] = statsprocessor.ratio(
-                        self.result[eachplayer]["Runsgiven"], self.result[eachplayer]["Balls Bowled"],
-                        multiplier=6)
-                    self.result[eachplayer]["Dot Ball Bowled %"] = statsprocessor.ratio(
-                        self.result[eachplayer]["Dot Balls Bowled"], self.result[eachplayer]["Balls Bowled"],
-                        multiplier=100)
-                    self.result[eachplayer]["Boundary Given %"] = statsprocessor.ratio(
-                        (self.result[eachplayer]["Foursgiven"]
-                        + self.result[eachplayer]["Sixesgiven"]),
-                        self.result[eachplayer]["Balls Bowled"], multiplier=100)
+                # if self.result[eachplayer]["Balls Bowled"] > 0:
+                #     self.result[eachplayer]["Runsgiven/Ball"] = statsprocessor.ratio(self.result[eachplayer]["Runsgiven"], self.result[eachplayer]["Balls Bowled"])
+                #     self.result[eachplayer]["Economy Rate"] = statsprocessor.ratio(
+                #         self.result[eachplayer]["Runsgiven"], self.result[eachplayer]["Balls Bowled"],
+                #         multiplier=6)
+                #     self.result[eachplayer]["Dot Ball Bowled %"] = statsprocessor.ratio(
+                #         self.result[eachplayer]["Dot Balls Bowled"], self.result[eachplayer]["Balls Bowled"],
+                #         multiplier=100)
+                #     self.result[eachplayer]["Boundary Given %"] = statsprocessor.ratio(
+                #         (self.result[eachplayer]["Foursgiven"]
+                #         + self.result[eachplayer]["Sixesgiven"]),
+                #         self.result[eachplayer]["Balls Bowled"], multiplier=100)
+                    
                 if self.result[eachplayer]["dotballseries"]:
-                    self.result[eachplayer]["Avg Consecutive Dot Balls"] = round(np.mean(self.result[eachplayer]["dotballseries"]),2)
+                    self.result[eachplayer]["Avg Consecutive Dot Balls"] = round(np.mean(self.result[eachplayer]["dotballseries"]),1)
 
-                if self.result[eachplayer]["Wickets"] > 0:
-                    self.result[eachplayer]["Bowling Avg"] = statsprocessor.ratio(
-                        self.result[eachplayer]["Runsgiven"], self.result[eachplayer]["Wickets"], multiplier=0)
-                    self.result[eachplayer]["Bowling S/R"] = statsprocessor.ratio(
-                        self.result[eachplayer]["Balls Bowled"], self.result[eachplayer]["Wickets"], multiplier=0)
+                # if self.result[eachplayer]["Wickets"] > 0:
+                #     self.result[eachplayer]["Bowling Avg"] = statsprocessor.ratio(
+                #         self.result[eachplayer]["Runsgiven"], self.result[eachplayer]["Wickets"], multiplier=0)
+                #     self.result[eachplayer]["Bowling S/R"] = statsprocessor.ratio(
+                #         self.result[eachplayer]["Balls Bowled"], self.result[eachplayer]["Wickets"], multiplier=0)
 
-                if (self.result[eachplayer]["Fours"]+self.result[eachplayer]["Sixes"])>0:
-                    self.result[eachplayer]["Boundary Rate"] = statsprocessor.ratio(self.result[eachplayer]["Balls Faced"],(self.result[eachplayer]["Fours"]+self.result[eachplayer]["Sixes"]), multiplier=0)
+                # if (self.result[eachplayer]["Fours"]+self.result[eachplayer]["Sixes"])>0:
+                #     self.result[eachplayer]["Boundary Rate"] = statsprocessor.ratio(self.result[eachplayer]["Balls Faced"],(self.result[eachplayer]["Fours"]+self.result[eachplayer]["Sixes"]), multiplier=0)
 
-                if (self.result[eachplayer]["Foursgiven"]+self.result[eachplayer]["Sixesgiven"])>0:
-                    self.result[eachplayer]["Boundary Given Rate"] = statsprocessor.ratio(self.result[eachplayer]["Balls Bowled"],(self.result[eachplayer]["Foursgiven"]+self.result[eachplayer]["Sixesgiven"]), multiplier=0) 
+                # if (self.result[eachplayer]["Foursgiven"]+self.result[eachplayer]["Sixesgiven"])>0:
+                #     self.result[eachplayer]["Boundary Given Rate"] = statsprocessor.ratio(self.result[eachplayer]["Balls Bowled"],(self.result[eachplayer]["Foursgiven"]+self.result[eachplayer]["Sixesgiven"]), multiplier=0) 
 
                 if self.result[eachplayer]["Balls Bowled"] > 5 and self.result[eachplayer]["Economy Rate"]>0:
                     self.result[eachplayer]["Economy Rate MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Player"]==eachplayer,"Economy Rate"] - self.inningsresult.loc[self.inningsresult["Player"]==eachplayer,"Economy Rate"].mean()).abs().mean(),2)
@@ -2219,6 +2221,119 @@ class search:
                 if self.result[eachplayer]["Wickets"] > 0 and self.result[eachplayer]["Bowling S/R"]>0:
                     self.result[eachplayer]["Bowling S/R MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Player"]==eachplayer,"Bowling S/R"] - self.inningsresult.loc[self.inningsresult["Player"]==eachplayer,"Bowling S/R"].mean()).abs().mean(),2)
 
+            # self.inningsresult["Batting S/R AA"]= np.nan
+            # self.inningsresult.loc[self.inningsresult["Innings Type"]=="Batting","Batting S/R AA"] = self.inningsresult["Batting S/R"] - self.inningsresult["Batting S/R"].mean()
+
+            # self.ballresult["Batter Score AA"] = np.nan
+            # self.ballresult["Batting S/R AA"] = np.nan
+            # for everyball in pd.unique(self.ballresult['Balls Faced']):
+            #     self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Batter Score AA"] = self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Batter Score"] - self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Batter Score"].mean()
+            #     self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Batting S/R AA"] = self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Strike Rate"] - self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Strike Rate"].mean()
+            
+            
+        if self.teams or self.allteams==True:
+            for eachteam in self.result:
+                # if self.result[eachteam]["Games"] > 0:
+                #     self.result[eachteam]["Win %"] = statsprocessor.ratio(self.result[eachteam]["Won"],self.result[eachteam]["Games"],multiplier=100)
+                # if self.result[eachteam]["Balls Faced"] > 0:
+                    # self.result[eachteam]["Runs/Ball"] = statsprocessor.ratio(self.result[eachteam]["Runs"],self.result[eachteam]["Balls Faced"])
+                    # self.result[eachteam]["Boundary %"] = statsprocessor.ratio((self.result[eachteam]["Fours"] + self.result[eachteam]["Sixes"]),
+                    #     self.result[eachteam]["Balls Faced"], multiplier=100)
+                    # self.result[eachteam]["Dot Ball %"] = statsprocessor.ratio(self.result[eachteam]["Dot Balls"],self.result[eachteam]["Balls Faced"], multiplier=100)
+
+                    # self.result[eachteam]["Run Rate"] = statsprocessor.ratio(self.result[eachteam]["Runs"], self.result[eachteam]["Balls Faced"], multiplier=6)
+
+                self.result[eachteam]["Avg First Boundary Ball"] = round(self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"First Boundary Ball"].mean(),2)
+
+                # if self.result[eachteam]["Outs"] > 0:
+                #     self.result[eachteam]["Runs/Wicket"] = statsprocessor.ratio(self.result[eachteam]["Runs"],self.result[eachteam]["Outs"])
+
+                if self.result[eachteam]["Balls Faced"] > 5 and self.result[eachteam]["Run Rate"]>0:
+                    self.result[eachteam]["Run Rate MeanAD"]=round((self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"Run Rate"] - self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"Run Rate"].mean()).abs().mean(), 2)
+
+                if self.result[eachteam]["Runs"] > 0 and self.result[eachteam]["Innings Batted"] > 0:
+                    self.result[eachteam]["Score MeanAD"]=round((self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"Score"] - self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"Score"].mean()).abs().mean(), 2) 
+
+                    # self.result[eachteam]["Mean Score"]=round(statsprocessor.ratio(self.result[eachteam]["Runs"], self.result[eachteam]["Innings Batted"], multiplier=0), 2)
+                    # self.result[eachteam]["Scoring Consistency"] = 100 - statsprocessor.ratio(self.result[eachteam]["Score MeanAD"], self.result[eachteam]["Mean Score"], multiplier=100)
+
+                # if self.result[eachteam]["Balls Bowled"] > 0:
+                #     self.result[eachteam]["Runsgiven/Ball"] = statsprocessor.ratio(
+                #         self.result[eachteam]["Runsgiven"], self.result[eachteam]["Balls Bowled"])
+                #     self.result[eachteam]["Dot Ball Bowled %"] = statsprocessor.ratio(
+                #         self.result[eachteam]["Dot Balls Bowled"], self.result[eachteam]["Balls Bowled"],
+                #         multiplier=100)
+                #     self.result[eachteam]["Boundary Given %"] = statsprocessor.ratio(
+                #         (self.result[eachteam]["Foursgiven"]
+                #         + self.result[eachteam]["Sixesgiven"]),
+                #         self.result[eachteam]["Balls Bowled"], multiplier=100)
+                #     self.result[eachteam]["Runsgiven Rate"] = statsprocessor.ratio(self.result[eachteam]["Runsgiven"], self.result[eachteam]["Balls Bowled"], multiplier=6)
+                
+                if self.result[eachteam]["Balls Bowled"] > 5 and self.result[eachteam]["Runsgiven Rate"]>0:
+                    self.result[eachteam]["Runsgiven Rate MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Bowling Team"]==eachteam,"Run Rate"] - self.inningsresult.loc[self.inningsresult["Bowling Team"]==eachteam,"Run Rate"].mean()).abs().mean(), 2)
+
+                # if self.result[eachteam]["Wickets"] > 0:
+                #     self.result[eachteam]['Runsgiven/Wicket'] = statsprocessor.ratio(
+                #         self.result[eachteam]["Runsgiven"], self.result[eachteam]["Wickets"])
+                
+                # fix this 
+                if self.result[eachteam]["dotballseries"]:
+                    self.result[eachteam]["Avg Consecutive Dot Balls"] = round(np.mean(self.result[eachteam]["dotballseries"]),2)
+
+
+
+    # derived stats vectorised
+    def vectorderivedstats(self):
+        
+        # Test self result with team, and see if errors comeup               
+        self.result["Win %"] = round((self.result["Won"] / self.result["Games"])*100,1)
+
+        self.result["Runs/Ball"] = round(self.result["Runs"]/self.result["Balls Faced"],1)
+        self.result["Runs Rate"] = round((self.result["Runs"]/self.result["Balls Faced"])*6,1)
+        self.result["Batting S/R"] = round((self.result["Runs"]/self.result["Balls Faced"])*100,1)
+        self.result["Boundary %"] = round(((self.result["Fours"]+ self.result["Sixes"])/ self.result["Balls Faced"])*100, 1)
+        self.result["Dot Ball %"] = round(self.result["Dot Balls"]/self.result["Balls Faced"], 1)
+
+        
+        self.result["Dismissal Rate"] = round(self.result["Balls Faced"]/self.result["Outs"],1)
+
+        # do this above by looping just once.
+        # self.result["Avg First Boundary Ball"] = self.result["firstboundary"].apply(lambda x: round(sum(x)/len(x),1) if len(x)>0 else None)
+
+        self.result["Strike Turnover %"] = round(self.result["totalstos"]/ self.result["totalstosopp"], 1)
+
+        self.result["Mean Balls Faced"] = round(self.result["Balls Faced"]/self.result["Innings Batted"],1)
+
+        self.result["Mean Score"] = round(self.result["Runs"]/self.result["Innings Batted"], 2)
+        self.result["Scoring Consistency"] = 100 - round((self.result["Score MeanAD"]/self.result["Mean Score"])*100,1)
+
+        self.result["Runsgiven/Ball"] = round(self.result["Runsgiven"]/ self.result["Balls Bowled"],1)
+        self.result["Economy Rate"] = round((self.result["Runsgiven"]/ self.result["Balls Bowled"])*6,1)
+        self.result['Runsgiven/Wicket'] = round((self.result["Runsgiven"]/ self.result["Wickets"]),1)
+        self.result["Dot Ball Bowled %"] = round((self.result["Dot Balls Bowled"]/ self.result["Balls Bowled"])*100,1)
+        self.result["Boundary Given %"] = round(((self.result["Foursgiven"]+self.result["Sixesgiven"])/self.result["Balls Bowled"])*100,1)
+
+        self.result["Bowling Avg"] = round(self.result["Runsgiven"]/ self.result["Wickets"],2)
+        self.result["Bowling S/R"] = round(self.result["Balls Bowled"]/ self.result["Wickets"], 1)
+
+
+        self.result["Boundary Rate"] = round(self.result["Balls Faced"]/(self.result["Fours"]+self.result["Sixes"]), 1)
+        self.result["Boundary Given Rate"] = round(self.result["Balls Bowled"]/(self.result["Foursgiven"]+self.result["Sixesgiven"]), 1) 
+
+        # Above average stats
+        self.result["Runs AA"] = round(self.result["Runs"] - self.result["Runs"].mean(),1)
+        self.result["Runs/Ball AA"] = round(self.result["Runs/Ball"] - self.result["Runs/Ball"].mean(),1)
+
+        self.result["Runsgiven AA"] = round(self.result["Runsgiven"] - self.result["Runsgiven"].mean(),1)
+        self.result["Runsgiven/Ball AA"] = round(self.result["Runsgiven/Ball"] - self.result["Runsgiven/Ball"].mean(),1)
+
+
+        if self.players or self.allplayers==True:
+
+            self.result["Batting Avg"] = round(self.result["Runs"]/self.result["Outs"],2)
+            self.result["Survival Consistency"] = 100 - round((self.result["Balls Faced MeanAD"]/ self.result["Mean Balls Faced"])*100,1)
+
+            # innings balls derived stats
             self.inningsresult["Batting S/R AA"]= np.nan
             self.inningsresult.loc[self.inningsresult["Innings Type"]=="Batting","Batting S/R AA"] = self.inningsresult["Batting S/R"] - self.inningsresult["Batting S/R"].mean()
 
@@ -2227,57 +2342,13 @@ class search:
             for everyball in pd.unique(self.ballresult['Balls Faced']):
                 self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Batter Score AA"] = self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Batter Score"] - self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Batter Score"].mean()
                 self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Batting S/R AA"] = self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Strike Rate"] - self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Strike Rate"].mean()
-            
-            
+
         if self.teams or self.allteams==True:
-            for eachteam in self.result:
-                if self.result[eachteam]["Games"] > 0:
-                    self.result[eachteam]["Win %"] = statsprocessor.ratio(self.result[eachteam]["Won"],self.result[eachteam]["Games"],multiplier=100)
-                if self.result[eachteam]["Balls Faced"] > 0:
-                    self.result[eachteam]["Runs/Ball"] = statsprocessor.ratio(self.result[eachteam]["Runs"],self.result[eachteam]["Balls Faced"])
-                    self.result[eachteam]["Boundary %"] = statsprocessor.ratio((self.result[eachteam]["Fours"] + self.result[eachteam]["Sixes"]),
-                        self.result[eachteam]["Balls Faced"], multiplier=100)
-                    self.result[eachteam]["Dot Ball %"] = statsprocessor.ratio(self.result[eachteam]["Dot Balls"],self.result[eachteam]["Balls Faced"], multiplier=100)
+            self.result["Runs/Wicket"] = round(self.result["Runs"]/self.result["Balls Faced"],1)
+            self.result["Net Run Rate"] = self.result["Run Rate"] - self.result["Runsgiven Rate"]
+            self.result["Net Boundary %"] = self.result["Boundary %"] - self.result["Boundary Given %"]
+            
 
-                    self.result[eachteam]["Run Rate"] = statsprocessor.ratio(self.result[eachteam]["Runs"], self.result[eachteam]["Balls Faced"], multiplier=6)
-
-                self.result[eachteam]["Avg First Boundary Ball"] = round(self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"First Boundary Ball"].mean(),2)
-
-                if self.result[eachteam]["Outs"] > 0:
-                    self.result[eachteam]["Runs/Ball"] = statsprocessor.ratio(self.result[eachteam]["Runs"],self.result[eachteam]["Outs"])
-
-                if self.result[eachteam]["Balls Faced"] > 5 and self.result[eachteam]["Run Rate"]>0:
-                    self.result[eachteam]["Run Rate MeanAD"]=round((self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"Run Rate"] - self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"Run Rate"].mean()).abs().mean(), 2)
-
-                if self.result[eachteam]["Runs"] > 0 and self.result[eachteam]["Innings Batted"] > 0:
-                    self.result[eachteam]["Score MeanAD"]=round((self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"Score"] - self.inningsresult.loc[self.inningsresult["Batting Team"]==eachteam,"Score"].mean()).abs().mean(), 2) 
-                    self.result[eachteam]["Mean Score"]=round(statsprocessor.ratio(self.result[eachteam]["Runs"], self.result[eachteam]["Innings Batted"], multiplier=0), 2)
-                    self.result[eachteam]["Scoring Consistency"] = statsprocessor.ratio(self.result[eachteam]["Score MeanAD"], self.result[eachteam]["Mean Score"], multiplier=100)
-
-                if self.result[eachteam]["Balls Bowled"] > 0:
-                    self.result[eachteam]["Runsgiven/Ball"] = statsprocessor.ratio(
-                        self.result[eachteam]["Runsgiven"], self.result[eachteam]["Balls Bowled"])
-                    self.result[eachteam]["Dot Ball Bowled %"] = statsprocessor.ratio(
-                        self.result[eachteam]["Dot Balls Bowled"], self.result[eachteam]["Balls Bowled"],
-                        multiplier=100)
-                    self.result[eachteam]["Boundary Given %"] = statsprocessor.ratio(
-                        (self.result[eachteam]["Foursgiven"]
-                        + self.result[eachteam]["Sixesgiven"]),
-                        self.result[eachteam]["Balls Bowled"], multiplier=100)
-                    self.result[eachteam]["Runsgiven Rate"] = statsprocessor.ratio(self.result[eachteam]["Runsgiven"], self.result[eachteam]["Balls Bowled"], multiplier=6)
-                
-                if self.result[eachteam]["Balls Bowled"] > 5 and self.result[eachteam]["Runsgiven Rate"]>0:
-                    self.result[eachteam]["Runsgiven Rate MeanAD"] = round((self.inningsresult.loc[self.inningsresult["Bowling Team"]==eachteam,"Run Rate"] - self.inningsresult.loc[self.inningsresult["Bowling Team"]==eachteam,"Run Rate"].mean()).abs().mean(), 2)
-
-                if self.result[eachteam]["Wickets"] > 0:
-                    self.result[eachteam]['Runsgiven/Wicket'] = statsprocessor.ratio(
-                        self.result[eachteam]["Runsgiven"], self.result[eachteam]["Wickets"])
-                
-                if self.result[eachteam]["dotballseries"]:
-                    self.result[eachteam]["Avg Consecutive Dot Balls"] = round(np.mean(self.result[eachteam]["dotballseries"]),2)
-
-                self.result[eachteam]["Net Run Rate"] = self.result[eachteam]["Run Rate"] - self.result[eachteam]["Runsgiven Rate"]
-                self.result[eachteam]["Net Boundary %"] = self.result[eachteam]["Boundary %"] - self.result[eachteam]["Boundary Given %"]
 
     # Sum and record stats from all players and teams in a search
     def sumstats(self, allgamesplayed, allgameswinloss, allgamesdrawn,playerindex):    
@@ -2484,11 +2555,12 @@ class search:
             self.result[eachteam]["Net Boundary %"] = self.result[eachteam]["Boundary %"] - self.result[eachteam]["Boundary Given %"]
 
     def cleanup(self):
-        for eachdict in self.result:
-            removestats = ["firstboundary", "totalstos", "totalstosopp", "totalstosgiven", "totalstosgivenopp","dotballseries","inningstally"]
-            for eachstat in removestats:
-                if eachstat in self.result[eachdict]: 
-                    self.result[eachdict].pop(eachstat)
+        # for eachdict in self.result:
+        #     removestats = ["firstboundary", "totalstos", "totalstosopp", "totalstosgiven", "totalstosgivenopp","dotballseries","inningstally"]
+        #     for eachstat in removestats:
+        #         if eachstat in self.result[eachdict]: 
+        #             self.result[eachdict].pop(eachstat)
+        self.result.drop(["firstboundary", "totalstos", "totalstosopp", "totalstosgiven", "totalstosgivenopp","dotballseries"],axis=1,inplace=True)
 
     # This is the main function to be applied to search object.
     def stats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playersteams=None, teammates=None, oppositionbatters=None, oppositionbowlers = None, oppositionteams=None, venue=None, event=None, teamtype=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None, fielders=None, toss=None, tossdecision=None, sumstats=False, playerindexfile=None):
@@ -2895,10 +2967,14 @@ class search:
         if sumstats:
             search.sumstats(self,allgamesplayed, allgameswinloss, allgamesdrawn,playerindex)
 
-        search.cleanup(self)
+        
 
         # print(f'Time after sumstats(): {time.time() - start}')
         # if self.players or self.teams:
         df = pd.DataFrame(self.result)
-        self.result = df.transpose()
+        self.result = df.transpose().infer_objects()
+
+        search.vectorderivedstats(self)
+        
+        search.cleanup(self)
         # print(f'Time after transpose(): {time.time() - start}')

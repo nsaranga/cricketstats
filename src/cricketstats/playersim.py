@@ -45,7 +45,7 @@ class playersim:
         matchtypes={"T20": limitedovers, "ODI": limitedovers,"ODM": limitedovers,"Test": testmatch}
         self.simresults = matchtypes[statsmatchtype]
 
-    def pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype):
+    def pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,playerindexfile=None,matchindexfile=None):
         # search stats for p-values
         simplayers=[]
         for eachteam in self.simteams:
@@ -55,7 +55,7 @@ class playersim:
         searchmatchtypes={"T20": ["T20"], "ODI": ["ODI","ODM"],"ODM": ["ODI","ODM"],"Test": ["Test","MDM"],"MDM": ["Test","MDM"]} 
 
         self.simteamstats = cricketstats.search(players=simplayers)
-        self.simteamstats.stats(database=statsdatabase, from_date=statsfrom_date, to_date=statsto_date, matchtype=searchmatchtypes[statsmatchtype], betweenovers=[], innings=[], sex=[statssex], playersteams=[], oppositionbatters=[], oppositionbowlers=[], oppositionteams=[], venue=[], event=[], matchresult=[], superover=None, battingposition=[], bowlingposition=[], fielders=[], sumstats=False)
+        self.simteamstats.stats(database=statsdatabase, from_date=statsfrom_date, to_date=statsto_date, matchtype=searchmatchtypes[statsmatchtype], betweenovers=[], innings=[], sex=[statssex], playersteams=[], oppositionbatters=[], oppositionbowlers=[], oppositionteams=[], venue=[], event=[], matchresult=[], superover=None, battingposition=[], bowlingposition=[], fielders=[], sumstats=False,playerindexfile=None,matchindexfile=None)
 
     def playerP(self,nthinnings,thisinnings, bowlingteam,simteams,simteamstats,thisover,hometeam):
 
@@ -310,12 +310,12 @@ class playersim:
 
         return sim.results
             
-    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False,matchscore=None,hometeam=None, multicore=True ,endover=None):
+    def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False,matchscore=None,hometeam=None, multicore=True ,endover=None,playerindexfile=None,matchindexfile=None):
         # Setup match results
         playersim.simresultssetup(self,statsmatchtype)
 
         # Search for pvalues
-        playersim.pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype)
+        playersim.pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,playerindexfile=None,matchindexfile=None)
 
         # multiprocessing
         if multicore==True:

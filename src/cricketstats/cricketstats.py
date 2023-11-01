@@ -172,11 +172,15 @@ class search:
                         }
 
     # Indexes matches by match type for quick search.
-    def fileindexing(self, database, matches):
-        currentdir = os.path.dirname(os.path.abspath(__file__))
+    def fileindexing(self, database, matches,matchindexfile):
+        if matchindexfile != None:
+            currentdir = matchindexfile
+        if matchindexfile == None:  
+            currentdir = os.path.dirname(os.path.abspath(__file__))
         databasemtime = os.path.getmtime(database)
         databasetime = time.gmtime(databasemtime)
         databaseyear = int(databasetime[0])
+
         if not os.path.exists(f"{currentdir}/matchindex.json"):
             newmatchindex = {"file": "", 'indexedtime': 0, "matches":{"Test": {}, "MDM":{}, "ODI":{}, "ODM": {}, "T20":{}, "IT20":{}}}
             for eachmatchtype in newmatchindex["matches"]:
@@ -2291,7 +2295,10 @@ class search:
         self.result.drop(["firstboundary", "totalstos", "totalstosopp", "totalstosgiven", "totalstosgivenopp","dotballseries"],axis=1,inplace=True)
 
     # This is the main function to be applied to search object.
-    def stats(self, database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playersteams=None, teammates=None, oppositionbatters=None, oppositionbowlers = None, oppositionteams=None, venue=None, event=None, teamtype=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None, fielders=None, toss=None, tossdecision=None, sumstats=False, playerindexfile=None):
+    def stats(self,database, from_date, to_date, matchtype, betweenovers=None, innings=None, sex=None, playersteams=None, teammates=None, oppositionbatters=None, oppositionbowlers = None, oppositionteams=None, venue=None, event=None, teamtype=None, matchresult=None, superover=None, battingposition=None, bowlingposition=None, fielders=None, toss=None, tossdecision=None, sumstats=False, playerindexfile=None,matchindexfile=None):
+
+        currentdir = os.path.dirname(os.path.abspath(__file__))
+
         if betweenovers == None:
             betweenovers = []
         if innings == None:
@@ -2305,7 +2312,8 @@ class search:
         if fielders == None:
             fielders = []
 
-        currentdir = os.path.dirname(os.path.abspath(__file__))
+        # load playerindex
+        # need to update playerindexing to make use of custom file as well
         if playerindexfile==None:
             pindexfile = open(f"{currentdir}/playerindex.json")
             playerindex = json.load(pindexfile)
@@ -2378,10 +2386,14 @@ class search:
                 search.addteamstoresult(self, eachteam)
 
         # Ingest zipfile of data
-        matches = zipfile.ZipFile(database, 'r')
+        # cehck if database is file or folder: then listdir to var, open with abs path below
+        if os.path.isfile(database):
+            matches = zipfile.ZipFile(database, 'r')
+        if os.path.isdir(database):
+            matches = os.listdir(database)
 
         # create an index file for eachfile
-        search.fileindexing(self, database, matches)
+        search.fileindexing(self, database, matches,matchindexfile)
 
         # start = time.time()
         
@@ -2390,13 +2402,14 @@ class search:
         allgameswinloss = 0
         allgamesdrawn = 0
 
-        # load playerindex
-        # playerindexfile = open(f"{currentdir}/playerindex.json")
-        # players = json.load(playerindexfile)
-        
-        currentdir = os.path.dirname(os.path.abspath(__file__))
-        matchindexfile = open(f"{currentdir}/matchindex.json")
-        matchindex = json.load(matchindexfile)
+    
+        if matchindexfile == None:
+            mindexfile = open(f"{currentdir}/matchindex.json")
+            matchindex = json.load(mindexfile)
+        if matchindexfile!=None:
+            mindexfile = open(matchindexfile + "/matchindex.json")
+            matchindex = json.load(mindexfile)
+
         # Open each file by searched for matchtype in index
         for eachmatchtype in matchtype:
             for eachyear in matchindex["matches"][eachmatchtype]:
@@ -2405,17 +2418,13 @@ class search:
                 for eachfile in matchindex["matches"][eachmatchtype][eachyear]:
                     # print(eachfile)
                     
-                    matchdata = matches.open(eachfile)
+                    if os.path.isdir(database):
+                        matchdata = open(database + eachfile)
+                    if os.path.isfile(database):
+                        matchdata = matches.open(eachfile)
                     match = json.load(matchdata)
 
-                    # creat temporary player index
-                    # tempplayerindex={"Batting":{"Right hand":[],"Left hand":[]},"Bowling":{"Right arm pace":[],"Left arm pace":[],"Right arm off break":[],"Right arm leg break":[],"Left arm orthodox":[],"Left arm wrist spin":[]}}
-                    # for eachplayer in match['info']['registry']['people'].keys():
-                    #     if eachplayer in playerindex.keys():
-                    #         if  playerindex[eachplayer]["Batting"] in tempplayerindex["Batting"]:
-                    #             tempplayerindex["Batting"][playerindex[eachplayer]["Batting"]].append(eachplayer)
-                    #         if  playerindex[eachplayer]["Bowling"] in tempplayerindex["Bowling"]:
-                    #             tempplayerindex["Bowling"][playerindex[eachplayer]["Bowling"]].append(eachplayer)
+                    # create temporary player index
                     tempplayerindex = playerindex
 
 
@@ -2659,8 +2668,9 @@ class search:
                     search.gamesandwins(self, match["info"],match['innings'],innings)
 
                     matchdata.close()
-        matches.close()
-        matchindexfile.close()
+        if os.path.isfile(database):
+            matches.close()
+        mindexfile.close()
         pindexfile.close()
         # print(f'Time after stats(): {time.time() - start}')
 

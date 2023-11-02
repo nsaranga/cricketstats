@@ -200,12 +200,20 @@ class search:
                 if f"{databaseyear}" not in matchindex["matches"][eachmatchtype].keys():
                     matchindex["matches"][eachmatchtype][f"{databaseyear}"] = []
             matchindex['indexedtime'] = os.path.getmtime(database)
-            matchindex['file'] = matches.filename
-            filelist = matches.namelist()
+            
+            if os.path.isdir(database):
+                matchindex['file'] = database
+                filelist = matches
+            if os.path.isfile(database):
+                matchindex['file'] = matches.filename
+                filelist = matches.namelist()
             for eachfile in filelist:
                 if ".json" not in eachfile:
                     continue
-                matchdata = matches.open(eachfile)
+                if os.path.isdir(database):
+                    matchdata = open(database +"/"+ eachfile)
+                if os.path.isfile(database):
+                    matchdata = matches.open(eachfile)
                 match = json.load(matchdata)
                 if eachfile not in newmatchindex["matches"][match["info"]["match_type"]][match["info"]["dates"][0][:4]]:
                     newmatchindex["matches"][match["info"]["match_type"]][match["info"]["dates"][0][:4]].append(eachfile)
@@ -2419,7 +2427,7 @@ class search:
                     # print(eachfile)
                     
                     if os.path.isdir(database):
-                        matchdata = open(database + eachfile)
+                        matchdata = open(database + "/"+ eachfile)
                     if os.path.isfile(database):
                         matchdata = matches.open(eachfile)
                     match = json.load(matchdata)

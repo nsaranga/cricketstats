@@ -315,7 +315,7 @@ class playersim:
         playersim.simresultssetup(self,statsmatchtype)
 
         # Search for pvalues
-        playersim.pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,playerindexfile=None,matchindexfile=None)
+        playersim.pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,statsplayerindexfile=None,statsmatchindexfile=None)
 
         # multiprocessing
         if multicore==True:

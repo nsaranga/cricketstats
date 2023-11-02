@@ -208,7 +208,7 @@ class matchsim:
         matchsim.simresultssetup(self,statsmatchtype)
 
         # Search for pvalues
-        matchsim.pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,playerindexfile=None,matchindexfile=None)
+        matchsim.pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,statsplayerindexfile=None,statsmatchindexfile=None)
 
 
 

@@ -60,10 +60,10 @@ class matchsim:
         matchtypes={"T20": limitedovers, "ODI": limitedovers,"ODM": limitedovers,"Test": testmatch}
         self.simresults = matchtypes[statsmatchtype]
 
-    def pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype):
+    def pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,statsplayerindexfile=None,statsmatchindexfile=None):
         # search stats for p-values
         self.simteamstats = cricketstats.search(teams=self.simteams)
-        self.simteamstats.stats(database=statsdatabase, from_date=statsfrom_date, to_date=statsto_date, matchtype=[statsmatchtype], betweenovers=[], innings=[], sex=[statssex], playersteams=[], oppositionbatters=[], oppositionbowlers=[], oppositionteams=[], venue=[], event=[], matchresult=[], superover=None, battingposition=[], bowlingposition=[], fielders=[], sumstats=False,playerindexfile=None,matchindexfile=None)
+        self.simteamstats.stats(database=statsdatabase, from_date=statsfrom_date, to_date=statsto_date, matchtype=[statsmatchtype], betweenovers=[], innings=[], sex=[statssex], playersteams=[], oppositionbatters=[], oppositionbowlers=[], oppositionteams=[], venue=[], event=[], matchresult=[], superover=None, battingposition=[], bowlingposition=[], fielders=[], sumstats=False,playerindexfile=statsplayerindexfile,matchindexfile=statsmatchindexfile)
 
         # Pre search p-values have to add one search as dictionary this will speed up simulations.
         # simstats = {}

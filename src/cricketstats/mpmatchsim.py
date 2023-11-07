@@ -199,7 +199,7 @@ class matchsim:
                 sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,endover)
 
             if statsmatchtype=="Test":
-                sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam)
+                sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,endover)
 
         return sim.results
             
@@ -429,7 +429,7 @@ class tm(matchsim):
             self.inningsscore = matchscore["Innings 4"][2]
             self.inningsovers = matchscore["Innings 4"][3]
 
-    def testmatch(self,rng,statsmatchtype,inningsorder, rain,simteams,simteamstats,matchscore,hometeam):
+    def testmatch(self,rng,statsmatchtype,inningsorder, rain,simteams,simteamstats,matchscore,hometeam,endover):
 
         if matchscore:
             tm.midinningssetup(self,matchscore)

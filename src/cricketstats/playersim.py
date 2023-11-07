@@ -303,10 +303,10 @@ class playersim:
             sim.matchresultssetup()
             # Function to simulate a match
             if statsmatchtype=="T20" or statsmatchtype=="ODI" or statsmatchtype=="ODM":
-                sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,start)
+                sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,endover)
 
             if statsmatchtype=="Test":
-                sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,start)
+                sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,endover)
 
         return sim.results
             
@@ -357,10 +357,10 @@ class playersim:
                 sim.matchresultssetup()
                 # Function to simulate a match
                 if statsmatchtype=="T20" or statsmatchtype=="ODI" or statsmatchtype=="ODM":
-                    sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,start,endover)
+                    sim.limitedovers(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,endover)
 
                 if statsmatchtype=="Test":
-                    sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,start)
+                    sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,endover)
 
             self.simresults=pd.DataFrame(sim.results)
 
@@ -396,7 +396,7 @@ class ld(playersim):
             self.inningsscore = matchscore["Innings 2"][2]
             self.inningsovers = matchscore["Innings 2"][3]
 
-    def limitedovers(self,rng,statsmatchtype,inningsorder,rain,simteams,simteamstats,matchscore,hometeam,start,endover):
+    def limitedovers(self,rng,statsmatchtype,inningsorder,rain,simteams,simteamstats,matchscore,hometeam,endover):
 
         if matchscore:
             ld.midinningssetup(self,matchscore)
@@ -543,7 +543,7 @@ class tm(playersim):
             self.inningsscore = matchscore["Innings 4"][2]
             self.inningsovers = matchscore["Innings 4"][3]
 
-    def testmatch(self,rng,statsmatchtype,inningsorder,rain,simteams,simteamstats,matchscore,hometeam,start):
+    def testmatch(self,rng,statsmatchtype,inningsorder,rain,simteams,simteamstats,matchscore,hometeam,endover):
 
         if matchscore:
             tm.midinningssetup(self,matchscore)

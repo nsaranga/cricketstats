@@ -3,7 +3,7 @@ A python module which gets team and player statistics from the [cricsheet.org](h
 
 **If you want to try this module out [CLICK HERE](https://cricanalyst.anivaasi.net/) to use a web implementation of it by Sudarshan Narayana**
 
-If you have any questions about the module you can contact me on [Twitter](https://www.twitter.com/humesfinger/), email me at [nsaranga@hotmail.com](mailto:nsaranga@hotmail.com). If you have any bugs to report or features to suggest you can use raise ticket on the issues tab in github. If you want to know more about why I decided to write it you can find a blog post [here](https://nsaranga.github.io/cricket/2021/12/19/TheAimOfCricketstats/), and if you want to know more about what the module can actually you do you can read another blog post [here](https://nsaranga.github.io/cricket/2021/12/24/WhatCanCricketstatsDo/) 
+If you have any questions about the module you can contact me on [Twitter](https://www.twitter.com/humesfinger/), email me at [nsaranga@hotmail.com](mailto:nsaranga@hotmail.com). If you have any bugs to report or features to suggest you can raise a ticket on the issues tab in github. If you want to know more about why I decided to write it you can find a blog post [here](https://nsaranga.github.io/cricket/2021/12/19/TheAimOfCricketstats/), and if you want to know more about what the module can actually you do you can read another blog post [here](https://nsaranga.github.io/cricket/2021/12/24/WhatCanCricketstatsDo/) 
 
 Some tips/warnings: 
 1. Python packages this module requires: datetime, json, time, pandas, os, zipfile, numpy, math, importlib, matplotlib

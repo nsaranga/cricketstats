@@ -69,7 +69,7 @@ class playersim:
             batadv=0.5
             bowladv=0.5
 
-        # wicket probabilites
+        # wicket probabilites by innings
         # wicketfallP = {self.batters[0]:
         # (simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Innings Type"]=="Batting")&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)*batadv).add(
         #     simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
@@ -101,6 +101,8 @@ class playersim:
         # }
         # if len(scoreP[self.batters[0]])==0 or sum(scoreP[self.batters[0]])<0.99:
             #print(f"Innings {nthinnings}, {self.batters[0]}")
+            
+        # Problem is with debuatants bats, the whole score probability ends up being half the bowlers probability,
         scoreP= {self.batters[0]:
         (simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))].value_counts(normalize=True,sort=False)*batadv).add(
             simteamstats.ballresult['Batter Score'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
@@ -593,17 +595,19 @@ class tm(playersim):
                         self.battersstats[eachbatter] = 0
 
                 wicketfallP,scoreP = playersim.playerP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
-                # Fix if p-values don't have all possibilites
-                if len(scoreP[self.batters[0]])>0 and len(scoreP[self.batters[0]])<7:
-                    scoreP = playersim.redistributepvalues(self,scoreP)
+                # # Fix if p-values don't have all possibilites
+                # if len(scoreP[self.batters[0]])>0 and len(scoreP[self.batters[0]])<7:
+                #     scoreP = playersim.redistributepvalues(self,scoreP)
 
-                if len(wicketfallP[self.batters[0]])<2 or sum(wicketfallP[self.batters[0]])<0.99:
-                    wicketfallP=playersim.wicketfallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
+                # if len(wicketfallP[self.batters[0]])<2 or sum(wicketfallP[self.batters[0]])<0.99:
+                #     wicketfallP=playersim.wicketfallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
+                    # print(self.batters[0])
+                    # print(wicketfallP)     
 
-                if len(scoreP[self.batters[0]])==0 or sum(scoreP[self.batters[0]])<0.99:
-                    scoreP=playersim.scorefallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
+                # if len(scoreP[self.batters[0]])==0 or sum(scoreP[self.batters[0]])<0.99:
+                #     scoreP=playersim.scorefallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
 
-                extrasP, fieldingextrasP = ld.extras(self,nthinnings,thisinnings, bowlingteam,simteams,simteamstats,thisover)
+                extrasP, fieldingextrasP = tm.extras(self,nthinnings,thisinnings, bowlingteam,simteams,simteamstats,thisover)
                 if len(extrasP)==0 or sum(extrasP)<0.99:
                     extrasP=playersim.extrasfallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam,)
                 #print(f'Time after beforeover: {time.time() - start}')
@@ -635,6 +639,7 @@ class tm(playersim):
             self.matchresults[f"Innings {nthinnings+1} Wickets"].append(self.inningswickets)
             self.matchresults[f"Innings {nthinnings+1} Score"].append(self.inningsscore)
             self.matchresults[f"Innings {nthinnings+1} Overs"].append(self.inningsovers)
+            # print(self.battersstats)
             tm.resetinningstally(self)
         
         # print(f"Overs left: {450-matchover}")

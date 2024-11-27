@@ -445,14 +445,14 @@ class ld(playersim):
                 wicketfallP,scoreP = playersim.playerP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
                 
                 # Fix if p-values don't have all possibilites
-                if len(scoreP[self.batters[0]])>0 and len(scoreP[self.batters[0]])<7:
-                    scoreP = playersim.redistributepvalues(self,scoreP)
+                # if len(scoreP[self.batters[0]])>0 and len(scoreP[self.batters[0]])<7:
+                #     scoreP = playersim.redistributepvalues(self,scoreP)
 
-                if len(wicketfallP[self.batters[0]])<2 or sum(wicketfallP[self.batters[0]])<0.99:
-                    wicketfallP=playersim.wicketfallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
+                # if len(wicketfallP[self.batters[0]])<2 or sum(wicketfallP[self.batters[0]])<0.99:
+                #     wicketfallP=playersim.wicketfallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
 
-                if len(scoreP[self.batters[0]])==0 or sum(scoreP[self.batters[0]])<0.99:
-                    scoreP=playersim.scorefallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
+                # if len(scoreP[self.batters[0]])==0 or sum(scoreP[self.batters[0]])<0.99:
+                #     scoreP=playersim.scorefallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
 
                 extrasP, fieldingextrasP = ld.extras(self,nthinnings,thisinnings, bowlingteam,simteams,simteamstats,thisover)
                 if len(extrasP)==0 or sum(extrasP)<0.99:

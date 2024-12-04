@@ -57,6 +57,10 @@ class playersim:
         self.simteamstats = cricketstats.search(players=simplayers)
         self.simteamstats.stats(database=statsdatabase, from_date=statsfrom_date, to_date=statsto_date, matchtype=searchmatchtypes[statsmatchtype], betweenovers=[], innings=[], sex=[statssex], playersteams=[], oppositionbatters=[], oppositionbowlers=[], oppositionteams=[], venue=[], event=[], matchresult=[], superover=None, battingposition=[], bowlingposition=[], fielders=[], sumstats=False,playerindexfile=statsplayerindexfile,matchindexfile=statsmatchindexfile)
 
+    def floattrunc(self,floatnum, decimals):
+        multiplier = 10 ** decimals
+        return int(floatnum * multiplier) / multiplier
+
     def playerP(self,nthinnings,thisinnings, bowlingteam,simteams,simteamstats,thisover,hometeam):
 
         if hometeam==thisinnings:
@@ -68,17 +72,6 @@ class playersim:
         if hometeam==None:
             batadv=0.5
             bowladv=0.5
-
-        # wicket probabilites by innings
-        #  hard to get probabilties
-        # wicketfallP = {self.batters[0]:
-        # (simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Innings Type"]=="Batting")&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)*batadv).add(
-        #     simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
-        # ,
-        # self.batters[1]: 
-        # (simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Innings Type"]=="Batting")&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)*batadv).add(
-        #     simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
-        # }
 
         # # wicket probability all innings fallback
         # Does work for debutants
@@ -100,19 +93,21 @@ class playersim:
         self.batters[1]:
         simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Innings Type"]=="Batting")&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))].value_counts(normalize=True,sort=False)
         }
-        if len(wicketprobs[self.batters[0]])==0:
+        if len(wicketprobs[self.batters[0]])<2 or sum(wicketprobs[self.batters[0]])!=1:
             wicketprobs[self.batters[0]] = simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"].isin(simteams[thisinnings]["battingorder"]))&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)
-        if len(wicketprobs[self.batters[1]])==0:
+
+        if len(wicketprobs[self.batters[1]])<2 or sum(wicketprobs[self.batters[1]])!=1:
             wicketprobs[self.batters[1]] = simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"].isin(simteams[thisinnings]["battingorder"]))&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)
 
-        if sum(wicketprobs[self.batters[0]])<0.99:
-            wicketprobs[self.batters[0]] = simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)
+        # if len(wicketprobs[self.batters[0]])<2 or sum(wicketprobs[self.batters[0]])!=1:
+        #     wicketprobs[self.batters[0]] = simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)
 
-        if sum(wicketprobs[self.batters[1]])<0.99:
-            wicketprobs[self.batters[1]] = simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)
+        # if len(wicketprobs[self.batters[0]])<2 or sum(wicketprobs[self.batters[1]])!=1:
+        #     wicketprobs[self.batters[1]] = simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)
 
         # Final Wicket probability
-        wicketfallP = {self.batters[0]:
+        wicketfallP = {
+        self.batters[0]:
         (wicketprobs[self.batters[0]]*batadv).add(
             simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
         ,
@@ -120,19 +115,16 @@ class playersim:
         (wicketprobs[self.batters[1]]*batadv).add(
             simteamstats.ballresult['Out/NotOut'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
         }
+        if sum(wicketfallP[self.batters[0]])!=1:
+            wicketfallP[self.batters[0]]['Not Out'] = self.floattrunc(wicketfallP[self.batters[0]]['Not Out'],2)
+            wicketfallP[self.batters[0]]['Out'] = (1- wicketfallP[self.batters[0]]['Not Out'])
+            
+        if sum(wicketfallP[self.batters[1]])!=1:
+            wicketfallP[self.batters[1]]['Not Out'] = self.floattrunc(wicketfallP[self.batters[1]]['Not Out'],2)
+            wicketfallP[self.batters[1]]['Out'] = (1- wicketfallP[self.batters[1]]['Not Out'])
 
 
         # Score Probabilities
-        # Score probabilites by innings
-        # scoreP= {self.batters[0]:
-        # (simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)*batadv).add(
-        #     simteamstats.ballresult['Batter Score'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
-        # ,
-        # self.batters[1]:
-        # (simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)*batadv).add(
-        #     simteamstats.ballresult['Batter Score'].loc[(simteamstats.ballresult["Bowler"].isin(simteams[bowlingteam]["bowlers"]))&(simteamstats.ballresult["Innings Type"]=="Bowling")&(simteamstats.ballresult["Innings Ball"]>(thisover))&(simteamstats.ballresult["Innings Ball"]<(thisover+1))&(simteamstats.ballresult["Innings"]==(nthinnings+1))].value_counts(normalize=True,sort=False)*bowladv,fill_value=0)
-        # }
-
         # Score probability all innings fallback
         # if len(scoreP[self.batters[0]])==0 or sum(scoreP[self.batters[0]])<0.99:
         # scoreP= {self.batters[0]:
@@ -152,17 +144,17 @@ class playersim:
         self.batters[1]:
         simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Balls Faced"]<(self.battersstats[self.batters[0]]+6))].value_counts(normalize=True,sort=False)
         }
-        if len(battersprobs[self.batters[0]])==0:
+        if len(battersprobs[self.batters[0]])==0 or sum(battersprobs[self.batters[0]])!=1:
             battersprobs[self.batters[0]] = simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"].isin(simteams[thisinnings]["battingorder"]))&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)
     
-        if len(battersprobs[self.batters[1]])==0:
+        if len(battersprobs[self.batters[1]])==0 or sum(battersprobs[self.batters[1]])!=1:
             battersprobs[self.batters[1]] = simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"].isin(simteams[thisinnings]["battingorder"]))&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)
 
-        if sum(battersprobs[self.batters[0]])<0.99:
-            battersprobs[self.batters[0]] = simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)
+        # if sum(battersprobs[self.batters[0]])!=1:
+        #     battersprobs[self.batters[0]] = simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"]==self.batters[0])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)
 
-        if sum(battersprobs[self.batters[1]])<0.99:
-            battersprobs[self.batters[1]] = simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)
+        # if sum(battersprobs[self.batters[1]])!=1:
+        #     battersprobs[self.batters[1]] = simteamstats.ballresult["Batter Score"].loc[(simteamstats.ballresult["Batter"]==self.batters[1])&(simteamstats.ballresult["Innings Type"]=="Batting")].value_counts(normalize=True,sort=False)
 
         # Final score probability
         scoreP={
@@ -253,8 +245,12 @@ class playersim:
         legaldeliveries = 0
         while legaldeliveries < 6:
             
-            # if len(wicketfallP[self.batters[0]])<2 or sum(wicketfallP[self.batters[0]])<0.99:
-            #         wicketfallP=playersim.wicketfallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
+            # Debugging lines
+            # if sum(wicketfallP[self.batters[0]])!=1:
+            #     print(thisover)
+            #     print(self.batters[0])
+            #     print(wicketfallP)
+
             # Over based wicket rng
             wicket = rng.choice(wicketfallP[self.batters[0]].index, p=wicketfallP[self.batters[0]].tolist(), shuffle=False)
             
@@ -278,8 +274,8 @@ class playersim:
                 # if len(wicketfallP[self.batters[0]])<2 or sum(wicketfallP[self.batters[0]])<0.99:
                 #     wicketfallP=playersim.wicketfallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
 
-                # if len(scoreP[self.batters[0]])==0 or sum(scoreP[self.batters[0]])<0.99:
-                #     scoreP=playersim.scorefallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
+                if len(scoreP[self.batters[0]])==0 or sum(scoreP[self.batters[0]])!=1:
+                    scoreP=playersim.scorefallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
 
                 # Fix if p-values don't have all possibilites
                 if len(scoreP[self.batters[0]])>0 and len(scoreP[self.batters[0]])<7:
@@ -288,17 +284,23 @@ class playersim:
             # Over based scoring rng
             if wicket=="Not Out":
 
-                # if len(scoreP[self.batters[0]])==0 or sum(scoreP[self.batters[0]])<0.99:
-                #     scoreP=playersim.scorefallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
+                if len(scoreP[self.batters[0]])==0 or sum(scoreP[self.batters[0]])!=1:
+                    scoreP=playersim.scorefallbackplayersP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
+                # Debugging lines, if this problem occurs for scoring, I need to do truncating and let redistributing function take care of it.
+                # if sum(scoreP[self.batters[0]])!=1:
+                #     print(thisover)
+                #     print(self.batters[0])
+                #     print(scoreP)
 
                 # Fix if p-values don't have all possibilites
                 if len(scoreP[self.batters[0]])>0 and len(scoreP[self.batters[0]])<7:
                     scoreP = playersim.redistributepvalues(self,scoreP)
 
-                #try:
+
+                # try:
                 batterscore = rng.choice(scoreP[self.batters[0]].index, p=scoreP[self.batters[0]].tolist(), shuffle=False)
                 # except:
-                #     print(self.batters[0])
+                #     print(scoreP)
 
                 if batterscore!=0:
                     extras = rng.choice(extrasP.index, p=extrasP.tolist(), shuffle=False)

@@ -2084,7 +2084,7 @@ class search:
                 self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Batting S/R AA"] = self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Strike Rate"] - self.ballresult.loc[((self.ballresult["Innings Type"]=="Batting")&(self.ballresult["Balls Faced"]==everyball)),"Strike Rate"].mean()
 
         if self.teams or self.allteams==True:
-            self.result["Runs/Wicket"] = round(self.result["Runs"]/self.result["Balls Faced"],1)
+            self.result["Runs/Wicket"] = round(self.result["Runs"]/self.result['Outs'],2)
             self.result["Net Run Rate"] = self.result["Run Rate"] - self.result["Runsgiven Rate"]
             self.result["Net Boundary %"] = self.result["Boundary %"] - self.result["Boundary Given %"]
             

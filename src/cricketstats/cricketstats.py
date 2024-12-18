@@ -59,7 +59,7 @@ class search:
                                     "totalstos": 0, "totalstosopp": 0, 
                                     'Dot Ball %': 0, 'Strike Turnover %': 0, 'Batting S/R': 0, 'Batting S/R MeanAD': 0, 'Batting Avg': 0, "Mean Score":0, 'Score MeanAD': 0, "Scoring Consistency":0, 'Boundary %': 0, "Runs/Ball":0,
                                     "Mean Balls Faced":0, "Balls Faced MeanAD":0, "Survival Consistency":0,
-                                    "firstboundary": [], 'Avg First Boundary Ball': 0, "Dismissal Rate":0, "Boundary Rate":0,
+                                    "firstboundary": [], 'Avg First Boundary Ball': 0, "Dismissal Rate":0, "Boundary Rate":0, 'DotsSingles %':0,
                                     
                                     "Innings Bowled":0,
                                     "Runsgiven": 0, "Singlesgiven":0, "Foursgiven": 0, "Sixesgiven": 0, 
@@ -67,7 +67,7 @@ class search:
                                     "Dot Balls Bowled": 0, 
                                     "Bowleds": 0, "LBWs": 0, "Hitwickets": 0, "Caughts": 0, "Stumpeds": 0, "Caught and Bowleds": 0,
                                     "Catches": 0, "Runouts": 0, "Stumpings": 0, 
-                                    'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Avg': 0, "Bowling Avg MeanAD": 0, 'Bowling S/R': 0, "Bowling S/R MeanAD": 0,  "Runsgiven/Ball":0, "Boundary Given Rate":0,"totalstosgiven": 0, "totalstosgivenopp": 0, 'Strike Turnovergiven %': 0,
+                                    'Economy Rate': 0, 'Economy Rate MeanAD': 0, 'Dot Ball Bowled %': 0,'Boundary Given %': 0, 'Bowling Avg': 0, "Bowling Avg MeanAD": 0, 'Bowling S/R': 0, "Bowling S/R MeanAD": 0,  "Runsgiven/Ball":0, "Boundary Given Rate":0,"totalstosgiven": 0, "totalstosgivenopp": 0, 'Strike Turnovergiven %': 0,'DotsSingles Bowled %':0,
                                     "dotballseries": [], "Avg Consecutive Dot Balls": 0,
                                     }
         if eachplayer in playerindex.keys():
@@ -78,7 +78,7 @@ class search:
     # Player innings results
     def playerinningsresultsetup(self):
         self.inningsresult = {
-        "MatchID":[],"InningsID":[], "Date":[], "Year":[], "Month":[], "Match Type":[], "Venue":[], "Event":[],"Match Winner":[],  "Player":[], "Team":[], "Opposition":[], "Innings":[], "Innings Type":[],"Super Over":[],"Target":[],"Chase":[],"Defence":[],'% Target Achieved':[],"Runs Required":[], "Run Rate Required":[],
+        "MatchID":[],"InningsID":[], "Date":[], "Year":[], "Month":[], "Match Type":[], "Venue":[], "Event":[],"Match Winner":[],  "Player":[], "Team":[], "Opposition":[], "Innings":[], "Innings Type":[],"Super Over":[],"Target":[],"Chase":[],"Defence":[],'% Target Achieved':[],"Runs Required":[], "Run Rate Required":[], 'Start Over':[],
         "Fielder":[],
 
         "Batter Type":[], "Batting Position":[], "Score": [], "Balls Faced": [],  "How Out": [], "First Boundary Ball":[], "Batting S/R":[], "Runs/Ball":[], "Boundary %":[],"Boundary Rate":[],
@@ -111,13 +111,13 @@ class search:
                                 "Runs": 0, "Singles":0,"Twos":0, "Fours": 0, "Sixes": 0, "Dot Balls": 0, "Outs": 0, "Balls Faced": 0, 
                                 "Bowled Outs": 0, "LBW Outs": 0, "Caught Outs": 0, "Stumped Outs": 0, "Run Outs": 0, "Caught and Bowled Outs": 0,
                                 "Runs/Wicket":0, "Runs/Ball":0, "Run Rate":0, 'Avg First Boundary Ball': 0,
-                                'Dot Ball %': 0, 'Score MeanAD': 0, "Scoring Consistency":0, 'Boundary %': 0, "totalstos": 0, "totalstosopp": 0,"firstboundary": [], 'Strike Turnover %': 0,
+                                'Dot Ball %': 0, 'Score MeanAD': 0, "Scoring Consistency":0, 'Boundary %': 0, "totalstos": 0, "totalstosopp": 0,"firstboundary": [], 'Strike Turnover %': 0,'DotsSingles %':0,
 
                                 "Runsgiven":0, "Singlesgiven":0,"Foursgiven": 0, "Sixesgiven": 0, 
                                 "Wickets": 0, "Balls Bowled": 0, "Extras": 0, "No Balls": 0, "Wides":0, "Byes": 0, "Leg Byes": 0, "Dot Balls Bowled": 0, 
                                 "Bowleds": 0, "LBWs": 0, "Hitwickets": 0,  "Caughts": 0, "Runouts": 0, "Stumpeds": 0, "Caught and Bowleds": 0,
                                 'Dot Ball Bowled %': 0,'Boundary Given %': 0,'Runsgiven/Wicket': 0, "Runsgiven/Ball":0, "Runsgiven Rate": 0,
-                                "Avg Consecutive Dot Balls": 0, "dotballseries": [], "totalstosgiven": 0, "totalstosgivenopp": 0, 'Strike Turnovergiven %': 0,
+                                "Avg Consecutive Dot Balls": 0, "dotballseries": [], "totalstosgiven": 0, "totalstosgivenopp": 0, 'Strike Turnovergiven %': 0,'DotsSingles Bowled %':0,
                                 }
 
     # Team innings results
@@ -936,8 +936,6 @@ class search:
                         oppositionteam = eachteam
                 playersteam = inningsteam
 
-
-
                 self.result[eachplayer]["Innings Batted"] += 1
                 self.inningsresult["MatchID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}')
                 self.inningsresult["InningsID"].append(f'{matchinfo["teams"][0].replace(" ","_")}-{matchinfo["teams"][1].replace(" ","_")}-{matchinfo["dates"][0]}-{matchinfo["gender"]}-{matchinfo["match_type"]}-{(nthinnings + 1)}')
@@ -995,6 +993,8 @@ class search:
                     self.inningsresult["Batter Type"].append(tempplayerindex[eachplayer]["Batting"])
                 if eachplayer not in tempplayerindex.keys():
                     self.inningsresult["Batter Type"].append(None)
+                
+                self.inningsresult['Start Over'].append(int(min(self.playermatchtally[nthinnings][eachplayer]["teaminningsballs"]))+1)
 
 
                 for eachstat in ["Bowler Type", "Bowling Position","Runsgiven","Wickets","Balls Bowled","Overs Bowled","Economy Rate","Bowling Avg","Avg Consecutive Dot Balls", "Bowling S/R", "Runsgiven/Ball"]:
@@ -1336,6 +1336,7 @@ class search:
                     self.inningsresult["Bowler Type"].append(tempplayerindex[eachplayer]["Bowling"])
                 if eachplayer not in tempplayerindex.keys():
                     self.inningsresult["Bowler Type"].append(None)
+                self.inningsresult['Start Over'].append(int(min(self.playermatchtally[nthinnings][eachplayer]["teaminningsballs"]))+1)
 
                 if "result" not in matchinfo["outcome"]:
                         self.inningsresult["Match Winner"].append(matchinfo["outcome"]["winner"])
@@ -2031,8 +2032,8 @@ class search:
         self.result["Runs Rate"] = round((self.result["Runs"]/self.result["Balls Faced"])*6,1)
         self.result["Batting S/R"] = round((self.result["Runs"]/self.result["Balls Faced"])*100,1)
         self.result["Boundary %"] = round(((self.result["Fours"]+ self.result["Sixes"])/ self.result["Balls Faced"])*100, 1)
-        self.result["Dot Ball %"] = round(self.result["Dot Balls"]/self.result["Balls Faced"], 1)
-
+        self.result["Dot Ball %"] = round((self.result["Dot Balls"]/self.result["Balls Faced"])*100, 1)
+        self.result["DotsSingles %"] = round(((self.result["Dot Balls"]+self.result["Singles"])/self.result["Balls Faced"])*100, 1)
         
         self.result["Dismissal Rate"] = round(self.result["Balls Faced"]/self.result["Outs"],1)
 
@@ -2051,6 +2052,7 @@ class search:
         self.result["Economy Rate"] = round((self.result["Runsgiven"]/ self.result["Balls Bowled"])*6,1)
         self.result['Runsgiven/Wicket'] = round((self.result["Runsgiven"]/ self.result["Wickets"]),1)
         self.result["Dot Ball Bowled %"] = round((self.result["Dot Balls Bowled"]/ self.result["Balls Bowled"])*100,1)
+        self.result["DotsSingles Bowled %"] = round(((self.result["Dot Balls Bowled"]+self.result["Singlesgiven"])/ self.result["Balls Bowled"])*100,1)
         self.result["Boundary Given %"] = round(((self.result["Foursgiven"]+self.result["Sixesgiven"])/self.result["Balls Bowled"])*100,1)
 
         self.result["Bowling Avg"] = round(self.result["Runsgiven"]/ self.result["Wickets"],2)
@@ -2157,6 +2159,7 @@ class search:
                     + self.result[eachplayer]["Sixes"]),
                     self.result[eachplayer]["Balls Faced"], multiplier=100)
                 self.result[eachplayer]["Dot Ball %"] = statsprocessor.ratio(self.result[eachplayer]["Dot Balls"],self.result[eachplayer]["Balls Faced"], multiplier=100)
+                self.result[eachplayer]["DotsSingles %"] = statsprocessor.ratio((self.result[eachplayer]["Dot Balls"]+self.result[eachplayer]["Singles"]),self.result[eachplayer]["Balls Faced"], multiplier=100)
 
             if len(self.inningsresult["Balls Faced"].dropna().index) > 0:
                 self.result[eachplayer]["Mean Balls Faced"] = round(self.inningsresult["Balls Faced"].mean(),2)
@@ -2202,9 +2205,8 @@ class search:
                 self.result[eachplayer]["Economy Rate"] = statsprocessor.ratio(
                     self.result[eachplayer]["Runsgiven"], self.result[eachplayer]["Balls Bowled"],
                     multiplier=6)
-                self.result[eachplayer]["Dot Ball Bowled %"] = statsprocessor.ratio(
-                    self.result[eachplayer]["Dot Balls Bowled"], self.result[eachplayer]["Balls Bowled"],
-                    multiplier=100)
+                self.result[eachplayer]["Dot Ball Bowled %"] = statsprocessor.ratio(self.result[eachplayer]["Dot Balls Bowled"], self.result[eachplayer]["Balls Bowled"],multiplier=100)
+                self.result[eachplayer]["DotsSingles Bowled %"] = statsprocessor.ratio((self.result[eachplayer]["Dot Balls Bowled"]+self.result[eachplayer]["Singlesgiven"]), self.result[eachplayer]["Balls Bowled"],multiplier=100)
                 self.result[eachplayer]["Boundary Given %"] = statsprocessor.ratio(
                     (self.result[eachplayer]["Foursgiven"]
                     + self.result[eachplayer]["Sixesgiven"]),
@@ -2252,6 +2254,7 @@ class search:
                 self.result[eachteam]["Boundary %"] = statsprocessor.ratio((self.result[eachteam]["Fours"] + self.result[eachteam]["Sixes"]),
                     self.result[eachteam]["Balls Faced"], multiplier=100)
                 self.result[eachteam]["Dot Ball %"] = statsprocessor.ratio(self.result[eachteam]["Dot Balls"],self.result[eachteam]["Balls Faced"], multiplier=100)
+                self.result[eachteam]["DotsSingles %"] = statsprocessor.ratio((self.result[eachteam]["Dot Balls"]+self.result[eachteam]["Singles"]),self.result[eachteam]["Balls Faced"], multiplier=100)
 
                 self.result[eachteam]["Run Rate"] = statsprocessor.ratio(self.result[eachteam]["Runs"], self.result[eachteam]["Balls Faced"], multiplier=6)
 
@@ -2275,6 +2278,7 @@ class search:
                 self.result[eachteam]["Dot Ball Bowled %"] = statsprocessor.ratio(
                     self.result[eachteam]["Dot Balls Bowled"], self.result[eachteam]["Balls Bowled"],
                     multiplier=100)
+                self.result[eachteam]["DotsSingles Bowled %"] = statsprocessor.ratio((self.result[eachteam]["Dot Balls Bowled"]+self.result[eachteam]["Singlesgiven"]), self.result[eachteam]["Balls Bowled"],multiplier=100)
                 self.result[eachteam]["Boundary Given %"] = statsprocessor.ratio(
                     (self.result[eachteam]["Foursgiven"]
                     + self.result[eachteam]["Sixesgiven"]),

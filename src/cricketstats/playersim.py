@@ -27,9 +27,6 @@ from cricketstats import cricketstats
 
 # TODO record player's scores and balls faced
 # TODO fix bowler's runs
-# TODO add bowling order, or some mechanism to pick specific bowlers, yeah
-
-# basically this should be a way to simululate players performance in specific overs as well. fir do specific overse for matchsim
 
 
 
@@ -38,12 +35,14 @@ class playersim:
         self.simteams = simteams
         self.simresults = None
         self.simteamstats = None
+        self.siminningsresults = None # In this basically append batting score for for each player likea the scoresheet with innings, and final innings score, overs, and wickets.
 
     def simresultssetup(self, statsmatchtype):
         limitedovers = {"Innings 1 Team":[], "Innings 1 Wickets":[],"Innings 1 Score":[], "Innings 1 Overs":[], "Innings 2 Team":[],"Innings 2 Wickets":[], "Innings 2 Score":[], "Innings 2 Overs":[],"Winner":[]}
         testmatch={"Innings 1 Team":[],"Innings 1 Wickets":[], "Innings 1 Score":[], "Innings 1 Overs":[],"Innings 2 Team":[],"Innings 2 Wickets":[], "Innings 2 Score":[],"Innings 2 Overs":[],"Innings 3 Team":[],"Innings 3 Wickets":[], "Innings 3 Score":[],"Innings 3 Overs":[],"Innings 4 Team":[], "Innings 4 Wickets":[],"Innings 4 Score":[],"Innings 4 Overs":[],"Winner":[]}
         matchtypes={"T20": limitedovers, "ODI": limitedovers,"ODM": limitedovers,"Test": testmatch}
         self.simresults = matchtypes[statsmatchtype]
+        inningsresults = {'Player':[],'Score':[],'Balls Faced':[],'Innings':[],"Innings Wickets":[],'Innings Score':[],"Innings Overs":[],"Innings Team":[]}
 
     def pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,statsplayerindexfile=None,statsmatchindexfile=None):
         # search stats for p-values

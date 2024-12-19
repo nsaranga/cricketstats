@@ -505,10 +505,16 @@ class ld(playersim):
         self.battersstats={}
         self.playersout = []
 
+        self.playerballstats = None
+        self.playerinningsstats = {}
+        self.matchplayerinningsstats =[]
+
     def resultssetup(self):
         self.results = {"Innings 1 Team":[], "Innings 1 Wickets":[],"Innings 1 Score":[], "Innings 1 Overs":[], "Innings 2 Team":[],"Innings 2 Wickets":[], "Innings 2 Score":[], "Innings 2 Overs":[],"Winner":[]}
     def matchresultssetup(self):
         self.matchresults = {"Innings 1 Team":[], "Innings 1 Wickets":[],"Innings 1 Score":[], "Innings 1 Overs":[], "Innings 2 Team":[],"Innings 2 Wickets":[], "Innings 2 Score":[], "Innings 2 Overs":[],"Winner":[]}
+    def playerinningsstatssetup(self,player,team,nthinnings):
+        self.playerinningsstats[player]={'Player':player,'Score':0,'Balls Faced':0,'How Out':'Not Out','Innings':nthinnings+1,"Innings Wickets":0,'Innings Score':0,"Innings Overs":0,"Innings Team":team}
 
     def midinningssetup(self, matchscore):
         if len(matchscore) == 1:
@@ -567,6 +573,8 @@ class ld(playersim):
                     self.batters = simteams[thisinnings]["battingorder"][0:2]
                     for eachbatter in self.batters:
                         self.battersstats[eachbatter] = 0
+                    tm.playerinningsstatssetup(self,self.batters[0],thisinnings,nthinnings)
+                    tm.playerinningsstatssetup(self,self.batters[1],thisinnings,nthinnings)
 
                 wicketfallP,scoreP = playersim.playerP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
                 
@@ -596,6 +604,7 @@ class ld(playersim):
             self.matchresults[f"Innings {nthinnings+1} Wickets"].append(self.inningswickets)
             self.matchresults[f"Innings {nthinnings+1} Score"].append(self.inningsscore)
             self.matchresults[f"Innings {nthinnings+1} Overs"].append(self.inningsovers)
+            self.matchplayerinningsstats.extend(list(self.playerinningsstats.values()))
             # print(self.battersstats)
             ld.resetinningstally(self)
 

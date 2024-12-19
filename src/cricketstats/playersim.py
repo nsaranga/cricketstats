@@ -35,14 +35,17 @@ class playersim:
         self.simteams = simteams
         self.simresults = None
         self.simteamstats = None
-        self.siminningsresults = None # In this basically append batting score for for each player likea the scoresheet with innings, and final innings score, overs, and wickets.
+        self.siminningsresults = [] # In this basically append batting score for for each player likea the scoresheet with innings, and final innings score, overs, and wickets.
+        self.simplayerballresults = {}
+        self.testresults=None
 
     def simresultssetup(self, statsmatchtype):
         limitedovers = {"Innings 1 Team":[], "Innings 1 Wickets":[],"Innings 1 Score":[], "Innings 1 Overs":[], "Innings 2 Team":[],"Innings 2 Wickets":[], "Innings 2 Score":[], "Innings 2 Overs":[],"Winner":[]}
         testmatch={"Innings 1 Team":[],"Innings 1 Wickets":[], "Innings 1 Score":[], "Innings 1 Overs":[],"Innings 2 Team":[],"Innings 2 Wickets":[], "Innings 2 Score":[],"Innings 2 Overs":[],"Innings 3 Team":[],"Innings 3 Wickets":[], "Innings 3 Score":[],"Innings 3 Overs":[],"Innings 4 Team":[], "Innings 4 Wickets":[],"Innings 4 Score":[],"Innings 4 Overs":[],"Winner":[]}
         matchtypes={"T20": limitedovers, "ODI": limitedovers,"ODM": limitedovers,"Test": testmatch}
         self.simresults = matchtypes[statsmatchtype]
-        inningsresults = {'Player':[],'Score':[],'Balls Faced':[],'Innings':[],"Innings Wickets":[],'Innings Score':[],"Innings Overs":[],"Innings Team":[]}
+        # self.siminningsresults = {'Player':[],'Score':[],'Balls Faced':[],'Innings':[],"Innings Wickets":[],'Innings Score':[],"Innings Overs":[],"Innings Team":[]}
+        # self.simplayerballresults = {'Player':[],'Score':[],'Balls':[],'Innings':[],"Innings Wickets":[],'Innings Score':[],"Innings Overs":[],"Innings Team":[]}
 
     def pvaluesearch(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,statsplayerindexfile=None,statsmatchindexfile=None):
         # search stats for p-values
@@ -259,14 +262,37 @@ class playersim:
                 self.battersstats[self.batters[0]] += 1
                 self.inningswickets += 1
                 self.playersout.append(self.batters[0])
+                self.inningsovers=float(f"{thisover}.{legaldeliveries}")
+                self.playerinningsstats[self.batters[0]]['Balls Faced']+=1
+                self.playerinningsstats[self.batters[0]]['How Out']='Out'
+                self.playerinningsstats[self.batters[0]]["Innings Wickets"]=self.inningswickets
+                self.playerinningsstats[self.batters[0]]["Innings Overs"]=self.inningsovers
+                self.playerinningsstats[self.batters[0]]["Innings Score"]=self.inningsscore
+
+                self.playerballstats['Player'].append(self.batters[0])
+                self.playerballstats['Score'].append(0)
+                self.playerballstats['Balls'].append(1)
+                self.playerballstats['Innings'].append(nthinnings+1)
+                self.playerballstats['Innings Wickets'].append(self.inningswickets)
+                self.playerballstats['Innings Score'].append(self.inningsscore)
+                self.playerballstats['Innings Overs'].append(float(f"{thisover}.{legaldeliveries}"))
+                self.playerballstats['Innings Team'].append(thisinnings)
+
 
             if self.inningswickets == 10:
                 self.inningsovers=float(f"{thisover}.{legaldeliveries}")
+                self.playerinningsstats[self.batters[0]]["Innings Wickets"]=self.inningswickets
+                self.playerinningsstats[self.batters[0]]["Innings Overs"]=self.inningsovers
+                self.playerinningsstats[self.batters[0]]["Innings Score"]=self.inningsscore
+                self.playerinningsstats[self.batters[1]]["Innings Wickets"]=self.inningswickets
+                self.playerinningsstats[self.batters[1]]["Innings Overs"]=self.inningsovers
+                self.playerinningsstats[self.batters[1]]["Innings Score"]=self.inningsscore
                 break
 
             if wicket=="Out":
                 self.batters[0]= simteams[thisinnings]["battingorder"][(self.inningswickets + 1)]
                 self.battersstats[simteams[thisinnings]["battingorder"][(self.inningswickets + 1)]] = 0
+                tm.playerinningsstatssetup(self,self.batters[0],thisinnings,nthinnings)
 
                 wicketfallP,scoreP = playersim.playerP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
 
@@ -301,6 +327,14 @@ class playersim:
                 # except:
                 #     print(scoreP)
 
+                self.playerballstats['Player'].append(self.batters[0])
+                self.playerballstats['Score'].append(batterscore)
+                self.playerballstats['Balls'].append(1)
+                self.playerballstats['Innings'].append(nthinnings+1)
+
+                self.playerinningsstats[self.batters[0]]['Balls Faced']+=1
+
+
                 if batterscore!=0:
                     extras = rng.choice(extrasP.index, p=extrasP.tolist(), shuffle=False)
                     self.inningsscore+=(batterscore+extras)
@@ -319,12 +353,32 @@ class playersim:
                     if (fieldingextras)%2!=0:
                         self.batters.reverse()
 
+                self.playerinningsstats[self.batters[0]]['Score']+=batterscore
+                
+                self.playerballstats['Innings Wickets'].append(self.inningswickets)
+                self.playerballstats['Innings Score'].append(self.inningsscore)
+                self.playerballstats['Innings Overs'].append(float(f"{thisover}.{legaldeliveries}"))
+                self.playerballstats['Innings Team'].append(thisinnings)
+
 
             # Check if score has been chased
             if ((statsmatchtype == "T20" or statsmatchtype == "ODI" or statsmatchtype == "ODM") and (nthinnings == 1 and self.inningsscore > self.matchresults["Innings 1 Score"][-1])) or (statsmatchtype == "Test" and (self.inningswickets==10 or (nthinnings == 3 and self.inningsscore > (self.matchresults["Innings 1 Score"][-1]+self.matchresults["Innings 3 Score"][-1]-self.matchresults["Innings 2 Score"][-1])))):
                 self.inningsovers=float(f"{thisover}.{legaldeliveries}")
+                self.playerinningsstats[self.batters[0]]["Innings Wickets"]=self.inningswickets
+                self.playerinningsstats[self.batters[0]]["Innings Overs"]=self.inningsovers
+                self.playerinningsstats[self.batters[0]]["Innings Score"]=self.inningsscore
+                self.playerinningsstats[self.batters[1]]["Innings Wickets"]=self.inningswickets
+                self.playerinningsstats[self.batters[1]]["Innings Overs"]=self.inningsovers
+                self.playerinningsstats[self.batters[1]]["Innings Score"]=self.inningsscore
                 break
-        
+
+            self.playerinningsstats[self.batters[0]]["Innings Wickets"]=self.inningswickets
+            self.playerinningsstats[self.batters[0]]["Innings Overs"]=self.inningsovers
+            self.playerinningsstats[self.batters[0]]["Innings Score"]=self.inningsscore
+            self.playerinningsstats[self.batters[1]]["Innings Wickets"]=self.inningswickets
+            self.playerinningsstats[self.batters[1]]["Innings Overs"]=self.inningsovers
+            self.playerinningsstats[self.batters[1]]["Innings Score"]=self.inningsscore
+    
 
     def redistributepvalues(self,scoreP):
         # print(f"Before Modification: {scoreP}")
@@ -348,6 +402,7 @@ class playersim:
         self.playersout=[]
         self.batters=[]
         self.battersstats={}
+        self.playerinningsstats = {}
 
     def mcsimulations(self,statsmatchtype,simulations,inningsorder,rain,matchscore,hometeam,endover):
         # print("Sims started")
@@ -371,7 +426,7 @@ class playersim:
             if statsmatchtype=="Test":
                 sim.testmatch(rng,statsmatchtype,inningsorder,rain,self.simteams,self.simteamstats,matchscore,hometeam,endover)
 
-        return sim.results
+        return sim.results, sim.matchplayerinningsstats
             
     def sim(self, statsdatabase, statsfrom_date, statsto_date, statssex, statsmatchtype,simulations,inningsorder=None,rain=False,matchscore=None,hometeam=None, multicore=True ,endover=None,playerindexfile=None,matchindexfile=None):
         # Setup match results
@@ -393,17 +448,27 @@ class playersim:
                 inputs.append((self,statsmatchtype,simulations,inningsorder,rain,matchscore,hometeam,endover))
 
             #start = time.time()
-            simprocs = procpool.starmap(playersim.mcsimulations,inputs)
+            simprocs= procpool.starmap(playersim.mcsimulations,inputs)
             
             procpool.close()
             #print(f'Time after mcsimulations(): {time.time() - start}')
-
-            for eachdict in simprocs:
-                for eachlist in eachdict:
-                    self.simresults[eachlist].extend(eachdict[eachlist])
+            self.testresults = simprocs
+            # for eachdict in simprocs:
+            #     for eachlist in eachdict:
+            #         self.simresults[eachlist].extend(eachdict[eachlist])
+            for eachtuple in simprocs:
+                for eachlist in eachtuple[0]:
+                    self.simresults[eachlist].extend(eachtuple[0][eachlist])
+                # for eachlist in eachtuple[1]:
+                    # self.simplayerballresults[eachlist].extend(eachtuple[1][eachlist]) # this is ballresult
+                self.siminningsresults.extend(eachtuple[1])
+            
             print("Sims finished")
 
             self.simresults=pd.DataFrame(self.simresults)
+            # self.simplayerballresults=pd.DataFrame(self.simplayerballresults)
+            self.siminningsresults=pd.DataFrame(self.siminningsresults)
+
 
         if multicore==False:
             start = time.time()
@@ -555,8 +620,17 @@ class tm(playersim):
         self.battersstats={}
         self.playersout = []
 
+        self.playerballstats = None
+        self.playerinningsstats = {}
+        self.matchplayerinningsstats =[]
+
+
     def resultssetup(self):
         self.results={"Innings 1 Team":[],"Innings 1 Wickets":[], "Innings 1 Score":[], "Innings 1 Overs":[],"Innings 2 Team":[],"Innings 2 Wickets":[], "Innings 2 Score":[],"Innings 2 Overs":[],"Innings 3 Team":[],"Innings 3 Wickets":[], "Innings 3 Score":[],"Innings 3 Overs":[],"Innings 4 Team":[], "Innings 4 Wickets":[],"Innings 4 Score":[],"Innings 4 Overs":[],"Winner":[]}
+        self.playerballstats = {'Player':[],'Score':[],'Balls':[],'Innings':[],"Innings Wickets":[],'Innings Score':[],"Innings Overs":[],"Innings Team":[]}
+
+    def playerinningsstatssetup(self,player,team,nthinnings):
+        self.playerinningsstats[player]={'Player':player,'Score':0,'Balls Faced':0,'How Out':'Not Out','Innings':nthinnings+1,"Innings Wickets":0,'Innings Score':0,"Innings Overs":0,"Innings Team":team}
 
     def matchresultssetup(self):
         self.matchresults={"Innings 1 Team":[],"Innings 1 Wickets":[], "Innings 1 Score":[], "Innings 1 Overs":[],"Innings 2 Team":[],"Innings 2 Wickets":[], "Innings 2 Score":[],"Innings 2 Overs":[],"Innings 3 Team":[],"Innings 3 Wickets":[], "Innings 3 Score":[],"Innings 3 Overs":[],"Innings 4 Team":[], "Innings 4 Wickets":[],"Innings 4 Score":[],"Innings 4 Overs":[],"Winner":[]}
@@ -654,6 +728,8 @@ class tm(playersim):
                     self.batters = simteams[thisinnings]["battingorder"][0:2]
                     for eachbatter in self.batters:
                         self.battersstats[eachbatter] = 0
+                    tm.playerinningsstatssetup(self,self.batters[0],thisinnings,nthinnings)
+                    tm.playerinningsstatssetup(self,self.batters[1],thisinnings,nthinnings)
 
                 wicketfallP,scoreP = playersim.playerP(self,nthinnings,thisinnings,bowlingteam,simteams,simteamstats,thisover,hometeam)
                 # # Fix if p-values don't have all possibilites
@@ -688,7 +764,7 @@ class tm(playersim):
                     if rainaffected=="rain":
                         rain=False
                         rainaffected="no_rain"
-                        overslost = rng.integers(low=15, high=60)
+                        overslost = rng.integers(low=15, high=90)
                         matchover+=overslost
             
             #print(thisover)
@@ -700,6 +776,7 @@ class tm(playersim):
             self.matchresults[f"Innings {nthinnings+1} Wickets"].append(self.inningswickets)
             self.matchresults[f"Innings {nthinnings+1} Score"].append(self.inningsscore)
             self.matchresults[f"Innings {nthinnings+1} Overs"].append(self.inningsovers)
+            self.matchplayerinningsstats.extend(list(self.playerinningsstats.values()))
             # print(self.battersstats)
             tm.resetinningstally(self)
         

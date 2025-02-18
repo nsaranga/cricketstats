@@ -78,7 +78,7 @@ class search:
     # Player innings results
     def playerinningsresultsetup(self):
         self.inningsresult = {
-        "MatchID":[],"InningsID":[], "Date":[], "Year":[], "Month":[], "Match Type":[], "Venue":[], "Event":[],"Match Winner":[],  "Player":[], "Team":[], "Opposition":[], "Innings":[], "Innings Type":[],"Super Over":[],"Target":[],"Chase":[],"Defence":[],'% Target Achieved':[],"Runs Required":[], "Run Rate Required":[], 'Start Over':[],
+        "MatchID":[],"InningsID":[], "Date":[], "Year":[], "Month":[], "Match Type":[], "Team Type":[],"Venue":[], "Event":[],"Match Winner":[],  "Player":[], "Team":[], "Opposition":[], "Innings":[], "Innings Type":[],"Super Over":[],"Target":[],"Chase":[],"Defence":[],'% Target Achieved':[],"Runs Required":[], "Run Rate Required":[], 'Start Over':[],
         "Fielder":[],
 
         "Batter Type":[], "Batting Position":[], "Score": [], "Balls Faced": [],  "How Out": [], "First Boundary Ball":[], "Batting S/R":[], "Runs/Ball":[], "Boundary %":[],"Boundary Rate":[],
@@ -90,7 +90,7 @@ class search:
     # Player ball results
     def playersballresultsetup(self):
         self.playersballresult = { 
-        "MatchID":[],"InningsID":[], "BallID":[], "Date":[], "Year":[], "Month":[], "Match Type":[], "Venue":[], "Event":[], "Match Winner":[], "Batting Team":[], "Bowling Team":[], "Innings":[],"Innings Type":[], "Super Over":[], #"Phase": [],
+        "MatchID":[],"InningsID":[], "BallID":[], "Date":[], "Year":[], "Month":[], "Match Type":[],"Team Type":[], "Venue":[], "Event":[], "Match Winner":[], "Batting Team":[], "Bowling Team":[], "Innings":[],"Innings Type":[], "Super Over":[], #"Phase": [],
         "Ball":[], "Innings Ball":[], "Innings Outs":[], "Innings Runs":[], "Target":[],"Chase":[],"Defence":[],"% Target Achieved":[],"Runs Required":[],"Run Rate Required":[],
         "Runs":[], "Batter Score":[], "Extras":[],"Noballs":[], "Wides":[],"Byes":[], "Legbyes":[], "How Out":[],"Fielder":[], "Out/NotOut":[], "Runs/Ball":[], "Bowler Extras":[], "Fielding Extras":[],
 
@@ -123,7 +123,7 @@ class search:
     # Team innings results
     def teaminningsresultsetup(self):
         self.inningsresult = {
-        "MatchID":[],"InningsID":[],"Date":[],"Year":[], "Month":[], "Match Type":[],"Venue":[], "Event":[], "Match Winner":[], "Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Super Over":[],
+        "MatchID":[],"InningsID":[],"Date":[],"Year":[], "Month":[], "Match Type":[],"Team Type":[], "Venue":[], "Event":[], "Match Winner":[], "Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[], "Super Over":[],
         "Defence":[], "Defended Score": [],"Chase":[], "Chased Score": [], "Margin":[], "Declared":[],
         "Score": [], "Outs": [], "Overs": [], "Extras": [],
         "Runs/Wicket":[], "Runs/Ball":[], "Run Rate":[], "First Boundary Ball":[], "Boundary %":[], "Net Boundary %":[], "TwosThrees %": [],
@@ -133,7 +133,7 @@ class search:
     # Team ball results
     def teamsballresultsetup(self):
         self.teamsballresult = { 
-        "MatchID":[],"InningsID":[], "BallID":[],"Date":[],"Year":[], "Month":[], "Match Type":[], "Venue":[], "Event":[], "Match Winner":[],"Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[],"Super Over":[], "Defence":[], "Chase":[], "Target":[], "% Target Achieved":[], "Runs Required":[], "Run Rate Required":[], "Balls rem":[], "Wickets rem":[],
+        "MatchID":[],"InningsID":[], "BallID":[],"Date":[],"Year":[], "Month":[], "Match Type":[],"Team Type":[], "Venue":[], "Event":[], "Match Winner":[],"Toss Winner":[],"Toss Decision":[], "Batting Team":[], "Bowling Team":[], "Innings":[],"Super Over":[], "Defence":[], "Chase":[], "Target":[], "% Target Achieved":[], "Runs Required":[], "Run Rate Required":[], "Balls rem":[], "Wickets rem":[],
         "Innings Ball":[], "Innings Over":[], "Ball":[], "Ball in Over":[], "Nth Ball in Over":[], "Phase":[],
         "Current Score":[], "Current Outs":[], "Final Score":[], "Final Outs":[],"Final Overs":[],
         "Batter":[], "Batting Position":[],"Batter Type":[], "Non_striker": [], 
@@ -949,6 +949,7 @@ class search:
                 self.inningsresult["Year"].append(matchtimetuple[0])
                 self.inningsresult["Month"].append(matchtimetuple[1])
                 self.inningsresult["Match Type"].append(eachmatchtype)
+                self.inningsresult["Team Type"].append(matchinfo["team_type"])
                 self.inningsresult["Team"].append(playersteam)
                 self.inningsresult["Opposition"].append(oppositionteam)
                 self.inningsresult["Innings"].append(nthinnings + 1)
@@ -1110,6 +1111,7 @@ class search:
                     self.playersballresult["Year"].append(matchtimetuple[0])
                     self.playersballresult["Month"].append(matchtimetuple[1])
                     self.playersballresult["Match Type"].append(matchinfo["match_type"])
+                    self.playersballresult["Team Type"].append(matchinfo["team_type"])
                     self.playersballresult["Venue"].append(matchinfo["venue"])
                     if "event" in matchinfo:
                         self.playersballresult["Event"].append(matchinfo["event"]["name"])
@@ -1289,6 +1291,7 @@ class search:
                 self.inningsresult["Year"].append(matchtimetuple[0])
                 self.inningsresult["Month"].append(matchtimetuple[1])
                 self.inningsresult["Match Type"].append(eachmatchtype)
+                self.inningsresult["Team Type"].append(matchinfo["team_type"])
                 self.inningsresult["Team"].append(playersteam)
                 self.inningsresult["Opposition"].append(oppositionteam)
                 self.inningsresult["Innings"].append(nthinnings + 1)
@@ -1445,6 +1448,7 @@ class search:
                     self.playersballresult["Year"].append(matchtimetuple[0])
                     self.playersballresult["Month"].append(matchtimetuple[1])
                     self.playersballresult["Match Type"].append(matchinfo["match_type"])
+                    self.playersballresult["Team Type"].append(matchinfo["team_type"])
                     self.playersballresult["Venue"].append(matchinfo["venue"])
                     if "event" in matchinfo:
                         self.playersballresult["Event"].append(matchinfo["event"]["name"])
@@ -1608,6 +1612,7 @@ class search:
         self.inningsresult["Year"].append(matchtimetuple[0])
         self.inningsresult["Month"].append(matchtimetuple[1])
         self.inningsresult["Match Type"].append(matchinfo["match_type"])
+        self.inningsresult["Team Type"].append(matchinfo["team_type"])
         self.inningsresult["Venue"].append(matchinfo["venue"])
         if "event" in matchinfo:
             self.inningsresult["Event"].append(matchinfo["event"]["name"])
@@ -1732,6 +1737,7 @@ class search:
             self.teamsballresult["Year"].append(matchtimetuple[0])
             self.teamsballresult["Month"].append(matchtimetuple[1])
             self.teamsballresult["Match Type"].append(matchinfo["match_type"])
+            self.teamsballresult["Team Type"].append(matchinfo["team_type"])
             self.teamsballresult["Venue"].append(matchinfo["venue"])
             if "event" in matchinfo:
                 self.teamsballresult["Event"].append(matchinfo["event"]["name"])

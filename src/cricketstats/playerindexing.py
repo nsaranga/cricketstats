@@ -49,12 +49,16 @@ from bs4 import BeautifulSoup
 def index(playerdatabase,playerindexfile=None):
     if playerindexfile==None:
         currentdir = os.path.dirname(os.path.abspath(__file__))
-        indexfile = open(f"{currentdir}/playerindex.json")
-        playerindex = json.load(indexfile)
+        if os.path.exists(f"{currentdir}/playerindex.json"):
+            indexfile = open(f"{currentdir}/playerindex.json")
+            playerindex = json.load(indexfile)
+        else:
+            playerindex = {}
+        
         playerlist = pd.read_csv(playerdatabase)
         newplayers = {}
         #{"Batting":None,"Bowling":None,"Umpire":"No"}
-    else:
+    if playerindexfile!=None:
         playerlist = pd.read_csv(playerdatabase)
         indexfile = open(playerindexfile)
         playerindex = json.load(indexfile)
@@ -70,46 +74,83 @@ def index(playerdatabase,playerindexfile=None):
                 continue
             playerid = math.floor(playerlist.at[playerlist.loc[playerlist["name"]==f"{eachplayer}"].index[0], "key_cricinfo"])
             print(eachplayer + ", "+ f"https://www.espncricinfo.com/*/content/player/{playerid}.html")
-            webpage = requests.get(f"https://www.espncricinfo.com/*/content/player/{playerid}.html")
+            webpage = requests.get(f"https://www.espncricinfo.com/*/content/player/{playerid}.html",headers={"User-Agent":"Mozilla/5.0"})
             playerpage = BeautifulSoup(webpage.content, "html.parser")
-            main = playerpage.find(id="main-container")
-            if main is None:
+            playerinfo = playerpage.find(id="main-container")
+            if playerinfo is None:
                 continue
-            playerinfo = main.find_all("h5", class_="player-card-description gray-900")
-            for element in playerinfo:
-                if eachplayer not in playerindex.keys() and ("Right hand bat" in element.text or "Left hand bat" in element.text or "Umpire" in element.text):
-                    playerindex[eachplayer]={"Batting":None,"Bowling":None,"Umpire":None}
+            # playerinfo = main.find_all("h5", class_="player-card-description gray-900")
+            allinfo =playerinfo.find(string="Full Name").find_parent().find_parent().find_parent()
+            if eachplayer not in playerindex.keys() and ("Batting Style" in allinfo.text or "Bowling Style" in allinfo.text or "Umpire" in allinfo.text):
+                playerindex[eachplayer]={"Batting":None,"Bowling":None,"Umpire":None}
+                # print('player not in index')
 
-                # Batting
-                if "Right hand bat" in element.text and playerindex[eachplayer]["Batting"]==None:
-                    playerindex[eachplayer]["Batting"]="Right hand bat"
+            # Batting            
+            if "Batting Style" in allinfo.text and playerindex[eachplayer]["Batting"]==None:
+                if "Right hand Bat" in allinfo.text:
+                    playerindex[eachplayer]["Batting"]="Right hand"
+                if "Left hand Bat" in allinfo.text:
+                    playerindex[eachplayer]["Batting"]="Left hand"
 
-                if "Left hand bat" in element.text and playerindex[eachplayer]["Batting"]==None:
-                    playerindex[eachplayer]["Batting"]="Left hand bat"
-                
-                # Bowling
-                if ("Right arm fast" in element.text or "Right arm fast medium" in element.text  or "Right arm medium" in element.text) and playerindex[eachplayer]["Bowling"]==None:
+            # Bowling
+            if "Bowling Style" in allinfo.text and playerindex[eachplayer]["Bowling"]==None:
+                if ("Right arm Fast" in allinfo.text or "Right arm Fast medium" in allinfo.text  or "Right arm Medium" in allinfo.text):
                     playerindex[eachplayer]["Bowling"]="Right arm pace"
-
-                if ("Left arm fast" in element.text or "Left arm fast medium" in element.text  or "Left arm medium" in element.text) and playerindex[eachplayer]["Bowling"]==None:
+                if ("Left arm Fast" in allinfo.text or "Left arm Fast medium" in allinfo.text  or "Left arm Medium" in allinfo.text):
                     playerindex[eachplayer]["Bowling"]="Left arm pace"
 
-                if "offbreak" in element.text and playerindex[eachplayer]["Bowling"]==None:
+                if "Offbreak" in allinfo.text:
                     playerindex[eachplayer]["Bowling"]="Right arm off break"
-                if "Legbreak" in element.text and playerindex[eachplayer]["Bowling"]==None:
+                if "Legbreak" in allinfo.text:
                     playerindex[eachplayer]["Bowling"]="Right arm leg break"
                     
-                if "Slow left arm orthodox" in element.text and playerindex[eachplayer]["Bowling"]==None:
+                if "Slow Left arm Orthodox" in allinfo.text:
                     playerindex[eachplayer]["Bowling"]="Left arm orthodox"
 
-                if ("Left arm wrist spin" in element.text or "Left-arm googly" in element.text) and playerindex[eachplayer]["Bowling"]==None:
+                if ("Left arm Wrist spin" in allinfo.text or "Left-arm googly" in allinfo.text):
                     playerindex[eachplayer]["Bowling"]="Left arm wrist spin"
-                # Umpire
-                if "Umpire" in element.text and (playerindex[eachplayer]["Umpire"]==None or playerindex[eachplayer]["Umpire"]=="No"):
-                    playerindex[eachplayer]["Umpire"]="Yes"
+
+            # Umpire
+            if "Umpire" in allinfo.text and (playerindex[eachplayer]["Umpire"]==None or playerindex[eachplayer]["Umpire"]=="No"):
+                playerindex[eachplayer]["Umpire"]="Yes"
+
+            # for element in playerinfo:
+            #     if eachplayer not in playerindex.keys() and ("Right hand Bat" in element.text or "Left hand Bat" in element.text or "Umpire" in element.text):
+            #         playerindex[eachplayer]={"Batting":None,"Bowling":None,"Umpire":None}
+            #         print('player not in index')
+
+            #     # Batting
+            #     if "Right hand Bat" in element.text and playerindex[eachplayer]["Batting"]==None:
+            #         playerindex[eachplayer]["Batting"]="Right hand bat"
+
+            #     if "Left hand Bat" in element.text and playerindex[eachplayer]["Batting"]==None:
+            #         playerindex[eachplayer]["Batting"]="Left hand bat"
+                
+            #     # Bowling
+            #     if ("Right arm Fast" in element.text or "Right arm Fast medium" in element.text  or "Right arm Medium" in element.text) and playerindex[eachplayer]["Bowling"]==None:
+            #         playerindex[eachplayer]["Bowling"]="Right arm pace"
+
+            #     if ("Left arm Fast" in element.text or "Left arm Fast medium" in element.text  or "Left arm Medium" in element.text) and playerindex[eachplayer]["Bowling"]==None:
+            #         playerindex[eachplayer]["Bowling"]="Left arm pace"
+
+            #     if "Offbreak" in element.text and playerindex[eachplayer]["Bowling"]==None:
+            #         playerindex[eachplayer]["Bowling"]="Right arm off break"
+            #     if "Legbreak" in element.text and playerindex[eachplayer]["Bowling"]==None:
+            #         playerindex[eachplayer]["Bowling"]="Right arm leg break"
+                    
+            #     if "Slow Left arm Orthodox" in element.text and playerindex[eachplayer]["Bowling"]==None:
+            #         playerindex[eachplayer]["Bowling"]="Left arm orthodox"
+
+            #     if ("Left arm Wrist spin" in element.text or "Left-arm googly" in element.text) and playerindex[eachplayer]["Bowling"]==None:
+            #         playerindex[eachplayer]["Bowling"]="Left arm wrist spin"
+            #     # Umpire
+            #     if "Umpire" in element.text and (playerindex[eachplayer]["Umpire"]==None or playerindex[eachplayer]["Umpire"]=="No"):
+            #         playerindex[eachplayer]["Umpire"]="Yes"
     finally:
-        indexfile.close()
+        if os.path.exists(f"{currentdir}/playerindex.json"):
+            indexfile.close()
         if playerindexfile==None:
+            print(playerindex)
             file = open(f"{currentdir}/playerindex.json", "w")
             file.write(json.dumps(playerindex))
             file.close()

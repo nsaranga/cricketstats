@@ -150,7 +150,7 @@ def index(playerdatabase,playerindexfile=None):
         if os.path.exists(f"{currentdir}/playerindex.json"):
             indexfile.close()
         if playerindexfile==None:
-            print(playerindex)
+            # print(playerindex)
             file = open(f"{currentdir}/playerindex.json", "w")
             file.write(json.dumps(playerindex))
             file.close()

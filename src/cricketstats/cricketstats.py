@@ -930,6 +930,8 @@ class search:
             
             
             if eachplayer in self.result and self.playermatchtally[nthinnings][eachplayer]["batinningscount"] == True:
+                # print(eachplayer)
+                # print(self.playermatchtally[nthinnings][eachplayer])
                 # record playersinningsresult
                 for eachteam in matchinfo["teams"]:
                     if eachteam != inningsteam:
@@ -995,6 +997,9 @@ class search:
                 if eachplayer not in tempplayerindex.keys():
                     self.inningsresult["Batter Type"].append(None)
                 
+                # print(self.inningsresult["InningsID"][0])
+                # print(eachplayer)
+                # print(self.playermatchtally[nthinnings][eachplayer]["teaminningsballs"])
                 self.inningsresult['Start Over'].append(int(min(self.playermatchtally[nthinnings][eachplayer]["teaminningsballs"]))+1)
 
 
@@ -2489,6 +2494,14 @@ class search:
                     if self.players and not any(eachplayer in self.players for eachplayer in match['info']['registry']['people'].keys()):
                         continue
 
+                    # Opposition Batters Check
+                    if oppositionbatters and not any(eachplayer in oppositionbatters for eachplayer in match['info']['registry']['people'].keys()):
+                        continue
+
+                    # Opposition Bowlers Check
+                    if oppositionbowlers and not any(eachplayer in oppositionbowlers for eachplayer in match['info']['registry']['people'].keys()):
+                        continue
+
                     # Toss check
                     if toss and "winner" in match["info"]["toss"] and ((toss=="won" and match["info"]["toss"]["winner"] not in self.teams) or (toss=="lost" and match["info"]["toss"]["winner"] in self.teams)):
                         continue
@@ -2634,7 +2647,7 @@ class search:
                                         search.strikerstats(self, eachball, nthball, eachover,battingorder,legdel, nthinnings)
     
                                     # Non-striker's outs.
-                                    if eachball["non_striker"] in self.result and "wickets" in eachball and (not oppositionteams or eachinnings["team"] not in oppositionteams) and (not battingposition or (battingposition and ((battingorder.index(eachball['non_striker']) + 1) in battingposition))):
+                                    if eachball["non_striker"] in self.result and "wickets" in eachball and (not oppositionbowlers or eachball['bowler'] in bowlingmatchups) and (not oppositionteams or eachinnings["team"] not in oppositionteams) and (not battingposition or (battingposition and ((battingorder.index(eachball['non_striker']) + 1) in battingposition))):
                                         search.nonstrikerstats(self, eachball, oppositionbowlers,nthinnings)
 
                                     # Bowling stats
@@ -2664,7 +2677,7 @@ class search:
 
                         # Should move this to recordign at end of match so I can put in dervied innings stats like net boundary %
                         # Record Player innings and ball by ball stats
-                        if self.players or self.allplayers==True:
+                        if (self.players or self.allplayers==True):
                             search.playerinnings(self,matchtimetuple, match["info"], nthinnings, eachinnings["team"], eachmatchtype, battingorder, bowlingorder,tempplayerindex, match['innings'])
                             # if len(self.playersballresult["Defence"]) != len(self.playersballresult["Target"]):
                             # print(eachfile)
